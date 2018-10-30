@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Extensions.Tests
+{
+    [TestClass]
+    public class RangeTests
+    {
+        [TestMethod]
+        public void ToTests()
+        {
+            var a = new DateTime(2015, 11, 16, 12, 15, 51);
+            var b = new DateTime(2016, 12, 11, 16, 11, 19);
+            var dr = a.To(b);
+            Assert.AreEqual(a, dr.Start);
+            Assert.AreEqual(b, dr.End);
+        }
+
+        [TestMethod]
+        public void EnumerateTests()
+        {
+            var arr = new[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+            var r = new Range<int>(0, 10);
+            var i = 0;
+            foreach (var v in r.Enumerate(p => p + 1))
+            {
+                Assert.AreEqual(arr[i++], v);
+            }
+            Assert.AreEqual(11, i);
+        }
+
+        [TestMethod]
+        public void OverlapDateTimeTests()
+        {
+            Func<int, int, DateTime> d = (h, m) => new DateTime(2015, 12, 16, h, m, 0);
+            Func<int, DateTime> f = h => d(h, 0);
+
+            var n = new DateTime(2015, 12, 16, 10, 0, 0).To(new DateTime(2015, 12, 16, 18, 0, 0));
+
+            Assert.AreEqual(false, n.Overlaps(f(2), f(4)));
+            Assert.AreEqual(false, n.Overlaps(f(2), f(10)));
+            Assert.AreEqual(true, n.Overlaps(f(8), f(20)));
+            Assert.AreEqual(true, n.Overlaps(f(2), f(11)));
+            Assert.AreEqual(true, n.Overlaps(f(10), f(11)));
+            Assert.AreEqual(true, n.Overlaps(f(11), f(12)));
+            Assert.AreEqual(true, n.Overlaps(f(11), f(18)));
+            Assert.AreEqual(true, n.Overlaps(d(17, 59), f(18)));
+            Assert.AreEqual(false, n.Overlaps(f(18), f(19)));
+            Assert.AreEqual(false, n.Overlaps(f(20), f(22)));
+        }
+
+        [TestMethod]
+        public void OverlapTimeSpanTests()
+        {
+            Func<int, int, TimeSpan> d = (h, m) => new TimeSpan(h, m, 0);
+            Func<int, TimeSpan> f = h => d(h, 0);
+
+            var n = new TimeSpan(10, 0, 0).To(new TimeSpan(18, 0, 0));
+
+            Assert.AreEqual(false, n.Overlaps(f(2), f(4)));
+            Assert.AreEqual(false, n.Overlaps(f(2), f(10)));
+            Assert.AreEqual(true, n.Overlaps(f(8), f(20)));
+            Assert.AreEqual(true, n.Overlaps(f(2), f(11)));
+            Assert.AreEqual(true, n.Overlaps(f(10), f(11)));
+            Assert.AreEqual(true, n.Overlaps(f(11), f(12)));
+            Assert.AreEqual(true, n.Overlaps(f(11), f(18)));
+            Assert.AreEqual(true, n.Overlaps(d(17, 59), f(18)));
+            Assert.AreEqual(false, n.Overlaps(f(18), f(19)));
+            Assert.AreEqual(false, n.Overlaps(f(20), f(22)));
+        }
+
+        [TestMethod]
+        public void DateTimeRangeOverlapTests()
+        {
+            Func<int, int, int, int, Range<DateTime>> range = (a, b, c, d) => new DateTime(2016, 11, 28, a, b, 0).To(new DateTime(2016, 11, 28, c, d, 0));
+            var r = range(19, 20, 19, 40);
+
+            Assert.AreEqual(0, r.Overlap(range(18, 0, 18, 0)).TotalMinutes);
+            Assert.AreEqual(0, r.Overlap(range(18, 0, 18, 20)).TotalMinutes);
+            Assert.AreEqual(0, r.Overlap(range(20, 0, 20, 0)).TotalMinutes);
+            Assert.AreEqual(0, r.Overlap(range(19, 10, 19, 20)).TotalMinutes);
+            Assert.AreEqual(0, r.Overlap(range(19, 40, 19, 50)).TotalMinutes);
+            Assert.AreEqual(10, r.Overlap(range(14, 0, 19, 30)).TotalMinutes);
+            Assert.AreEqual(20, r.Overlap(range(19, 20, 19, 40)).TotalMinutes);
+            Assert.AreEqual(20, r.Overlap(range(19, 10, 19, 50)).TotalMinutes);
+            Assert.AreEqual(10, r.Overlap(range(19, 30, 19, 40)).TotalMinutes);
+            Assert.AreEqual(10, r.Overlap(range(19, 30, 19, 50)).TotalMinutes);
+            Assert.AreEqual(10, r.Overlap(range(19, 25, 19, 35)).TotalMinutes);
+        }
+
+        [TestMethod]
+        public void MoreOverlapTests()
+        {
+            Func<int, int, DateTime> f2 = (h, m) => new DateTime(2015, 12, 16, h, m, 0);
+            Func<int, DateTime> f = h => f2(h, 0);
+            Action<int, int, int, int> t = (a, b, c, d) => Assert.AreEqual(f(a).To(f(b)).Overlaps(f(c).To(f(d))), f(c).To(f(d)).Overlaps(f(a).To(f(b))));
+
+            t(2, 4, 5, 6);
+            t(2, 4, 2, 4);
+            t(2, 4, 4, 5);
+            t(1, 2, 2, 4);
+            t(5, 6, 2, 4);
+        }
+    }
+}

@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Extensions.Lists;
+using Npgsql;
+
+namespace NpgsqlExtensions
+{
+    public static class NpgsqlCommandExtensions
+    {
+        public static IEnumerable<T> ExecuteReaderAndSelect<T>(this NpgsqlCommand cmd, Func<NpgsqlDataReader, T> func)
+        {
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                    yield return func(reader);
+            }
+        }
+
+        public static void ExecuteReaderForEach(this NpgsqlCommand cmd, Action<NpgsqlDataReader> action)
+        {
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                    action(reader);
+            }
+        }
+
+        public static NpgsqlCommand SetParameters(this NpgsqlCommand cmd, params object[] parameters)
+        {
+            var pars = parameters.Segment(2, p => new {Key = (string) p[0], Value = p[1]});
+            foreach (var par in pars)
+                cmd.Parameters.AddWithValue(par.Key, par.Value);
+            return cmd;
+        }
+    }
+}
