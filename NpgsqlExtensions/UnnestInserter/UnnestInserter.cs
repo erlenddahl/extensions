@@ -10,9 +10,9 @@ namespace NpgsqlExtensions.UnnestInserter
 {
     public class UnnestInserter
     {
-        private readonly List<IUnnestableColumn> _unnestColumns = new List<IUnnestableColumn>();
+        public readonly List<IUnnestableColumn> UnnestColumns = new List<IUnnestableColumn>();
         private readonly List<IUnnestableColumn> _staticColumns = new List<IUnnestableColumn>();
-        private IEnumerable<IUnnestableColumn> AllColumns => _unnestColumns.Concat(_staticColumns);
+        private IEnumerable<IUnnestableColumn> AllColumns => UnnestColumns.Concat(_staticColumns);
 
         public string TableName { get; set; }
 
@@ -35,32 +35,32 @@ namespace NpgsqlExtensions.UnnestInserter
 
         public void Add(string key, IEnumerable<int> values)
         {
-            _unnestColumns.Add(new UnnestableColumn<int>() { Name = key, Value = values.ToList() });
+            UnnestColumns.Add(new UnnestableColumn<int>() { Name = key, Value = values.ToList() });
         }
 
         public void Add(string key, IEnumerable<double> values)
         {
-            _unnestColumns.Add(new UnnestableColumn<double>() { Name = key, Value = values.ToList() });
+            UnnestColumns.Add(new UnnestableColumn<double>() { Name = key, Value = values.ToList() });
         }
 
         public void Add(string key, IEnumerable<string> values)
         {
-            _unnestColumns.Add(new UnnestableColumn<string>() { Name = key, Value = values.ToList() });
+            UnnestColumns.Add(new UnnestableColumn<string>() { Name = key, Value = values.ToList() });
         }
 
         public void AddStatic(string key, int value)
         {
-            _unnestColumns.Add(new StaticColumn<int>() { Name = key, Value = value });
+            UnnestColumns.Add(new StaticColumn<int>() { Name = key, Value = value });
         }
 
         public void AddStatic(string key, double value)
         {
-            _unnestColumns.Add(new StaticColumn<double>() { Name = key, Value = value });
+            UnnestColumns.Add(new StaticColumn<double>() { Name = key, Value = value });
         }
 
         public void AddStatic(string key, string value)
         {
-            _unnestColumns.Add(new StaticColumn<string>() { Name = key, Value = value });
+            UnnestColumns.Add(new StaticColumn<string>() { Name = key, Value = value });
         }
 
         private string GetNames()
