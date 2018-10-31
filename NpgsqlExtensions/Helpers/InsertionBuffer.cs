@@ -30,6 +30,12 @@ namespace NpgsqlExtensions.Helpers
             }
         }
 
+        public void AddRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+                Add(item);
+        }
+
         public void Finish()
         {
             if (Items.Any())
