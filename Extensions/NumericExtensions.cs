@@ -166,5 +166,21 @@ namespace Extensions
 
             return columnName;
         }
+
+        /// <summary>
+        /// Rounds the given number to the nearest bucket value.
+        /// Examples:
+        ///     12.RoundToNearest(10) => 10
+        ///     16.RoundToNearest(10) => 20
+        ///     12.RoundToNearest(100) => 0
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="bucket"></param>
+        /// <returns></returns>
+        public static int RoundToNearest(this int num, int bucket)
+        {
+            var rounded = (int)Math.Round(num / (double) bucket);
+            return rounded * bucket;
+        }
     }
 }
