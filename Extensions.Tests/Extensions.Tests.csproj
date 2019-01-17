@@ -103,6 +103,7 @@
     <Compile Include="Lists\PairwiseTests.cs" />
     <Compile Include="Lists\FillMissingValuesExtensions.cs" />
     <Compile Include="Lists\SegmentTests.cs" />
+    <Compile Include="Lists\WeightedAverageTests.cs" />
     <Compile Include="MoreMathTests.cs" />
     <Compile Include="NullableTests.cs" />
     <Compile Include="TimeSpanTests.cs" />

@@ -95,6 +95,7 @@
     <Compile Include="Lists\NeighbourExtensions.cs" />
     <Compile Include="Lists\PairwiseExtensions.cs" />
     <Compile Include="Lists\SegmentExtensions.cs" />
+    <Compile Include="Lists\WeightedAverageExtensions.cs" />
     <Compile Include="MoreMath.cs" />
     <Compile Include="NullableExtensions.cs" />
     <Compile Include="Range.cs" />
