@@ -48,6 +48,11 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new UnnestableColumn<string>() { Name = key, Value = values.ToList() });
         }
 
+        public void Add(string key, IEnumerable<DateTime> values)
+        {
+            UnnestColumns.Add(new UnnestableColumn<DateTime>() { Name = key, Value = values.ToList() });
+        }
+
         public void AddStatic(string key, int value)
         {
             UnnestColumns.Add(new StaticColumn<int>() { Name = key, Value = value });
@@ -61,6 +66,11 @@ namespace NpgsqlExtensions.UnnestInserter
         public void AddStatic(string key, string value)
         {
             UnnestColumns.Add(new StaticColumn<string>() { Name = key, Value = value });
+        }
+
+        public void AddStatic(string key, DateTime value)
+        {
+            UnnestColumns.Add(new StaticColumn<DateTime>() { Name = key, Value = value });
         }
 
         private string GetNames()
