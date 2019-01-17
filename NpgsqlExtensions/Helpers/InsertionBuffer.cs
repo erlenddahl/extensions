@@ -21,12 +21,15 @@ namespace NpgsqlExtensions.Helpers
 
         public void Add(T item)
         {
-            Items.Add(item);
-
-            if (Items.Count >= _insertAt)
+            lock (this)
             {
-                _insertAction(Items);
-                Items.Clear();
+                Items.Add(item);
+
+                if (Items.Count >= _insertAt)
+                {
+                    _insertAction(Items);
+                    Items.Clear();
+                }
             }
         }
 
@@ -38,10 +41,13 @@ namespace NpgsqlExtensions.Helpers
 
         public void Finish()
         {
-            if (Items.Any())
+            lock (this)
             {
-                _insertAction(Items);
-                Items.Clear();
+                if (Items.Any())
+                {
+                    _insertAction(Items);
+                    Items.Clear();
+                }
             }
         }
 
