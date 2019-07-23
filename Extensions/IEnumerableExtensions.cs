@@ -330,5 +330,16 @@ namespace Extensions
         {
             return new TimeSpan(source.Sum(p => target(p).Ticks));
         }
+
+        /// <summary>
+        /// Returns a new Queue based on the source list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static Queue<T> ToQueue<T>(this IEnumerable<T> source)
+        {
+            return new Queue<T>(source);
+        }
     }
 }
