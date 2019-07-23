@@ -66,6 +66,13 @@ namespace SqliteExtensions
         /// <returns></returns>
         public abstract SQLiteCommand GetUpdateCommand(SQLiteConnection conn);
 
+        public void Insert(SQLiteConnection db, bool updateId = true)
+        {
+            GetInsertCommand(db).ExecuteNonQuery();
+            if (updateId)
+                Id = db.LastInsertRowId;
+        }
+
         protected SQLiteCommand GetDeleteCommand(SQLiteConnection conn, string tableName)
         {
             return new SQLiteCommand("DELETE FROM " + tableName + " WHERE id = " + Id, conn);

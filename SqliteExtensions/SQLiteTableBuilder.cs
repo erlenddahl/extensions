@@ -23,11 +23,14 @@ namespace SqliteExtensions
         public bool PrimaryKey { get; set; }
         public bool Nullable { get; set; }
         public string Default { get; set; }
+        public bool AutoIncrement { get; set; }
 
         public string GetSQL()
         {
-            var s = Header + " " + Type.ToString().ToUpper();
-            if (!Nullable) s += " NOT NULL";
+            var s = Header + " " + Type.ToString().ToUpper().Replace("INT", "INTEGER");
+            if (PrimaryKey) s += " PRIMARY KEY";
+            if (AutoIncrement) s += " AUTOINCREMENT";
+            else if (!Nullable) s += " NOT NULL";
             return s;
         }
     }
@@ -43,9 +46,9 @@ namespace SqliteExtensions
             _tableName = tableName;
         }
 
-        public SQLiteTableBuilder AddColumn(string header, SQLiteColumnType type, bool primary = false, bool nullable = false, string defaultValue = null)
+        public SQLiteTableBuilder AddColumn(string header, SQLiteColumnType type, bool primary = false, bool nullable = false, string defaultValue = null, bool autoIncrement = false)
         {
-            _columns.Add(new SQLiteColumn() { Header = header, Type = type, PrimaryKey = primary, Nullable = nullable, Default = defaultValue });
+            _columns.Add(new SQLiteColumn() { Header = header, Type = type, PrimaryKey = primary, Nullable = nullable, Default = defaultValue, AutoIncrement = autoIncrement });
             return this;
         }
 
@@ -58,11 +61,11 @@ namespace SqliteExtensions
 
         public void Create(SQLiteConnection conn, bool ifNotExists = true)
         {
-            var hasPrimaryKey = _columns.Any(p => p.PrimaryKey);
+            var pks = _columns.Count(p => p.PrimaryKey);
 
             var s = "CREATE TABLE " + (ifNotExists ? "IF NOT EXISTS " : "") + _tableName + "(" + Environment.NewLine;
             s += "\t" + string.Join(Environment.NewLine + "\t", _columns.Select(p => p.GetSQL() + ","));
-            if (hasPrimaryKey) s += Environment.NewLine + "\tPRIMARY KEY(" + string.Join(", ", _columns.Where(p => p.PrimaryKey).Select(p => p.Header)) + ")";
+            if (pks > 1) s = s.Replace(" PRIMARY KEY", "") + Environment.NewLine + "\tPRIMARY KEY(" + string.Join(", ", _columns.Where(p => p.PrimaryKey).Select(p => p.Header)) + ")";
             else s = s.Substring(0, s.Length - 1);
             s += Environment.NewLine + ");";
 
