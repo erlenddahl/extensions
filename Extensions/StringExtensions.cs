@@ -129,6 +129,17 @@ namespace Extensions
         }
 
         /// <summary>
+        /// Will remove anything that is not a letter from a string.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string CleanLetters(this string s)
+        {
+            var cleaned = new string(s.ToCharArray().Where(Char.IsLetter).ToArray());
+            return cleaned;
+        }
+
+        /// <summary>
         /// Will pad a string with the given char until it reaches the given length.
         /// </summary>
         /// <param name="s">The string to pad</param>
@@ -154,6 +165,20 @@ namespace Extensions
             while (s.Length < length)
                 s = padding + s;
             return s;
+        }
+
+        /// <summary>
+        /// Will pad a string in both directions with the given char until it reaches the given length.
+        /// </summary>
+        /// <param name="s">The string to pad</param>
+        /// <param name="length">The target length of the string</param>
+        /// <param name="padding">The char to pad with</param>
+        /// <returns></returns>
+        public static string PadCenter(this string s, int length, char padding = ' ')
+        {
+            var toPad = length - s.Length;
+            var before = (int) (toPad / 2);
+            return s.PadBefore(before + s.Length, padding).PadAfter(length, padding);
         }
 
         /// <summary>
@@ -425,17 +450,6 @@ namespace Extensions
             return camel;
         }
 
-        /// <summary>
-        /// Will remove anything that is not a letter from a string.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string CleanLetters(this string s)
-        {
-            var cleaned = new string(s.ToCharArray().Where(Char.IsLetter).ToArray());
-            return cleaned;
-        }
-
         public static string RemoveTrailingZeroes(this string s)
         {
             if (string.IsNullOrEmpty(s)) return "0";
@@ -507,6 +521,24 @@ namespace Extensions
                 yield return str.Substring(0, l);
                 str = str.Substring(l);
             }
+        }
+
+        /// <summary>
+        /// Replaces the separator of a CSV line, taking double quotes into consideration.
+        /// WARNING: Does not consider single quotes.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="existingSeparator"></param>
+        /// <param name="newSeparator"></param>
+        /// <returns></returns>
+        public static string ChangeSeparator(this string str, char existingSeparator, char newSeparator)
+        {
+            var result = str.Split('"')
+                .Select((element, index) => index % 2 == 0  // If even index
+                    ? element.Split(new[] { existingSeparator }, StringSplitOptions.RemoveEmptyEntries)  // Split the item
+                    : new string[] { element })  // Keep the entire item
+                .SelectMany(element => element).ToList();
+            return string.Join(newSeparator.ToString(), result);
         }
     }
 }

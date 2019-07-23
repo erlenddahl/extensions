@@ -163,16 +163,38 @@ namespace Extensions.Tests
         }
 
         [TestMethod]
-        public void PadTests()
+        public void PadBeforeTests()
+        {
+            Assert.AreEqual("  ", "".PadBefore(2));
+            Assert.AreEqual("    Erlend", "Erlend".PadBefore(10));
+            Assert.AreEqual("!!!!!Heppa!!!!!", "Heppa!!!!!".PadBefore(15, '!'));
+        }
+
+        [TestMethod]
+        public void PadAfterTests()
         {
             Assert.AreEqual("", "".PadAfter(0));
             Assert.AreEqual("  ", "".PadAfter(2));
-            Assert.AreEqual("  ", "".PadBefore(2));
             Assert.AreEqual("Erlend    ", "Erlend".PadAfter(10));
             Assert.AreEqual("Erlend Dahl", "Erlend Dahl".PadAfter(2));
-            Assert.AreEqual("    Erlend", "Erlend".PadBefore(10));
             Assert.AreEqual("Heppa!!!!!", "Heppa".PadAfter(10, '!'));
-            Assert.AreEqual("!!!!!Heppa!!!!!", "Heppa!!!!!".PadBefore(15, '!'));
+        }
+
+        [TestMethod]
+        public void PadCenterTests()
+        {
+            Assert.AreEqual("", "".PadCenter(0));
+            Assert.AreEqual(" ", "".PadCenter(1));
+            Assert.AreEqual("  ", "".PadCenter(2));
+
+            Assert.AreEqual("A", "A".PadCenter(0));
+            Assert.AreEqual("A", "A".PadCenter(1));
+            Assert.AreEqual("A ", "A".PadCenter(2));
+            Assert.AreEqual(" A ", "A".PadCenter(3));
+
+            Assert.AreEqual("A", "A".PadCenter(0,'='));
+            Assert.AreEqual("===ABBA===", "ABBA".PadCenter(10, '='));
+            Assert.AreEqual("=====ABBA======", "ABBA".PadCenter(15, '='));
         }
 
         [TestMethod]
@@ -189,11 +211,12 @@ namespace Extensions.Tests
         [TestMethod]
         public void CapitalizeFirstTests()
         {
-            Assert.AreEqual("", "".CapitalizeFirst());
-            Assert.AreEqual("Erlend", "Erlend".CapitalizeFirst());
-            Assert.AreEqual("Erlend", "erlend".CapitalizeFirst());
-            Assert.AreEqual("A", "a".CapitalizeFirst());
-            Assert.AreEqual("Abc", "abc".CapitalizeFirst());
+            Assert.AreEqual("",       "".CapitalizeFirst());
+            Assert.AreEqual("John",   "John".CapitalizeFirst());
+            Assert.AreEqual("John",   "john".CapitalizeFirst());
+            Assert.AreEqual("A",      "a".CapitalizeFirst());
+            Assert.AreEqual("ABC",    "ABC".CapitalizeFirst());
+            Assert.AreEqual("ABC",    "aBC".CapitalizeFirst());
         }
 
         [TestMethod]
@@ -455,6 +478,13 @@ All                                         44.0".RemoveEmptyLines();
             strs = abc.SubstringsOfLength(10, 10).ToArray();
             Assert.AreEqual("abcdefghij", strs[0]);
             Assert.AreEqual("klmnopqrst", strs[1]);
+        }
+
+        [TestMethod]
+        public void ChangeSeparatorTests()
+        {
+            Assert.AreEqual("a;b;c", "a,b,c".ChangeSeparator(',', ';'));
+            Assert.AreEqual("a;b,d;c", "a,\"b,d\",c".ChangeSeparator(',', ';'));
         }
     }
 }
