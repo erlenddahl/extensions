@@ -25,12 +25,19 @@ namespace NpgsqlExtensions.UnnestInserter
 
         public void Insert(NpgsqlConnection conn)
         {
-            var cmdString = string.Format(InsertTemplate, TableName, GetNames(), GetParameters());
-            Debug.WriteLine(cmdString);
-            var cmd = new NpgsqlCommand(cmdString, conn);
-            foreach(var col in AllColumns)
-                col.AddParameters(cmd);
-            cmd.ExecuteNonQuery();
+            var cmdString = "";
+            try
+            {
+                cmdString = string.Format(InsertTemplate, TableName, GetNames(), GetParameters());
+                Debug.WriteLine(cmdString);
+                var cmd = new NpgsqlCommand(cmdString, conn);
+                foreach (var col in AllColumns)
+                    col.AddParameters(cmd);
+                cmd.ExecuteNonQuery();
+            }catch(Exception ex)
+            {
+                throw new Exception("Failed to unnest insert with command '" + cmdString + "'." ,ex);
+            }
         }
 
         public void Add(string key, IEnumerable<int> values)
@@ -80,35 +87,39 @@ namespace NpgsqlExtensions.UnnestInserter
 
         private string GetParameters()
         {
-            return string.Join(", ", AllColumns.Select(p => p.IsUnnestable ? "unnest(@" + p.Name + ")" : "@" + p.Name));
+            return string.Join(", ", AllColumns.Select(p => p.GetValueString(p.Name)));
         }
     }
 
-    public interface IUnnestableColumn
+    public abstract class IUnnestableColumn
     {
-        string Name { get; }
-        bool IsUnnestable { get; }
-        void AddParameters(NpgsqlCommand cmd);
+        public string Name { get; set; }
+        public abstract void AddParameters(NpgsqlCommand cmd);
+
+        public virtual string GetValueString(string name)
+        {
+            return "@" + name;
+        }
     }
 
     public class UnnestableColumn<T> : IUnnestableColumn
     {
-        public string Name { get; set; }
-        public bool IsUnnestable => true;
-
         public List<T> Value { get; set; }
-        public void AddParameters(NpgsqlCommand cmd)
+        public override void AddParameters(NpgsqlCommand cmd)
         {
             cmd.Parameters.AddWithValue("@" + Name, Value.ToArray());
+        }
+
+        public override string GetValueString(string name)
+        {
+            return "unnest(@" + name + ")";
         }
     }
 
     public class StaticColumn<T> : IUnnestableColumn
     {
-        public string Name { get; set; }
-        public bool IsUnnestable => false;
         public T Value { get; set; }
-        public void AddParameters(NpgsqlCommand cmd)
+        public override void AddParameters(NpgsqlCommand cmd)
         {
             cmd.Parameters.AddWithValue("@" + Name, Value);
         }
