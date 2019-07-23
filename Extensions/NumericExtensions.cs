@@ -177,9 +177,9 @@ namespace Extensions
         /// <param name="num"></param>
         /// <param name="bucket"></param>
         /// <returns></returns>
-        public static int RoundToNearest(this int num, int bucket)
+        public static int RoundToNearest(this int num, int bucket, MidpointRounding rounding = MidpointRounding.ToEven)
         {
-            var rounded = (int)Math.Round(num / (double) bucket);
+            var rounded = (int)Math.Round(num / (double) bucket, rounding);
             return rounded * bucket;
         }
     }
