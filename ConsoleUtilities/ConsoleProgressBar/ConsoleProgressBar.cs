@@ -111,47 +111,53 @@ namespace ConsoleUtilities.ConsoleProgressBar
             {
                 if (_disposed) return;
 
-                var percent = (int)(_currentProgress * 100);
-
-                var text = $" {percent:n0}%";
-
-                if (_max >= 0)
-                {
-                    var progress = _count.ToString("n0");
-                    if (percent < 100)
-                        progress += $" / {_max:n0}";
-
-                    var time = DateTime.Now.Subtract(_start);
-
-                    string timeInfo;
-                    if (_count > 0)
-                    {
-                        var timeLeft = new TimeSpan(time.Ticks / _count * (_max - _count));
-
-                        if (percent < 100)
-                            timeInfo = $"{time.ToShortPrettyFormat()} / {timeLeft.ToShortPrettyFormat()}";
-                        else
-                            timeInfo = time.ToShortPrettyFormat();
-                    }
-                    else
-                        timeInfo = $"{time.ToShortPrettyFormat()}";
-
-                    text += $" :: {progress} :: {timeInfo}";
-                }
-
-                var blockCount = _consoleWidth - text.Length - 5;
-                var doneCount = (int)(_currentProgress * blockCount);
-                var remainsCount = blockCount - doneCount;
-
-                if (percent < 100)
-                    text = $"[{new string('#', doneCount)}{Animation[_animationIndex++ % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
-                else
-                    text = $"[{new string('#', doneCount)}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
-
-                UpdateText(text);
+                UpdateText(GetAsciiProgress(_start, _currentProgress, _count, _max, _consoleWidth, _animationIndex++));
 
                 ResetTimer();
             }
+        }
+
+        public static string GetAsciiProgress(DateTime start, double currentProgress, long current = 0, long max = 0, int consoleWidth = 80, int animationIndex = 0)
+        {
+            if (double.IsInfinity(currentProgress) || double.IsNaN(currentProgress)) currentProgress = 0d;
+            var percent = (int)(currentProgress * 100);
+
+            var text = $" {percent:n0}%";
+
+            if (max >= 0)
+            {
+                var progress = current.ToString("n0");
+                if (percent < 100)
+                    progress += $" / {max:n0}";
+
+                var time = DateTime.Now.Subtract(start);
+
+                string timeInfo;
+                if (current > 0)
+                {
+                    var timeLeft = new TimeSpan(time.Ticks / current * (max - current));
+
+                    if (percent < 100)
+                        timeInfo = $"{time.ToShortPrettyFormat()} / {timeLeft.ToShortPrettyFormat()}";
+                    else
+                        timeInfo = time.ToShortPrettyFormat();
+                }
+                else
+                    timeInfo = $"{time.ToShortPrettyFormat()}";
+
+                text += $" :: {progress} :: {timeInfo}";
+            }
+
+            var blockCount = consoleWidth - text.Length - 5;
+            var doneCount = (int)(currentProgress * blockCount);
+            var remainsCount = blockCount - doneCount;
+
+            if (percent < 100)
+                text = $"[{new string('#', doneCount)}{Animation[animationIndex % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
+            else
+                text = $"[{new string('#', doneCount)}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
+
+            return text;
         }
 
         private void UpdateText(string text)
