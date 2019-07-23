@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{75D521B4-5230-4136-BDBF-A0C03474ECF2}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleUtilities</RootNamespace>
-    <AssemblyName>ConsoleUtilities</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <ProjectGuid>{FF2ED871-5E3E-4E0B-AEC5-67AB9B6C63DB}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ConsoleTester</RootNamespace>
+    <AssemblyName>ConsoleTester</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,21 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleCommand\ConsoleCommand.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandInterpreter.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandParameter.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandParameterType.cs" />
-    <Compile Include="ConsoleCommand\InvalidArgumentException.cs" />
-    <Compile Include="ConsoleCommand\MissingArgumentException.cs" />
-    <Compile Include="ConsoleEx.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanel.cs" />
-    <Compile Include="ConsoleProgressBar\ConsoleProgressBar.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj">
-      <Project>{5244fef3-8883-43ec-92bd-0bbbd6e98810}</Project>
-      <Name>Extensions</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ConsoleUtilities\ConsoleUtilities.csproj">
+      <Project>{75D521B4-5230-4136-BDBF-A0C03474ECF2}</Project>
+      <Name>ConsoleUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
