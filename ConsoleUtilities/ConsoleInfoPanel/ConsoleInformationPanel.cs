@@ -108,15 +108,25 @@ namespace ConsoleUtilities.ConsoleProgressBar
         {
             using (var pb = new ConsoleInformationPanel("Testing ..."))
             {
+                var r = new Random();
                 pb.SetProgress("Current", 0, 1000);
                 for (var i = 0; i < 1000; i++)
                 {
-                    pb.Increment("My key", 2);
-                    pb.Increment("Solo", 2.5);
-                    pb.Increment("Windows");
-                    pb.SetProgress("Current", i);
-                    pb.SetProgress("Quicker", i, i + 50);
-                    pb.Set("Now", DateTime.Now.ToString());
+                    pb.Set("Route consumers", r.Next(20));
+                    pb.Set("Result consumers", r.Next(40));
+                    pb.Set("Failed routes", r.Next(20000));
+                    pb.SetProgress("Processed", i, 1000);
+                    pb.SetProgress("Saved", i, i * 2);
+
+                    var now = DateTime.Now;
+                    pb.Set("Avg process age", r.NextDouble() * 4000);
+                    pb.Set("Avg insertion age", r.NextDouble() * 4000);
+                    pb.Set("Max process age", r.NextDouble() * 4000);
+                    pb.Set("Max insertion age", r.NextDouble() * 4000);
+                    pb.Set("Processing waiting", r.NextDouble() * 4000);
+                    pb.Set("Insertion waiting", r.NextDouble() * 4000);
+                    pb.Set("Refused connections", r.NextDouble() * 4000);
+                    pb.Set("Time", now.ToString("HH:mm:ss.fff"));
                     Thread.Sleep(100);
                 }
             }
@@ -147,28 +157,33 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 sb.Append("".PadRight(_consoleWidth, '='));
                 sb.Append(_title.PadCenter(_consoleWidth));
                 sb.Append("".PadRight(_consoleWidth, '='));
-                sb.AppendLine();
+                sb.Append("".PadRight(_consoleWidth));
 
                 if (items.Any())
                 {
                     var maxWidth = items.Max(p => p.Length) + 6;
                     var lineWidth = 0;
+                    var lastWasNewLine = false;
                     foreach (var item in items)
                     {
-                        if (lineWidth >= _consoleWidth - maxWidth - 1)
+                        if (lineWidth + 2 * maxWidth >= _consoleWidth)
                         {
-                            sb.AppendLine(item.PadRight(maxWidth));
+                            sb.AppendLine(item);
                             lineWidth = 0;
+                            lastWasNewLine = true;
                         }
                         else
                         {
                             sb.Append(item.PadRight(maxWidth));
                             lineWidth += maxWidth;
+                            lastWasNewLine = false;
                         }
                     }
-                }
 
-                sb.AppendLine();
+                    if (!lastWasNewLine)
+                        sb.AppendLine();
+                    sb.Append("".PadRight(_consoleWidth));
+                }
 
                 foreach (var item in Items.Where(p => p.Value is ProgressInfoItem))
                     sb.AppendLine(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2));
