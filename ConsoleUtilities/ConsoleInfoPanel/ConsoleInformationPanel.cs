@@ -7,16 +7,17 @@ using Extensions;
 
 namespace ConsoleUtilities.ConsoleProgressBar
 {
-    public interface ConsoleInfoItem
+    public abstract class ConsoleInfoItem
     {
-        string Format(int consoleWidth);
+        public bool FullWidth { get; set; }
+        public abstract string Format(int consoleWidth);
     }
 
     public class StringInfoItem : ConsoleInfoItem
     {
         public string Value;
 
-        public string Format(int consoleWidth)
+        public override string Format(int consoleWidth)
         {
             return Value;
         }
@@ -27,7 +28,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public int Value;
         public string FormatString = "n0";
 
-        public string Format(int consoleWidth)
+        public override string Format(int consoleWidth)
         {
             return Value.ToString(FormatString);
         }
@@ -38,7 +39,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public double Value;
         public string FormatString = "n3";
 
-        public string Format(int consoleWidth)
+        public override string Format(int consoleWidth)
         {
             return Value.ToString(FormatString);
         }
@@ -49,7 +50,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public DateTime Value;
         public string FormatString = "yyyy-MM-dd HH:mm:ss.fff";
 
-        public string Format(int consoleWidth)
+        public override string Format(int consoleWidth)
         {
             return Value.ToString(FormatString);
         }
@@ -65,9 +66,10 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public ProgressInfoItem()
         {
             _start = DateTime.Now;
+            FullWidth = true;
         }
 
-        public string Format(int consoleWidth)
+        public override string Format(int consoleWidth)
         {
             return ConsoleProgressBar.GetAsciiProgress(_start, Current / (double)Max, Current, Max, consoleWidth, _animationIndex++);
         }
@@ -127,6 +129,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     pb.Set("Insertion waiting", r.NextDouble() * 4000);
                     pb.Set("Refused connections", r.NextDouble() * 4000);
                     pb.Set("Time", now.ToString("HH:mm:ss.fff"));
+                    pb.Set("Exception", string.Join("", Enumerable.Range(0, r.Next(100)).Select(p => "A")), true);
                     Thread.Sleep(100);
                 }
             }
@@ -150,7 +153,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
                 var items = new List<string>();
 
-                foreach (var item in Items.Where(p => !(p.Value is ProgressInfoItem)))
+                foreach (var item in Items.Where(p => !(p.Value.FullWidth)))
                     items.Add(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2));
                 
                 var sb = new StringBuilder();
@@ -168,7 +171,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     {
                         if (lineWidth + 2 * maxWidth >= _consoleWidth)
                         {
-                            sb.AppendLine(item);
+                            sb.AppendLine(item.PadRight(_consoleWidth - lineWidth - 1));
                             lineWidth = 0;
                             lastWasNewLine = true;
                         }
@@ -185,8 +188,8 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     sb.Append("".PadRight(_consoleWidth));
                 }
 
-                foreach (var item in Items.Where(p => p.Value is ProgressInfoItem))
-                    sb.AppendLine(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2));
+                foreach (var item in Items.Where(p => p.Value.FullWidth))
+                    sb.AppendLine(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2).PadRight(_consoleWidth - item.Key.Length - 3));
 
                 UpdateText(sb.ToString());
 
@@ -295,12 +298,12 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 ((DoubleInfoItem)Items[key]).Value = value;
         }
 
-        public void Set(string key, string value)
+        public void Set(string key, string value, bool fullWidth = false)
         {
             if (!Items.ContainsKey(key))
             {
                 lock (_timer)
-                    Items.Add(key, new StringInfoItem() {Value = value});
+                    Items.Add(key, new StringInfoItem() {Value = value, FullWidth = fullWidth});
             }
             else
                 ((StringInfoItem)Items[key]).Value = value;
@@ -322,6 +325,11 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 if (current.HasValue) pii.Current = current.Value;
                 if (max.HasValue) pii.Max = max.Value;
             }
+        }
+
+        public void Remove(string key)
+        {
+            Items.Remove(key);
         }
     }
 }

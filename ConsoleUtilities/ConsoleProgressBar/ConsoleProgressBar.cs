@@ -149,7 +149,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
             }
 
             var blockCount = consoleWidth - text.Length - 5;
-            var doneCount = (int)(currentProgress * blockCount);
+            var doneCount = (int)(Math.Min(currentProgress, 1) * blockCount);
             var remainsCount = blockCount - doneCount;
 
             if (percent < 100)
