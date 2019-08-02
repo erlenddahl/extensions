@@ -95,6 +95,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="IEnumerable\SublistTests.cs" />
+    <Compile Include="IEnumerable\MinMaxExtensionTests.cs" />
     <Compile Include="IListTests.cs" />
     <Compile Include="Lists\Duplicates.cs" />
     <Compile Include="Lists\Interpolation.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Lists\PairwiseTests.cs" />
     <Compile Include="Lists\FillMissingValuesExtensions.cs" />
     <Compile Include="Lists\SegmentTests.cs" />
+    <Compile Include="Lists\BucketizeTests.cs" />
     <Compile Include="Lists\WeightedAverageTests.cs" />
     <Compile Include="MoreMathTests.cs" />
     <Compile Include="NullableTests.cs" />
