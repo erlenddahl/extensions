@@ -87,6 +87,7 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="BitmapExtensions.cs" />
     <Compile Include="CsvReader.cs" />
+    <Compile Include="IEnumerable\MinMaxExtensions.cs" />
     <Compile Include="IEnumerable\SublistExtensions.cs" />
     <Compile Include="IListExtensions.cs" />
     <Compile Include="Lists\Duplicates.cs" />
