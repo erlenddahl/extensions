@@ -27,7 +27,7 @@ namespace Extensions.Utilities
             Count++;
             if (Count == 1)
             {
-                Average = observation;
+                Average = Min = Max = observation;
                 return;
             }
 
