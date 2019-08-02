@@ -90,6 +90,7 @@
     <Compile Include="IEnumerable\MinMaxExtensions.cs" />
     <Compile Include="IEnumerable\SublistExtensions.cs" />
     <Compile Include="IListExtensions.cs" />
+    <Compile Include="Lists\BucketizeExtensions.cs" />
     <Compile Include="Lists\Duplicates.cs" />
     <Compile Include="Lists\FillMissingValuesExtensions.cs" />
     <Compile Include="Lists\InterpolationExtensions.cs" />
