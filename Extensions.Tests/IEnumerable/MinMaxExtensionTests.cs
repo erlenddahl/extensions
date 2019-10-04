@@ -42,5 +42,52 @@ namespace Extensions.Tests.IEnumerable
             Assert.AreEqual(2, mm.Min);
             Assert.AreEqual(10, mm.Max);
         }
+
+        [TestMethod]
+        public void EmptyTest()
+        {
+            var mm = DoubleMinMax.Empty;
+            Assert.AreEqual(mm.Min, double.MaxValue);
+            Assert.AreEqual(mm.Max, double.MinValue);
+        }
+
+        [TestMethod]
+        public void ExtendTests()
+        {
+            var mm = DoubleMinMax.Empty;
+            mm.Extend(0, 10);
+            Assert.AreEqual(0, mm.Min);
+            Assert.AreEqual(10, mm.Max);
+
+            mm.Extend(0, 10);
+            Assert.AreEqual(0, mm.Min);
+            Assert.AreEqual(10, mm.Max);
+
+            mm.Extend(0, 7);
+            Assert.AreEqual(0, mm.Min);
+            Assert.AreEqual(10, mm.Max);
+
+            mm.Extend(5, 10);
+            Assert.AreEqual(0, mm.Min);
+            Assert.AreEqual(10, mm.Max);
+
+            mm.Extend(-5, 10);
+            Assert.AreEqual(-5, mm.Min);
+            Assert.AreEqual(10, mm.Max);
+
+            mm.Extend(5, 15);
+            Assert.AreEqual(-5, mm.Min);
+            Assert.AreEqual(15, mm.Max);
+        }
+
+        [TestMethod]
+        public void DoubleExtendTests()
+        {
+            var mm = DoubleMinMax.Empty;
+            mm.Extend(0.51251, 20.1511);
+
+            Assert.AreEqual(0.51251, mm.Min);
+            Assert.AreEqual(20.1511, mm.Max);
+        }
     }
 }

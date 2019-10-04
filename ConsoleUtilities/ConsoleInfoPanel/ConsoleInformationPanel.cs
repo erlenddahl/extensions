@@ -11,6 +11,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
     {
         public bool FullWidth { get; set; }
         public abstract string Format(int consoleWidth);
+        public int Sequence { get; set; }
     }
 
     public class StringInfoItem : ConsoleInfoItem
@@ -60,18 +61,65 @@ namespace ConsoleUtilities.ConsoleProgressBar
     {
         public long Max;
         public long Current;
-        private DateTime _start;
+
+        public DateTime? StartTime
+        {
+            get => _start;
+            set
+            {
+                _start = value;
+                if (!_end.HasValue)
+                    _end = null;
+            }
+        }
+
+        public DateTime? EndTime
+        {
+            get => _end;
+            set
+            {
+                _end = value;
+                if (!_start.HasValue)
+                    _start = value;
+            }
+        }
+
         private int _animationIndex = 0;
+        private DateTime? _end;
+        private DateTime? _start;
 
         public ProgressInfoItem()
         {
-            _start = DateTime.Now;
+            StartTime = DateTime.Now;
             FullWidth = true;
         }
 
         public override string Format(int consoleWidth)
         {
-            return ConsoleProgressBar.GetAsciiProgress(_start, Current / (double)Max, Current, Max, consoleWidth, _animationIndex++);
+            return ConsoleProgressBar.GetAsciiProgress(StartTime, Current / (double)Max, Current, Max, consoleWidth, _animationIndex++, EndTime);
+        }
+
+        public void Set(long? current = null, long? max = null, bool? started = null)
+        {
+            if (current.HasValue) Current = current.Value;
+            if (max.HasValue) Max = max.Value;
+            if (started.HasValue) StartTime = started.Value ? DateTime.Now : (DateTime?)null;
+        }
+
+        public void Start()
+        {
+            StartTime = DateTime.Now;
+        }
+
+        public void Finish()
+        {
+            EndTime = DateTime.Now;
+            Current = Max;
+        }
+
+        public void Increment(int inc = 1)
+        {
+            Current += inc;
         }
     }
 
@@ -81,6 +129,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         private readonly TimeSpan _animationInterval = TimeSpan.FromSeconds(1.0 / 2.0);
 
         private readonly Timer _timer;
+        private readonly object _lockObject = new object();
 
         private bool _disposed = false;
         private string _title;
@@ -119,6 +168,9 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     pb.Set("Failed routes", r.Next(20000));
                     pb.SetProgress("Processed", i, 1000);
                     pb.SetProgress("Saved", i, i * 2);
+                    pb.SetProgress("Not started", started: false);
+                    pb.SetProgress("Finished", 0, 10, started: false);
+                    pb.FinishProgress("Finished");
 
                     var now = DateTime.Now;
                     pb.Set("Avg process age", r.NextDouble() * 4000);
@@ -153,7 +205,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
                 var items = new List<string>();
 
-                foreach (var item in Items.Where(p => !(p.Value.FullWidth)))
+                foreach (var item in Items.Where(p => !(p.Value.FullWidth)).OrderBy(p=>p.Value.Sequence))
                     items.Add(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2));
                 
                 var sb = new StringBuilder();
@@ -169,7 +221,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     var lastWasNewLine = false;
                     foreach (var item in items)
                     {
-                        if (lineWidth + 2 * maxWidth >= _consoleWidth)
+                        if (lineWidth + 2 * maxWidth >= _consoleWidth || item == items.Last())
                         {
                             sb.AppendLine(item.PadRight(_consoleWidth - lineWidth - 1));
                             lineWidth = 0;
@@ -184,11 +236,14 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     }
 
                     if (!lastWasNewLine)
+                    {
                         sb.AppendLine();
-                    sb.Append("".PadRight(_consoleWidth));
+                    }
                 }
 
-                foreach (var item in Items.Where(p => p.Value.FullWidth))
+                sb.AppendLine("".PadRight(_consoleWidth - 1));
+
+                foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
                     sb.AppendLine(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2).PadRight(_consoleWidth - item.Key.Length - 3));
 
                 UpdateText(sb.ToString());
@@ -251,85 +306,94 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         public void Increment(string key, int inc)
         {
-            if (!Items.ContainsKey(key))
-            {
-                lock(_timer)
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
                     Items.Add(key, new IntInfoItem() {Value = inc});
-            }
-            else
-            {
-                if (Items[key] is IntInfoItem iii)
-                    iii.Value += inc;
-                else if (Items[key] is ProgressInfoItem pii)
-                    pii.Current += inc;
-            }
+                }
+                else
+                {
+                    if (Items[key] is IntInfoItem iii)
+                        iii.Value += inc;
+                    else if (Items[key] is ProgressInfoItem pii)
+                        pii.Increment(inc);
+                }
         }
 
         public void Increment(string key, double inc)
         {
-            if (!Items.ContainsKey(key))
-            {
-                lock (_timer)
+            lock(_lockObject)
+                if (!Items.ContainsKey(key))
+                {
                     Items.Add(key, new DoubleInfoItem() {Value = inc});
-            }
-            else
-                ((DoubleInfoItem)Items[key]).Value += inc;
+                }
+                else
+                    ((DoubleInfoItem) Items[key]).Value += inc;
         }
 
-        public void Set(string key, int value)
+        public void Set(string key, int value, int? sequence = null)
         {
-            if (!Items.ContainsKey(key))
-            {
-                lock (_timer)
-                    Items.Add(key, new IntInfoItem() {Value = value});
-            }
-            else
-                ((IntInfoItem)Items[key]).Value = value;
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                    Items.Add(key, new IntInfoItem() {Value = value, Sequence = sequence ?? 0});
+                else
+                    ((IntInfoItem) Items[key]).Value = value;
         }
 
-        public void Set(string key, double value)
+        public void Set(string key, double value, int? sequence = null)
         {
-            if (!Items.ContainsKey(key))
-            {
-                lock (_timer)
-                    Items.Add(key, new DoubleInfoItem() {Value = value});
-            }
-            else
-                ((DoubleInfoItem)Items[key]).Value = value;
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                    Items.Add(key, new DoubleInfoItem() {Value = value, Sequence = sequence ?? 0});
+                else
+                    ((DoubleInfoItem) Items[key]).Value = value;
         }
 
-        public void Set(string key, string value, bool fullWidth = false)
+        public void Set(string key, string value, bool fullWidth = false, int? sequence = null)
         {
-            if (!Items.ContainsKey(key))
-            {
-                lock (_timer)
-                    Items.Add(key, new StringInfoItem() {Value = value, FullWidth = fullWidth});
-            }
-            else
-                ((StringInfoItem)Items[key]).Value = value;
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                    Items.Add(key, new StringInfoItem() {Value = value, FullWidth = fullWidth, Sequence = sequence ?? 0});
+                else
+                    ((StringInfoItem) Items[key]).Value = value;
         }
 
-        public void SetProgress(string key, long? current = null, long? max = null)
+        public ProgressInfoItem SetProgress(string key, long? current = null, long? max = null, bool? started = null, int? sequence = null)
         {
-            if (!Items.ContainsKey(key))
-            {
-                var pii = new ProgressInfoItem();
-                lock (_timer)
-                    Items.Add(key, pii);
-                if (current.HasValue) pii.Current = current.Value;
-                if (max.HasValue) pii.Max = max.Value;
-            }
-            else
-            {
-                var pii = ((ProgressInfoItem) Items[key]);
-                if (current.HasValue) pii.Current = current.Value;
-                if (max.HasValue) pii.Max = max.Value;
-            }
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    var pii = new ProgressInfoItem();
+                        Items.Add(key, pii);
+                    pii.Set(current, max, started);
+                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    return pii;
+                }
+                else
+                {
+                    var pii = ((ProgressInfoItem) Items[key]);
+                    pii.Set(current, max, started);
+                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    return pii;
+                }
+        }
+
+        public void FinishProgress(string key)
+        {
+            if(Items.TryGetValue(key, out var pii) && pii is ProgressInfoItem item)
+                item.Finish();
+        }
+
+        public void StartProgress(string key)
+        {
+            var pii = ((ProgressInfoItem)Items[key]);
+            pii.Start();
         }
 
         public void Remove(string key)
         {
-            Items.Remove(key);
+            lock (_lockObject)
+                Items.Remove(key);
         }
     }
 }

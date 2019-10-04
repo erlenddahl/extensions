@@ -6,16 +6,41 @@ using System.Threading.Tasks;
 
 namespace Extensions.IEnumerable
 {
-    public struct IntegerMinMax
+    public class IntegerMinMax
     {
         public int Min;
         public int Max;
+
+        public IntegerMinMax(int min, int max)
+        {
+            Min = min;
+            Max = max;
+        }
     }
 
-    public struct DoubleMinMax
+    public class DoubleMinMax
     {
         public double Min;
         public double Max;
+
+        public static DoubleMinMax Empty => new DoubleMinMax(double.MaxValue, double.MinValue);
+
+        public DoubleMinMax(double min, double max)
+        {
+            Min = min;
+            Max = max;
+        }
+
+        public void Extend(double min, double max)
+        {
+            if (min < Min) Min = min;
+            if (max > Max) Max = max;
+        }
+
+        public override string ToString()
+        {
+            return $"[{Min:n3}, {Max:n3}]";
+        }
     }
 
     public static class MinMaxExtensions
@@ -31,7 +56,7 @@ namespace Extensions.IEnumerable
                 if (value > max) max = value;
             }
 
-            return new DoubleMinMax() { Min = min, Max = max };
+            return new DoubleMinMax(min, max);
         }
 
         public static DoubleMinMax MinMax(this IEnumerable<double> enumerable)
@@ -44,7 +69,7 @@ namespace Extensions.IEnumerable
                 if (value > max) max = value;
             }
 
-            return new DoubleMinMax() { Min = min, Max = max };
+            return new DoubleMinMax(min, max);
         }
 
         public static IntegerMinMax MinMax<T>(this IEnumerable<T> enumerable, Func<T, int> selector)
@@ -58,7 +83,7 @@ namespace Extensions.IEnumerable
                 if (value > max) max = value;
             }
 
-            return new IntegerMinMax() { Min = min, Max = max };
+            return new IntegerMinMax(min, max);
         }
 
         public static IntegerMinMax MinMax(this IEnumerable<int> enumerable)
@@ -71,7 +96,7 @@ namespace Extensions.IEnumerable
                 if (value > max) max = value;
             }
 
-            return new IntegerMinMax() { Min = min, Max = max };
+            return new IntegerMinMax(min, max);
         }
     }
 }

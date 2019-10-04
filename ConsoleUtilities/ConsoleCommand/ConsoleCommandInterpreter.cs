@@ -30,23 +30,30 @@ namespace ConsoleUtilities.ConsoleCommand
             while (true)
             {
                 var line = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    Console.WriteLine("Command cannot be empty.");
-                    continue;
-                }
-
-                var arguments = ConsoleCommand.ParseCommand(line);
-                while (arguments.Any(p => p == "|"))
-                {
-                    var firstArguments = arguments.TakeWhile(p => p != "|").ToList();
-                    arguments = arguments.Skip(firstArguments.Count + 1).ToList();
-                    HandleCommand(firstArguments);
-                }
-
-                if (HandleCommand(arguments))
-                    break;
+                if (!RunCommand(line)) break;
             }
+        }
+
+        public bool RunCommand(string cmd)
+        {
+            if (string.IsNullOrWhiteSpace(cmd))
+            {
+                Console.WriteLine("Command cannot be empty.");
+                return true;
+            }
+
+            var arguments = ConsoleCommand.ParseCommand(cmd);
+            while (arguments.Any(p => p == "|"))
+            {
+                var firstArguments = arguments.TakeWhile(p => p != "|").ToList();
+                arguments = arguments.Skip(firstArguments.Count + 1).ToList();
+                HandleCommand(firstArguments);
+            }
+
+            if (HandleCommand(arguments))
+                return false;
+
+            return true;
         }
 
         private bool HandleCommand(List<string> arguments)

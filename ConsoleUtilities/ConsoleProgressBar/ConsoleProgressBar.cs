@@ -117,8 +117,14 @@ namespace ConsoleUtilities.ConsoleProgressBar
             }
         }
 
-        public static string GetAsciiProgress(DateTime start, double currentProgress, long current = 0, long max = 0, int consoleWidth = 80, int animationIndex = 0)
+        public static string GetAsciiProgress(DateTime? start, double currentProgress, long current = 0, long max = 0, int consoleWidth = 80, int animationIndex = 0, DateTime? end = null)
         {
+            var isFinished = end != null;
+            if (isFinished)
+            {
+                currentProgress = 1;
+                current = max;
+            }
             if (double.IsInfinity(currentProgress) || double.IsNaN(currentProgress)) currentProgress = 0d;
             var percent = (int)(currentProgress * 100);
 
@@ -130,10 +136,15 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 if (percent < 100)
                     progress += $" / {max:n0}";
 
-                var time = DateTime.Now.Subtract(start);
+                var endTime = isFinished ? end.Value : DateTime.Now;
+                var time = start == null ? TimeSpan.Zero : endTime.Subtract(start.Value);
 
                 string timeInfo;
-                if (current > 0)
+                if(time == TimeSpan.Zero)
+                {
+                    timeInfo = "";
+                }
+                else if (current > 0)
                 {
                     var timeLeft = new TimeSpan(time.Ticks / current * (max - current));
 
@@ -145,17 +156,20 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 else
                     timeInfo = $"{time.ToShortPrettyFormat()}";
 
-                text += $" :: {progress} :: {timeInfo}";
+                text += $" :: {progress}";
+                if(!string.IsNullOrWhiteSpace(timeInfo)) text += $" :: {timeInfo}";
             }
 
             var blockCount = consoleWidth - text.Length - 5;
             var doneCount = (int)(Math.Min(currentProgress, 1) * blockCount);
             var remainsCount = blockCount - doneCount;
 
-            if (percent < 100)
-                text = $"[{new string('#', doneCount)}{Animation[animationIndex % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
+            if (start == null)
+                text = $"[{new string(' ', doneCount + 1 + remainsCount)}] {text}";
+            else if (isFinished)
+                text = $"[{new string('#', doneCount)}] {text}"; 
             else
-                text = $"[{new string('#', doneCount)}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
+                text = $"[{new string('#', doneCount)}{Animation[animationIndex % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
 
             return text;
         }

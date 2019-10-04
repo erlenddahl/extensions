@@ -9,9 +9,9 @@ namespace Extensions.Lists
 {
     public static class BucketizeExtensions
     {
-        public static int[] Bucketize(this IList<double> list, int bucketCount)
+        public static int[] Bucketize(this IList<double> list, int bucketCount, DoubleMinMax minMax = null)
         {
-            var mm = list.MinMax();
+            var mm = minMax ?? list.MinMax();
 
             var buckets = new int[bucketCount];
             var bucketSize = (mm.Max - mm.Min) / bucketCount;
@@ -25,14 +25,14 @@ namespace Extensions.Lists
             return buckets;
         }
 
-        public static int[] Bucketize(this Dictionary<int, int> dict, int bucketCount)
+        public static int[] Bucketize(this Dictionary<int, int> dict, int bucketCount, DoubleMinMax minMax = null)
         {
-            return dict.ToDictionary(k => (int) k.Key, v => v.Value).Bucketize(bucketCount);
+            return dict.ToDictionary(k => (double) k.Key, v => v.Value).Bucketize(bucketCount, minMax);
         }
 
-        public static int[] Bucketize(this Dictionary<double, int> dict, int bucketCount)
+        public static int[] Bucketize(this Dictionary<double, int> dict, int bucketCount, DoubleMinMax minMax = null)
         {
-            var mm = dict.Keys.MinMax();
+            var mm = minMax ?? dict.Keys.MinMax();
 
             var buckets = new int[bucketCount];
             var bucketSize = (mm.Max - mm.Min) / bucketCount;

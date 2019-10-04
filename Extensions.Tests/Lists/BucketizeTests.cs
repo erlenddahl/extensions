@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Extensions.IEnumerable;
 using Extensions.Lists;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,6 +22,19 @@ namespace Extensions.Tests.Lists
             Test(new double[] { 1, 2, 3, 4, 5 }, new[] { 1, 1, 1, 1, 1 });
             Test(new double[] { 5, 6, 7, 8, 9 }, new[] { 1, 1, 1, 1, 1 });
             Test(new double[] { 500, 600, 700, 800, 900 }, new[] { 1, 1, 1, 1, 1 });
+        }
+
+        [TestMethod]
+        public void CustomMinMaxTests()
+        {
+            var items = new double[] {1, 2, 3, 4, 5};
+            var correct = new[] {1, 1, 1, 1, 1, 0, 0, 0, 0, 0};
+
+            var buckets = items.Bucketize(10, new DoubleMinMax(1, 10));
+            Assert.AreEqual(10, buckets.Length);
+
+            for (var i = 0; i < correct.Length; i++)
+                Assert.AreEqual(correct[i], buckets[i]);
         }
 
         [TestMethod]
