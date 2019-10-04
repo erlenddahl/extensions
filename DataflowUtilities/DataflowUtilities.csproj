@@ -45,10 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProducerConsumer\ConsumerCollectionBase.cs" />
+    <Compile Include="ProducerConsumer\StateConsumer.cs" />
     <Compile Include="ProducerConsumer\ConsumerBase.cs" />
     <Compile Include="ProducerConsumer\ConsumerCollection.cs" />
     <Compile Include="ProducerConsumer\QueuedConsumer.cs" />
     <Compile Include="ProducerConsumer\Consumer.cs" />
+    <Compile Include="ProducerConsumer\StateConsumerCollection.cs" />
+    <Compile Include="ProducerConsumer\UniqueBufferBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

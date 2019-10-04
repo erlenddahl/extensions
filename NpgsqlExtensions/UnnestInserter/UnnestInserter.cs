@@ -45,6 +45,11 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new UnnestableColumn<int>() { Name = key, Value = values.ToList() });
         }
 
+        public void Add(string key, IEnumerable<long> values)
+        {
+            UnnestColumns.Add(new UnnestableColumn<long>() { Name = key, Value = values.ToList() });
+        }
+
         public void Add(string key, IEnumerable<double> values)
         {
             UnnestColumns.Add(new UnnestableColumn<double>() { Name = key, Value = values.ToList() });
@@ -55,9 +60,19 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new UnnestableColumn<string>() { Name = key, Value = values.ToList() });
         }
 
+        public void Add(string key, IEnumerable<bool> values)
+        {
+            UnnestColumns.Add(new UnnestableColumn<bool>() { Name = key, Value = values.ToList() });
+        }
+
         public void Add(string key, IEnumerable<DateTime> values)
         {
             UnnestColumns.Add(new UnnestableColumn<DateTime>() { Name = key, Value = values.ToList() });
+        }
+
+        public void Add(string key, IEnumerable<TimeSpan> values)
+        {
+            UnnestColumns.Add(new UnnestableColumn<TimeSpan>() { Name = key, Value = values.ToList() });
         }
 
         public void AddStatic(string key, int value)
@@ -75,9 +90,19 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new StaticColumn<string>() { Name = key, Value = value });
         }
 
+        public void AddStatic(string key, bool value)
+        {
+            UnnestColumns.Add(new StaticColumn<bool>() { Name = key, Value = value });
+        }
+
         public void AddStatic(string key, DateTime value)
         {
             UnnestColumns.Add(new StaticColumn<DateTime>() { Name = key, Value = value });
+        }
+
+        public void AddStatic(string key, TimeSpan value)
+        {
+            UnnestColumns.Add(new StaticColumn<TimeSpan>() { Name = key, Value = value });
         }
 
         private string GetNames()
