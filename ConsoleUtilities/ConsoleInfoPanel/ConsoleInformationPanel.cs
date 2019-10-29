@@ -57,7 +57,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
     }
 
-    public class ProgressInfoItem : ConsoleInfoItem
+    public class ProgressInfoItem : ConsoleInfoItem, IDisposable
     {
         public long Max;
         public long Current;
@@ -133,6 +133,9 @@ namespace ConsoleUtilities.ConsoleProgressBar
             }
         }
 
+        public void Dispose()
+        {
+            Finish();
         }
     }
 
@@ -203,6 +206,9 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public void Finish()
         {
             if (_disposed) return;
+
+            foreach(var item in Items.Values)
+                (item as ProgressInfoItem)?.Finish();
 
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
             TimerHandler(null);
