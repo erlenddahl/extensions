@@ -6,11 +6,11 @@ namespace DataflowUtilities.ProducerConsumer
 {
     public class StateConsumer<TItem, TState> : ConsumerBase
     {
-        private TState _state;
+        public TState State { get; }
 
         public StateConsumer(TState state)
         {
-            _state = state;
+            State = state;
         }
 
         public async Task<ConsumerBase> Run(BufferBlock<TItem> buffer, Action<TItem, TState> action)
@@ -20,7 +20,7 @@ namespace DataflowUtilities.ProducerConsumer
                 while (buffer.TryReceive(out var item))
                 {
                     Received++;
-                    Process(item, _state, action);
+                    Process(item, State, action);
                 }
             }
 

@@ -8,24 +8,26 @@ namespace DataflowUtilities.ProducerConsumer
 {
     public class StateConsumerCollection<TItem, TState> : ConsumerCollectionBase<TItem>
     {
-        private TState[] _states;
+        public TState[] States { get; private set; }
         public Action<TItem, TState> ConsumeAction { get; set; }
 
-        public StateConsumerCollection(IEnumerable<TState> states, Action<TItem> consumeAction = null) : base()
+        public Func<TState> StateGenerator { get; set; }
+
+        public StateConsumerCollection(IEnumerable<TState> states) : base()
         {
-            _states = states.ToArray();
-            ConsumerCount = _states.Length;
+            States = states.ToArray();
+            ConsumerCount = States.Length;
         }
 
-        public StateConsumerCollection(double multiplier, Func<TState> stateGenerator, Action<TItem> consumeAction = null) : base()
+        public StateConsumerCollection() : base()
         {
-            ConsumerCount = (int)(Environment.ProcessorCount * multiplier);
-            _states = Enumerable.Range(0, ConsumerCount).Select(p => stateGenerator()).ToArray();
         }
 
         public override void Run()
         {
-            Consumers = _states.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction))).ToList();
+            if (States == null || !States.Any())
+                States = Enumerable.Range(0, ConsumerCount).Select(p => StateGenerator()).ToArray();
+            Consumers = States.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction))).ToList();
         }
     }
 }
