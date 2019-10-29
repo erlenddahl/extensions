@@ -114,6 +114,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeSpanExtensions.cs" />
     <Compile Include="Utilities\ArrayEqualityComparer.cs" />
+    <Compile Include="Utilities\EnumHelper.cs" />
     <Compile Include="Utilities\IncrementalStatistics.cs" />
     <Compile Include="Utilities\IntArrayEqualityComparer.cs" />
     <Compile Include="Utilities\LruCache.cs" />
