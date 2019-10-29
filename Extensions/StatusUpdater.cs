@@ -22,9 +22,9 @@ namespace Extensions
             return await SendMessage("progress", name, message, 300, -1, -1, progress);
         }
 
-        public static async Task<bool> SendHeartbeat(string name, string message)
+        public static async Task<bool> SendHeartbeat(string name, string message, int timeout = 300, int value = 1)
         {
-            return await SendMessage("heartbeat", name, message, 300, 1);
+            return await SendMessage("heartbeat", name, message, timeout, value);
         }
 
         public static async Task<bool> SendMessage(string name, string message, int timeout = 300, string status = null)
