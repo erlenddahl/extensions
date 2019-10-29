@@ -25,6 +25,21 @@ namespace DataflowUtilities.ProducerConsumer
         public double TimeLostToFullBuffer { get; private set; } = 0;
 
         /// <summary>
+        /// The average number of seconds since each consumer processed an item.
+        /// </summary>
+        public double AverageProcessAge => Consumers?.Any() == true ? Consumers.Average(p => DateTime.Now.Subtract(p.consumer.LastAction).TotalSeconds) : 0;
+
+        /// <summary>
+        /// The maximum number of seconds since a consumer processed an item.
+        /// </summary>
+        public double MaxProcessAge => Consumers?.Any() == true ? Consumers.Max(p => DateTime.Now.Subtract(p.consumer.LastAction).TotalSeconds) : 0;
+
+        /// <summary>
+        /// The most recent exceptions of all consumers that had any exceptions.
+        /// </summary>
+        public IEnumerable<(DateTime, Exception)> LastExceptions => Consumers?.Select(p => p.consumer.LastException).Where(p => p.ex != null) ?? new (DateTime, Exception)[0];
+
+        /// <summary>
         /// The number of items that has been posted to this collection.
         /// </summary>
         public int Posted { get; private set; }
