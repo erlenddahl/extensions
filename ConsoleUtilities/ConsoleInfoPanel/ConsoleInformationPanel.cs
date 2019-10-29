@@ -117,9 +117,22 @@ namespace ConsoleUtilities.ConsoleProgressBar
             Current = Max;
         }
 
+        private object _lock = new object();
         public void Increment(int inc = 1)
         {
-            Current += inc;
+            lock (_lock)
+            {
+                Current += inc;
+            }
+        }
+        public void IncrementMax(int inc = 1)
+        {
+            lock (_lock)
+            {
+                Max += inc;
+            }
+        }
+
         }
     }
 
