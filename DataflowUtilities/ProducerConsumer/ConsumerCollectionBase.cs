@@ -54,14 +54,17 @@ namespace DataflowUtilities.ProducerConsumer
 
         public abstract void Run();
 
-        public void Post(TItem item)
+        public void Post(TItem item, bool ignoreBufferLimit = false)
         {
-            if (Consumers == null) Run();
+            if (Consumers == null || !Consumers.Any()) Run();
 
-            var start = DateTime.Now;
-            while (Buffer.Count >= MaxBufferItemsPerConsumer * ConsumerCount)
-                Thread.Sleep(MaxBufferExceededWaitingTime);
-            TimeLostToFullBuffer += DateTime.Now.Subtract(start).TotalSeconds;
+            if (!ignoreBufferLimit)
+            {
+                var start = DateTime.Now;
+                while (Buffer.Count >= (long)MaxBufferItemsPerConsumer * ConsumerCount)
+                    Thread.Sleep(MaxBufferExceededWaitingTime);
+                TimeLostToFullBuffer += DateTime.Now.Subtract(start).TotalSeconds;
+            }
 
             Buffer.Post(item);
             Posted++;
