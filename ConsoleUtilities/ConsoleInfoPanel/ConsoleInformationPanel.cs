@@ -149,7 +149,6 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         private bool _disposed = false;
         private string _title;
-        private int _consoleWidth;
         private DateTime _start;
         
         public Dictionary<string, ConsoleInfoItem> Items = new Dictionary<string,ConsoleInfoItem>();
@@ -165,7 +164,6 @@ namespace ConsoleUtilities.ConsoleProgressBar
             // Otherwise, we'll end up with a lot of garbage in the target file.
             if (!Console.IsOutputRedirected)
             {
-                _consoleWidth = Console.WindowWidth;
                 ResetTimer();
                 Console.Clear();
             }
@@ -222,16 +220,23 @@ namespace ConsoleUtilities.ConsoleProgressBar
             {
                 if (_disposed) return;
 
+                var consoleWidth = Console.WindowWidth;
+
+                if (consoleWidth != _previousConsoleWidth)
+                    Console.Clear();
+
+                _previousConsoleWidth = consoleWidth;
+
                 var items = new List<string>();
 
                 foreach (var item in Items.Where(p => !(p.Value.FullWidth)).OrderBy(p=>p.Value.Sequence))
-                    items.Add(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2));
+                    items.Add(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2));
                 
                 var sb = new StringBuilder();
-                sb.Append("".PadRight(_consoleWidth, '='));
-                sb.Append(_title.PadCenter(_consoleWidth));
-                sb.Append("".PadRight(_consoleWidth, '='));
-                sb.Append("".PadRight(_consoleWidth));
+                sb.Append("".PadRight(consoleWidth, '='));
+                sb.Append(_title.PadCenter(consoleWidth));
+                sb.Append("".PadRight(consoleWidth, '='));
+                sb.Append("".PadRight(consoleWidth));
 
                 if (items.Any())
                 {
@@ -240,9 +245,9 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     var lastWasNewLine = false;
                     foreach (var item in items)
                     {
-                        if (lineWidth + 2 * maxWidth >= _consoleWidth || item == items.Last())
+                        if (lineWidth + 2 * maxWidth >= consoleWidth || item == items.Last())
                         {
-                            sb.AppendLine(item.PadRight(_consoleWidth - lineWidth - 1));
+                            sb.AppendLine(item.PadRight(consoleWidth - lineWidth - 1));
                             lineWidth = 0;
                             lastWasNewLine = true;
                         }
@@ -260,10 +265,10 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     }
                 }
 
-                sb.AppendLine("".PadRight(_consoleWidth - 1));
+                sb.AppendLine("".PadRight(consoleWidth - 1));
 
                 foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
-                    sb.AppendLine(item.Key + ": " + item.Value.Format(_consoleWidth - item.Key.Length - 2).PadRight(_consoleWidth - item.Key.Length - 3));
+                    sb.AppendLine(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2).PadRight(consoleWidth - item.Key.Length - 3));
 
                 UpdateText(sb.ToString());
 
@@ -272,6 +277,8 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
 
         private string _currentText = "";
+        private int _previousConsoleWidth;
+
         private void UpdateText(string text)
         {
             Console.SetCursorPosition(0, 0);
