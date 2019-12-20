@@ -121,6 +121,7 @@
     <Compile Include="StatisticsExtensionsTests.cs" />
     <Compile Include="Utilities\IncrementalStatisticsTests.cs" />
     <Compile Include="Utilities\LruHashSetTests.cs" />
+    <Compile Include="Utilities\Scaler2DTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

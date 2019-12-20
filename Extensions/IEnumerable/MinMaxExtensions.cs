@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ValueType = System.ValueType;
 
 namespace Extensions.IEnumerable
 {
@@ -25,16 +26,37 @@ namespace Extensions.IEnumerable
 
         public static DoubleMinMax Empty => new DoubleMinMax(double.MaxValue, double.MinValue);
 
+        public double Size;
+
         public DoubleMinMax(double min, double max)
         {
             Min = min;
             Max = max;
+            Size = max - min;
         }
 
         public void Extend(double min, double max)
         {
             if (min < Min) Min = min;
             if (max > Max) Max = max;
+            Size = max - min;
+        }
+
+        public bool Contains(double value)
+        {
+            return value >= Min && value <= Max;
+        }
+
+        /// <summary>
+        /// Scales the given value from this MinMax boundary to the given boundary.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public double ScaleTo(double value, double min, double max)
+        {
+            return ((value - Min) / (Max - Min)) * (max - min) + min;
         }
 
         public override string ToString()

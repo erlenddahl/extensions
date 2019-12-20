@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extensions</RootNamespace>
     <AssemblyName>Extensions</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>04f74146</NuGetPackageImportStamp>
@@ -120,6 +120,7 @@
     <Compile Include="Utilities\IntArrayEqualityComparer.cs" />
     <Compile Include="Utilities\LruCache.cs" />
     <Compile Include="Utilities\LruHashSet.cs" />
+    <Compile Include="Utilities\Scaler2D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
