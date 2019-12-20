@@ -84,6 +84,8 @@ namespace ConsoleUtilities.ConsoleProgressBar
             }
         }
 
+        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
+
         private int _animationIndex = 0;
         private DateTime? _end;
         private DateTime? _start;
@@ -113,6 +115,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         public void Finish()
         {
+            if (EndTime.HasValue) return;
             EndTime = DateTime.Now;
             Current = Max;
         }
@@ -149,20 +152,22 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         private bool _disposed = false;
         private string _title;
+        private readonly bool _isActive;
         private DateTime _start;
         
         public Dictionary<string, ConsoleInfoItem> Items = new Dictionary<string,ConsoleInfoItem>();
 
-        public ConsoleInformationPanel(string title)
+        public ConsoleInformationPanel(string title = "Processing ...", bool isActive = true)
         {
             _title = title;
+            _isActive = isActive;
             _timer = new Timer(TimerHandler);
             _start = DateTime.Now;
 
             // A progress bar is only for temporary display in a console window.
             // If the console output is redirected to a file, draw nothing.
             // Otherwise, we'll end up with a lot of garbage in the target file.
-            if (!Console.IsOutputRedirected)
+            if (isActive && !Console.IsOutputRedirected)
             {
                 ResetTimer();
                 Console.Clear();
@@ -215,17 +220,19 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         private void TimerHandler(object state)
         {
-            if (_timer == null) return;
+            if (_timer == null || !_isActive) return;
             lock (_timer)
             {
                 if (_disposed) return;
 
                 var consoleWidth = Console.WindowWidth;
+                var hiddenCount = Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden);
 
-                if (consoleWidth != _previousConsoleWidth)
+                if (consoleWidth != _previousConsoleWidth || hiddenCount != _previousHiddenCount)
                     Console.Clear();
 
                 _previousConsoleWidth = consoleWidth;
+                _previousHiddenCount = hiddenCount;
 
                 var items = new List<string>();
 
@@ -268,7 +275,10 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 sb.AppendLine("".PadRight(consoleWidth - 1));
 
                 foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
+                {
+                    if (item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
                     sb.AppendLine(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2).PadRight(consoleWidth - item.Key.Length - 3));
+                }
 
                 UpdateText(sb.ToString());
 
@@ -278,6 +288,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         private string _currentText = "";
         private int _previousConsoleWidth;
+        private int _previousHiddenCount = 0;
 
         private void UpdateText(string text)
         {
