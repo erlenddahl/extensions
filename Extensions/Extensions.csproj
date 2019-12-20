@@ -107,6 +107,7 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="RangeExtensions.cs" />
+    <Compile Include="Reflection\LambdaName.cs" />
     <Compile Include="Rounding.cs" />
     <Compile Include="StatisticsExtensions.cs" />
     <Compile Include="StatusUpdater.cs" />

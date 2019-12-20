@@ -109,6 +109,7 @@
     <Compile Include="Lists\WeightedAverageTests.cs" />
     <Compile Include="MoreMathTests.cs" />
     <Compile Include="NullableTests.cs" />
+    <Compile Include="Reflection\MemberNameTests.cs" />
     <Compile Include="TimeSpanTests.cs" />
     <Compile Include="RangeTests.cs" />
     <Compile Include="NumericTests.cs" />
