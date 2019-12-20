@@ -16,11 +16,24 @@ namespace Extensions.Utilities
             private set => _variance = value;
         }
 
+        public double Sum => Count * Average;
+
         public double StandardDeviation => Math.Sqrt(Variance);
         public double Average { get; private set; }
         public double Min { get; private set; }
         public double Max { get; private set; }
         public int Count { get; private set; }
+
+        public IncrementalStatistics()
+        {
+
+        }
+
+        public IncrementalStatistics(IEnumerable<double> values)
+        {
+            foreach (var value in values)
+                AddObservation(value);
+        }
 
         public void AddObservation(double observation)
         {

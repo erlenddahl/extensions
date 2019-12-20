@@ -40,6 +40,11 @@ namespace DataflowUtilities.ProducerConsumer
         public IEnumerable<(DateTime, Exception)> LastExceptions => Consumers?.Select(p => p.consumer.LastException).Where(p => p.ex != null) ?? new (DateTime, Exception)[0];
 
         /// <summary>
+        /// Returns true if the buffer currently holds more than the allowed number of items per consumer.
+        /// </summary>
+        public bool IsBufferLimitExceeded => ConsumerCount > 0 && Buffer.Count >= (long)MaxBufferItemsPerConsumer * ConsumerCount;
+
+        /// <summary>
         /// The number of items that has been posted to this collection.
         /// </summary>
         public int Posted { get; private set; }
@@ -54,20 +59,33 @@ namespace DataflowUtilities.ProducerConsumer
 
         public abstract void Run();
 
-        public void Post(TItem item, bool ignoreBufferLimit = false)
+        public void Post(TItem item, bool ignoreBufferLimit = false, Action performWhileWaiting = null)
         {
             if (Consumers == null || !Consumers.Any()) Run();
 
             if (!ignoreBufferLimit)
             {
-                var start = DateTime.Now;
-                while (Buffer.Count >= (long)MaxBufferItemsPerConsumer * ConsumerCount)
-                    Thread.Sleep(MaxBufferExceededWaitingTime);
-                TimeLostToFullBuffer += DateTime.Now.Subtract(start).TotalSeconds;
+                WaitForBufferLimit(performWhileWaiting);
             }
 
             Buffer.Post(item);
             Posted++;
+        }
+
+        /// <summary>
+        /// Sleeps the current thread until the number of items in the buffer is below the allowed number
+        /// of items per consumer.
+        /// </summary>
+        public void WaitForBufferLimit(Action performWhileWaiting = null)
+        {
+            var start = DateTime.Now;
+            while (IsBufferLimitExceeded)
+            {
+                performWhileWaiting?.Invoke();
+                Thread.Sleep(MaxBufferExceededWaitingTime);
+            }
+
+            TimeLostToFullBuffer += DateTime.Now.Subtract(start).TotalSeconds;
         }
 
         public void Complete(bool waitForConsumers = true)

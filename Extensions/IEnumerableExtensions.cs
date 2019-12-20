@@ -92,7 +92,7 @@ namespace Extensions
             }
         } 
 
-        public static IEnumerable<IEnumerable<T>> GroupAdjacentBy<T>(this IEnumerable<T> source, Func<T, T, bool> predicate)
+        public static IEnumerable<List<T>> GroupAdjacentBy<T>(this IEnumerable<T> source, Func<T, T, bool> predicate)
         {
             using (var e = source.GetEnumerator())
             {
