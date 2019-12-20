@@ -75,6 +75,10 @@
     <Compile Include="Helpers\InsertionBuffer.cs" />
     <Compile Include="NpgsqlCommandExtensions.cs" />
     <Compile Include="NpgsqlConnectionExtensions.cs" />
+    <Compile Include="Orm\PostgresOrm.cs" />
+    <Compile Include="Orm\PostgresOrmColumn.cs" />
+    <Compile Include="Orm\PostgresOrmTable.cs" />
+    <Compile Include="Orm\PostgresSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnnestInserter\UnnestInserter.cs" />
   </ItemGroup>

@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace NpgsqlExtensions.UnnestInserter
 {
     public class UnnestInserter
     {
         public readonly List<IUnnestableColumn> UnnestColumns = new List<IUnnestableColumn>();
-        private readonly List<IUnnestableColumn> _staticColumns = new List<IUnnestableColumn>();
-        private IEnumerable<IUnnestableColumn> AllColumns => UnnestColumns.Concat(_staticColumns);
+        private readonly NpgsqlCommandBuilder _cmdBuilder;
+        private IEnumerable<IUnnestableColumn> AllColumns => UnnestColumns;
 
         public string TableName { get; set; }
 
@@ -21,23 +22,28 @@ namespace NpgsqlExtensions.UnnestInserter
         public UnnestInserter(string tableName)
         {
             TableName = tableName;
+            _cmdBuilder = new NpgsqlCommandBuilder();
         }
 
         public void Insert(NpgsqlConnection conn)
         {
             var cmdString = "";
+#if !DEBUG
             try
             {
-                cmdString = string.Format(InsertTemplate, TableName, GetNames(), GetParameters());
+#endif
+                cmdString = string.Format(InsertTemplate, _cmdBuilder.QuoteIdentifier(TableName), GetNames(), GetParameters());
                 Debug.WriteLine(cmdString);
                 var cmd = new NpgsqlCommand(cmdString, conn);
                 foreach (var col in AllColumns)
                     col.AddParameters(cmd);
                 cmd.ExecuteNonQuery();
+#if !DEBUG
             }catch(Exception ex)
             {
                 throw new Exception("Failed to unnest insert with command '" + cmdString + "'." ,ex);
             }
+#endif
         }
 
         public void Add(string key, IEnumerable<int> values)
@@ -68,6 +74,11 @@ namespace NpgsqlExtensions.UnnestInserter
         public void Add(string key, IEnumerable<DateTime> values)
         {
             UnnestColumns.Add(new UnnestableColumn<DateTime>() { Name = key, Value = values.ToList() });
+        }
+
+        public void Add(string key, Type type, IEnumerable<object> values)
+        {
+            UnnestColumns.Add(new AnonymousUnnestableColumn(key, type, values));
         }
 
         public void Add(string key, IEnumerable<TimeSpan> values)
@@ -107,7 +118,7 @@ namespace NpgsqlExtensions.UnnestInserter
 
         private string GetNames()
         {
-            return string.Join(", ", AllColumns.Select(p => p.Name));
+            return string.Join(", ", AllColumns.Select(p => _cmdBuilder.QuoteIdentifier(p.Name)));
         }
 
         private string GetParameters()
@@ -133,6 +144,57 @@ namespace NpgsqlExtensions.UnnestInserter
         public override void AddParameters(NpgsqlCommand cmd)
         {
             cmd.Parameters.AddWithValue("@" + Name, Value.ToArray());
+        }
+
+        public override string GetValueString(string name)
+        {
+            return "unnest(@" + name + ")";
+        }
+    }
+
+    public class AnonymousUnnestableColumn : IUnnestableColumn
+    {
+        public object[] Value { get; set; }
+        private readonly Type _type;
+
+        public AnonymousUnnestableColumn(string key, Type type, IEnumerable<object> values)
+        {
+            Name = key;
+            _type = type;
+            Value = values.ToArray();
+        }
+
+        public override void AddParameters(NpgsqlCommand cmd)
+        {
+            cmd.Parameters.AddWithValue("@" + Name, NpgsqlDbType.Array | GetNpgsqlDbType(_type), Value);
+        }
+
+        private readonly Dictionary<Type, NpgsqlDbType> _types = new Dictionary<Type, NpgsqlDbType>()
+        {
+            {typeof(string), NpgsqlDbType.Text},
+            {typeof(short), NpgsqlDbType.Smallint},
+            {typeof(byte), NpgsqlDbType.Smallint},
+            {typeof(long), NpgsqlDbType.Bigint},
+            {typeof(int), NpgsqlDbType.Integer},
+            {typeof(float), NpgsqlDbType.Real},
+            {typeof(double), NpgsqlDbType.Double},
+            {typeof(decimal), NpgsqlDbType.Money},
+            {typeof(bool), NpgsqlDbType.Boolean},
+            {typeof(short?), NpgsqlDbType.Smallint},
+            {typeof(byte?), NpgsqlDbType.Smallint},
+            {typeof(long?), NpgsqlDbType.Bigint},
+            {typeof(int?), NpgsqlDbType.Integer},
+            {typeof(float?), NpgsqlDbType.Real},
+            {typeof(double?), NpgsqlDbType.Double},
+            {typeof(decimal?), NpgsqlDbType.Money},
+            {typeof(bool?), NpgsqlDbType.Boolean},
+            {typeof(DateTime), NpgsqlDbType.Timestamp},
+            {typeof(TimeSpan), NpgsqlDbType.Timestamp}
+        };
+        private NpgsqlDbType GetNpgsqlDbType(Type type)
+        {
+            if (_types.TryGetValue(type, out var dbt)) return dbt;
+            throw new NotImplementedException("Unnest inserter not implemented for type " + type.Name);
         }
 
         public override string GetValueString(string name)
