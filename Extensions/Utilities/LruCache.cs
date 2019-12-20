@@ -24,11 +24,8 @@ namespace Extensions.Utilities
     /// </remarks>
     public class LruCache<TKey, TValue>
     {
-        private readonly Dictionary<TKey, LinkedListNode<LruCacheItem>> _cacheMap =
-            new Dictionary<TKey, LinkedListNode<LruCacheItem>>();
-
-        private readonly LinkedList<LruCacheItem> _lruList =
-            new LinkedList<LruCacheItem>();
+        private readonly Dictionary<TKey, LinkedListNode<LruCacheItem>> _cacheMap = new Dictionary<TKey, LinkedListNode<LruCacheItem>>();
+        private readonly LinkedList<LruCacheItem> _lruList = new LinkedList<LruCacheItem>();
 
         private readonly Action<TValue> _dispose;
 

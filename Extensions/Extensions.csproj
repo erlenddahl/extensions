@@ -119,6 +119,7 @@
     <Compile Include="Utilities\IncrementalStatistics.cs" />
     <Compile Include="Utilities\IntArrayEqualityComparer.cs" />
     <Compile Include="Utilities\LruCache.cs" />
+    <Compile Include="Utilities\LruHashSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -120,6 +120,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatisticsExtensionsTests.cs" />
     <Compile Include="Utilities\IncrementalStatisticsTests.cs" />
+    <Compile Include="Utilities\LruHashSetTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
