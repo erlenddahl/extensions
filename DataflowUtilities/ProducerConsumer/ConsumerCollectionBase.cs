@@ -40,6 +40,11 @@ namespace DataflowUtilities.ProducerConsumer
         public IEnumerable<(DateTime, Exception)> LastExceptions => Consumers?.Select(p => p.consumer.LastException).Where(p => p.ex != null) ?? new (DateTime, Exception)[0];
 
         /// <summary>
+        /// Will be called when an item causes an exception.
+        /// </summary>
+        public Action<TItem, Exception> OnException;
+
+        /// <summary>
         /// Returns true if the buffer currently holds more than the allowed number of items per consumer.
         /// </summary>
         public bool IsBufferLimitExceeded => ConsumerCount > 0 && Buffer.Count >= (long)MaxBufferItemsPerConsumer * ConsumerCount;

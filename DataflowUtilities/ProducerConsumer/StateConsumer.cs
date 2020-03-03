@@ -13,14 +13,14 @@ namespace DataflowUtilities.ProducerConsumer
             State = state;
         }
 
-        public async Task<ConsumerBase> Run(BufferBlock<TItem> buffer, Action<TItem, TState> action)
+        public async Task<ConsumerBase> Run(BufferBlock<TItem> buffer, Action<TItem, TState> action, Action<TItem, Exception> onException)
         {
             while (await buffer.OutputAvailableAsync())
             {
                 while (buffer.TryReceive(out var item))
                 {
                     Received++;
-                    Process(item, State, action);
+                    Process(item, State, action, onException);
                 }
             }
 

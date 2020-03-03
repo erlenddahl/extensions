@@ -27,7 +27,7 @@ namespace DataflowUtilities.ProducerConsumer
         {
             if (States == null || !States.Any())
                 States = Enumerable.Range(0, ConsumerCount).Select(p => StateGenerator()).ToArray();
-            Consumers = States.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction))).ToList();
+            Consumers = States.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction, OnException))).ToList();
         }
     }
 }

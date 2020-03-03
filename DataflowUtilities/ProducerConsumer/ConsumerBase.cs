@@ -19,7 +19,7 @@ namespace DataflowUtilities.ProducerConsumer
         public DateTime LastAction { get; protected set; } = DateTime.Now;
         public (DateTime time, Exception ex) LastException { get; protected set; }
 
-        protected void Process<T>(T t, Action<T> action)
+        protected void Process<T>(T t, Action<T> action, Action<T, Exception> onException)
         {
             try
             {
@@ -29,6 +29,8 @@ namespace DataflowUtilities.ProducerConsumer
             {
                 Failed++;
                 LastException = (DateTime.Now, ex);
+
+                onException?.Invoke(t, ex);
 
                 if (ex.InnerException != null)
                 {
@@ -49,7 +51,7 @@ namespace DataflowUtilities.ProducerConsumer
             LastAction = DateTime.Now;
         }
 
-        protected void Process<TItem, TState>(TItem t, TState state, Action<TItem, TState> action)
+        protected void Process<TItem, TState>(TItem t, TState state, Action<TItem, TState> action, Action<TItem, Exception> onException)
         {
             try
             {
@@ -59,6 +61,8 @@ namespace DataflowUtilities.ProducerConsumer
             {
                 Failed++;
                 LastException = (DateTime.Now, ex);
+
+                onException?.Invoke(t, ex);
 
                 if (ex.InnerException != null)
                 {

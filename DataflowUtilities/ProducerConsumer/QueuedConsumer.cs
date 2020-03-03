@@ -15,7 +15,7 @@ namespace DataflowUtilities.ProducerConsumer
             _queueSize = queueSize;
         }
 
-        public async Task<QueuedConsumer<T>> Run(BufferBlock<T> buffer, Action<T> action)
+        public async Task<QueuedConsumer<T>> Run(BufferBlock<T> buffer, Action<T> action, Action<T, Exception> onException)
         {
             var todo = new List<T>();
             while (await buffer.OutputAvailableAsync())
@@ -28,14 +28,14 @@ namespace DataflowUtilities.ProducerConsumer
                     if (todo.Count >= _queueSize)
                     {
                         foreach (var t in todo)
-                            Process(t, action);
+                            Process(t, action, onException);
                         todo.Clear();
                     }
                 }
             }
 
             foreach (var t in todo)
-                Process(t, action);
+                Process(t, action, onException);
             todo.Clear();
 
             return this;

@@ -25,7 +25,7 @@ namespace DataflowUtilities.ProducerConsumer
 
         public override void Run()
         {
-            Consumers = Enumerable.Range(0, ConsumerCount).Select(p => new Consumer<TItem>()).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction))).ToList();
+            Consumers = Enumerable.Range(0, ConsumerCount).Select(p => new Consumer<TItem>()).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction, OnException))).ToList();
         }
     }
 }
