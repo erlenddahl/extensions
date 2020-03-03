@@ -119,6 +119,7 @@
     <Compile Include="Utilities\EnumHelper.cs" />
     <Compile Include="Utilities\IncrementalStatistics.cs" />
     <Compile Include="Utilities\IntArrayEqualityComparer.cs" />
+    <Compile Include="Utilities\LeafletGenerator.cs" />
     <Compile Include="Utilities\LruCache.cs" />
     <Compile Include="Utilities\LruHashSet.cs" />
     <Compile Include="Utilities\Scaler2D.cs" />
