@@ -52,21 +52,30 @@ namespace NpgsqlExtensions.Orm
         /// Note that the query will be prefixed with the ColumnString in order to extract all properties.
         /// </summary>
         /// <param name="query">The part after "SELECT * FROM table"</param>
+        /// <param name="tableName"></param>
+        /// <param name="parameters">Parameters for a prepared statement, if any. Must be supplied in pairs: "name1", value1, "name2", value2, etc.</param>
         /// <returns></returns>
-        public IEnumerable<T> Query<T>(string query = "") where T : new()
+        public IEnumerable<T> Query<T>(string query = "", string tableName = null, params object[] parameters) where T : new()
         {
-            var tableName = GetTableName<T>();
+            tableName = GetTableName<T>(tableName);
             var ormType = GetOrmType<T>();
             var cmd = ormType.GetSelectQuery(tableName, _conn);
 
             if (!query.StartsWith(" ")) query = " " + query;
             cmd.CommandText += query;
+            cmd.SetParameters(parameters);
 
             return cmd.ExecuteReaderAndSelect(p =>
             {
                 var t = new T();
                 for (var i = 0; i < ormType.Columns.Length; i++)
-                    ormType.Columns[i].SetValue(t, p.GetValue(i));
+                {
+                    if (!ormType.Columns[i].CanSet) continue;
+                    var v = p.GetValue(i);
+                    if (v is System.DBNull) v = null;
+                    ormType.Columns[i].SetValue(t, v);
+                }
+
                 return t;
             });
         }
@@ -173,6 +182,16 @@ namespace NpgsqlExtensions.Orm
         {
             _conn?.Close();
             _conn?.Dispose();
+        }
+
+        public int ExecuteNonQuery(string cmd, params object[] parameters)
+        {
+            return new NpgsqlCommand(cmd, _conn).SetParameters(parameters).ExecuteNonQuery();
+        }
+
+        public object ExecuteScalar(string cmd, params object[] parameters)
+        {
+            return new NpgsqlCommand(cmd, _conn).SetParameters(parameters).ExecuteScalar();
         }
     }
 }

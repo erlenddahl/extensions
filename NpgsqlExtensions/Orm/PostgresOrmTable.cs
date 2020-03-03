@@ -24,8 +24,7 @@ namespace NpgsqlExtensions.Orm
         public PostgresOrmTable(Type t)
         {
             _cmdBuilder = new NpgsqlCommandBuilder();
-            var properties = t.GetProperties();
-            Columns = properties.Select(p => new PostgresOrmColumn(p)).ToArray();
+            Columns = t.GetProperties().Select(p => new PostgresOrmColumn(p)).ToArray();
 
             IdColumn = Columns.FirstOrDefault(p => p.IsIdColumn);
 

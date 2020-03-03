@@ -11,6 +11,7 @@ namespace NpgsqlExtensions.Orm
         public bool IsIdColumn { get; set; }
         public string TypeName { get; set; }
         public Type PropertyType => _property.PropertyType;
+        public bool CanSet { get; set; }
 
         private readonly PropertyInfo _property;
 
@@ -20,6 +21,7 @@ namespace NpgsqlExtensions.Orm
             Name = property.Name.ToCamelCase();
             IsIdColumn = property.Name.ToLower() == "id";
             TypeName = GetTypeName(property.PropertyType);
+            CanSet = property.SetMethod != null;
         }
 
         public object GetValue<T>(T element)
