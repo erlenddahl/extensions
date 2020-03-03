@@ -17,6 +17,12 @@ namespace NpgsqlExtensions.UnnestInserter
 
         public string TableName { get; set; }
 
+        /// <summary>
+        /// If set to true, the table and column names will be quoted. This is useful if it's an identifier or multiple words,
+        /// but the casing must be correct (usually all lower case) when quoted.
+        /// </summary>
+        public bool QuoteNames { get; set; }
+
         public string InsertTemplate { get; set; } = "INSERT INTO {0}({1}) VALUES({2})";
 
         public UnnestInserter(string tableName)
@@ -32,7 +38,8 @@ namespace NpgsqlExtensions.UnnestInserter
             try
             {
 #endif
-                cmdString = string.Format(InsertTemplate, _cmdBuilder.QuoteIdentifier(TableName), GetNames(), GetParameters());
+
+                cmdString = string.Format(InsertTemplate, QuoteOrNot(TableName), GetNames(), GetParameters());
                 Debug.WriteLine(cmdString);
                 var cmd = new NpgsqlCommand(cmdString, conn);
                 foreach (var col in AllColumns)
@@ -44,6 +51,12 @@ namespace NpgsqlExtensions.UnnestInserter
                 throw new Exception("Failed to unnest insert with command '" + cmdString + "'." ,ex);
             }
 #endif
+        }
+
+        private string QuoteOrNot(string item)
+        {
+            if (QuoteNames) return _cmdBuilder.QuoteIdentifier(item);
+            return item;
         }
 
         public void Add(string key, IEnumerable<int> values)
@@ -96,6 +109,11 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new StaticColumn<double>() { Name = key, Value = value });
         }
 
+        public void AddStatic(string key, float value)
+        {
+            UnnestColumns.Add(new StaticColumn<double>() { Name = key, Value = value });
+        }
+
         public void AddStatic(string key, string value)
         {
             UnnestColumns.Add(new StaticColumn<string>() { Name = key, Value = value });
@@ -118,7 +136,7 @@ namespace NpgsqlExtensions.UnnestInserter
 
         private string GetNames()
         {
-            return string.Join(", ", AllColumns.Select(p => _cmdBuilder.QuoteIdentifier(p.Name)));
+            return string.Join(", ", AllColumns.Select(p => QuoteOrNot(p.Name)));
         }
 
         private string GetParameters()
@@ -126,7 +144,7 @@ namespace NpgsqlExtensions.UnnestInserter
             return string.Join(", ", AllColumns.Select(p => p.GetValueString(p.Name)));
         }
     }
-
+    
     public abstract class IUnnestableColumn
     {
         public string Name { get; set; }
