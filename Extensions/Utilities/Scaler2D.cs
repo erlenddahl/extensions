@@ -17,8 +17,17 @@ namespace Extensions.Utilities
         public double SizeX { get; }
         public double SizeY { get; }
 
-        public Scaler2D(IEnumerable<double> xs, IEnumerable<double> ys)
+        public Scaler2D(IEnumerable<double> xs, IEnumerable<double> ys) : this(double.MaxValue, double.MinValue, double.MaxValue, double.MinValue, xs, ys) { }
+
+        public Scaler2D(double minX, double maxX, double minY, double maxY):this(minX,maxX,minY,maxY, new double[0], new double[0]) { }
+
+        public Scaler2D(double minX, double maxX, double minY, double maxY, IEnumerable<double> xs, IEnumerable<double> ys)
         {
+            MinX = minX;
+            MaxX = maxX;
+            MinY = minY;
+            MaxY = maxY;
+
             foreach (var (x, y) in xs.Zip(ys, (x, y) => (x, y)))
             {
                 if (x < MinX) MinX = x;
@@ -29,6 +38,16 @@ namespace Extensions.Utilities
 
             SizeX = MaxX - MinX;
             SizeY = MaxY - MinY;
+        }
+
+        public Scaler2D Expand<T>(IList<T> line, Func<T, double> xFunc, Func<T, double> yFunc)
+        {
+            return new Scaler2D(MinX, MaxX, MinY, MaxY, line.Select(xFunc), line.Select(yFunc));
+        }
+
+        public Scaler2D Expand(double radius)
+        {
+            return new Scaler2D(MinX - radius, MaxX + radius, MinY - radius, MaxY + radius);
         }
 
         public static Scaler2D FromObject<T>(IList<T> line, Func<T, double> xFunc, Func<T, double> yFunc)
@@ -61,6 +80,9 @@ namespace Extensions.Utilities
 
             var x = (valueX - MinX) * facX + boundaryMinX + offsetX;
             var y = (valueY - MinY) * facY + boundaryMinY + offsetY;
+
+            if (SizeY == 0) y = valueY;
+            if (SizeX == 0) x = valueX;
 
             return (x, y);
         }
