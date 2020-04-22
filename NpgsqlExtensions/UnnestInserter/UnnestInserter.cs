@@ -12,6 +12,7 @@ namespace NpgsqlExtensions.UnnestInserter
     public class UnnestInserter
     {
         public readonly List<IUnnestableColumn> UnnestColumns = new List<IUnnestableColumn>();
+        public int? InsertTimeout { get; set; }
         private readonly NpgsqlCommandBuilder _cmdBuilder;
         private IEnumerable<IUnnestableColumn> AllColumns => UnnestColumns;
 
@@ -42,6 +43,8 @@ namespace NpgsqlExtensions.UnnestInserter
                 cmdString = string.Format(InsertTemplate, QuoteOrNot(TableName), GetNames(), GetParameters());
                 Debug.WriteLine(cmdString);
                 var cmd = new NpgsqlCommand(cmdString, conn);
+                if(InsertTimeout != null)
+                    cmd.CommandTimeout = InsertTimeout.Value;
                 foreach (var col in AllColumns)
                     col.AddParameters(cmd);
                 cmd.ExecuteNonQuery();
