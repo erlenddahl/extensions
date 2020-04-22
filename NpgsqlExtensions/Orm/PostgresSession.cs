@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using Extensions;
 using Extensions.IEnumerable;
@@ -15,7 +16,7 @@ namespace NpgsqlExtensions.Orm
         private readonly NpgsqlConnection _conn;
         private readonly string _username;
 
-        public PostgresOrmSession(string connString, string username)
+        public PostgresOrmSession(string connString, string username, int commandTimeout = 60)
         {
             _username = username;
             _conn = OpenConnection(connString);
@@ -192,6 +193,53 @@ namespace NpgsqlExtensions.Orm
         public object ExecuteScalar(string cmd, params object[] parameters)
         {
             return new NpgsqlCommand(cmd, _conn).SetParameters(parameters).ExecuteScalar();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="query">The part after "SELECT * FROM table"</param>
+        /// <param name="csvPath"></param>
+        /// <param name="separator"></param>
+        /// <param name="ignoreColumns">The name of any columns that should be ignored.</param>
+        /// <param name="parameters">Parameters for a prepared statement, if any. Must be supplied in pairs: "name1", value1, "name2", value2, etc.</param>
+        public void DumpTableAsCsv(string tableName, string csvPath, string separator = ";", string query = "", string[] ignoreColumns = null, params object[] parameters)
+        {
+            var b = new NpgsqlCommandBuilder();
+            var cmd = new NpgsqlCommand("SELECT * FROM public." + b.QuoteIdentifier(tableName), _conn);
+
+            if (!query.StartsWith(" ")) query = " " + query;
+            cmd.CommandTimeout = 0;
+            cmd.CommandText += query;
+            cmd.SetParameters(parameters);
+            cmd.AllResultTypesAreUnknown = true;
+
+            string SerializeToString(object value)
+            {
+                return value?.ToString() ?? "";
+            }
+
+            var csv = new CsvWriter(separator);
+            using (var file = new System.IO.StreamWriter(csvPath))
+            {
+                string[] columns = null;
+                bool[] useColumn = null;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (columns == null)
+                        {
+                            columns = reader.GetColumnSchema().Select(p => p.ColumnName).ToArray();
+                            useColumn = columns.Select((p, i) => !ignoreColumns.Contains(p)).ToArray();
+                            file.WriteLine(string.Join(separator, columns.Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(p))));
+                        }
+
+                        file.WriteLine(string.Join(separator, Enumerable.Range(0, reader.FieldCount).Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(SerializeToString(reader.GetValue(p))))));
+                    }
+                }
+            }
         }
     }
 }
