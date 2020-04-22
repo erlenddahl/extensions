@@ -14,6 +14,11 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public int Sequence { get; set; }
     }
 
+    public interface IHideableItem
+    {
+        bool CanBeHidden { get; }
+    }
+
     public class StringInfoItem : ConsoleInfoItem
     {
         public string Value;
@@ -57,7 +62,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
     }
 
-    public class ProgressInfoItem : ConsoleInfoItem, IDisposable
+    public class ProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
     {
         public long Max;
         public long Current;
@@ -142,6 +147,68 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
     }
 
+    public class UnknownProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
+    {
+        public DateTime StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+
+        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
+
+        private int _animationIndex = 0;
+        private int _animationDirection = 1;
+
+        public UnknownProgressInfoItem()
+        {
+            StartTime = DateTime.Now;
+            FullWidth = true;
+        }
+
+        public override string Format(int consoleWidth)
+        {
+            var isFinished = EndTime != null;
+
+            var endTime = isFinished ? EndTime.Value : DateTime.Now;
+            var time = endTime.Subtract(StartTime);
+
+            var text = $" :: {time.ToShortPrettyFormat()}";
+
+            var blockCount = consoleWidth - text.Length - 5;
+
+            var animationWidth = Math.Min(1, blockCount / 2);
+
+            if (isFinished)
+                text = $"[{new string('#', blockCount)}] {text}";
+            else
+            {
+                _animationIndex += _animationDirection * 2;
+                if (_animationIndex + animationWidth >= blockCount)
+                {
+                    _animationDirection = -1;
+                    _animationIndex = blockCount - animationWidth;
+                }else if (_animationIndex <= 0)
+                {
+                    _animationDirection = 1;
+                    _animationIndex = 0;
+                }
+
+                text = $"[{new string(' ', _animationIndex)}{new string('-', animationWidth)}{new string(' ', blockCount - (_animationIndex + animationWidth))}] {text}";
+            }
+
+            return text;
+        }
+
+        public void Finish()
+        {
+            if (EndTime.HasValue) return;
+            EndTime = DateTime.Now;
+        }
+
+        public void Dispose()
+        {
+            Finish();
+        }
+    }
+
     public class ConsoleInformationPanel : IDisposable
     {
 
@@ -180,6 +247,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
             {
                 var r = new Random();
                 pb.SetProgress("Current", 0, 1000);
+                var unk = pb.SetUnknownProgress("Unknown waiting ...");
                 for (var i = 0; i < 1000; i++)
                 {
                     pb.Set("Route consumers", r.Next(20));
@@ -202,6 +270,8 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     pb.Set("Time", now.ToString("HH:mm:ss.fff"));
                     pb.Set("Exception", string.Join("", Enumerable.Range(0, r.Next(100)).Select(p => "A")), true);
                     Thread.Sleep(100);
+
+                    if(DateTime.Now.Subtract(unk.StartTime).TotalSeconds > 50) unk.Finish();
                 }
             }
         }
@@ -226,7 +296,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 if (_disposed) return;
 
                 var consoleWidth = Console.WindowWidth;
-                var hiddenCount = Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden);
+                var hiddenCount = Items.Count(p => p.Value is IHideableItem pii && pii.CanBeHidden);
 
                 if (consoleWidth != _previousConsoleWidth || hiddenCount != _previousHiddenCount)
                     Console.Clear();
@@ -395,6 +465,24 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     ((StringInfoItem) Items[key]).Value = value;
         }
 
+        public UnknownProgressInfoItem SetUnknownProgress(string key, int? sequence = null)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    var pii = new UnknownProgressInfoItem();
+                    Items.Add(key, pii);
+                    pii.Sequence = sequence ?? (Items.Values.Max(p => p.Sequence) + 1);
+                    return pii;
+                }
+                else
+                {
+                    var pii = ((UnknownProgressInfoItem)Items[key]);
+                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    return pii;
+                }
+        }
+
         public ProgressInfoItem SetProgress(string key, long? current = null, long? max = null, bool? started = null, int? sequence = null)
         {
             lock (_lockObject)
@@ -403,7 +491,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     var pii = new ProgressInfoItem();
                         Items.Add(key, pii);
                     pii.Set(current, max, started);
-                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    pii.Sequence = sequence ?? (Items.Values.Max(p => p.Sequence) + 1);
                     return pii;
                 }
                 else
