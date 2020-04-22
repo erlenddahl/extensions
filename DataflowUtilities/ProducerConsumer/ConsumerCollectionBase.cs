@@ -97,7 +97,7 @@ namespace DataflowUtilities.ProducerConsumer
         {
             Buffer.Complete();
 
-            if (Consumers?.Any() != false) return;
+            if (Consumers?.Any() != true) return;
 
             if(waitForConsumers)
                 Task.WaitAll(Consumers.Select(p => p.task).ToArray<Task>());
