@@ -414,7 +414,7 @@ namespace Extensions
         }
 
         /// <summary>
-        /// Will return a camelcase representation of the given text. Everything that is not a letter will be removed.
+        /// Will return a camelcase representation of the given text. Anything that is not an alphanumeric symbol will be removed (as well as digits at the start of the string).
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -425,7 +425,9 @@ namespace Extensions
             var isFirst = true;
             foreach (var c in text)
             {
-                if (!char.IsLetter(c))
+                if (camel == "" && char.IsDigit(c)) continue;
+
+                if (!char.IsLetterOrDigit(c))
                 {
                     prevWasRemoved = true;
                     continue;
@@ -539,6 +541,20 @@ namespace Extensions
                     : new string[] { element })  // Keep the entire item
                 .SelectMany(element => element).ToList();
             return string.Join(newSeparator.ToString(), result);
+        }
+
+        /// <summary>
+        /// Returns true if the given string starts with any of the given needle strings.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="needles"></param>
+        /// <returns></returns>
+        public static bool StartsWithAny(this string str, params string[] needles)
+        {
+            foreach(var n in needles)
+                if (str.StartsWith(n))
+                    return true;
+            return false;
         }
     }
 }
