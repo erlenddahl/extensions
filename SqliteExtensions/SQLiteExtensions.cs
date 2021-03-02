@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using Extensions;
+using Extensions.StringExtensions;
 
 namespace SqliteExtensions
 {

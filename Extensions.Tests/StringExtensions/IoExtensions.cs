@@ -1,0 +1,59 @@
+﻿using Extensions.StringExtensions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Extensions.Tests.StringExtensions
+{
+    [TestClass]
+    public class IoExtensions
+    {
+
+        [TestMethod]
+        public void MakeSafeForFilenameTests()
+        {
+            Assert.AreEqual("hei", "hei".MakeSafeForFilename());
+            Assert.AreEqual("", "".MakeSafeForFilename());
+            Assert.AreEqual("h--ei--", "h?:ei?:".MakeSafeForFilename("-"));
+            Assert.AreEqual("hei", "h?:ei?:".MakeSafeForFilename());
+            Assert.AreEqual("hei", "h**///\\\\?:e<>i?:".MakeSafeForFilename());
+        }
+
+        [TestMethod]
+        public void ChangeExtensionTests()
+        {
+            Assert.AreEqual("", "".ChangeExtension(".ldb"));
+            Assert.AreEqual(null, ((string)null).ChangeExtension(".ldb"));
+
+            Assert.AreEqual("C:\\test.ldb", "C:\\test".ChangeExtension(".ldb"));
+
+            Assert.AreEqual("C:\\test.ldb", "C:\\test.mdb".ChangeExtension(".ldb"));
+            Assert.AreEqual("C:\\te.s.t.ldb", "C:\\te.s.t.mdb".ChangeExtension(".ldb"));
+            Assert.AreEqual("C:\\te\\s\\t.ldb", "C:\\te\\s\\t.mdb".ChangeExtension(".ldb"));
+        }
+
+        [TestMethod]
+        public void RemoveExtensionTests()
+        {
+            Assert.AreEqual("", "".RemoveExtension());
+            Assert.AreEqual(null, ((string)null).RemoveExtension());
+
+            Assert.AreEqual("C:\\test", "C:\\test".RemoveExtension());
+
+            Assert.AreEqual("C:\\test", "C:\\test.mdb".RemoveExtension());
+            Assert.AreEqual("C:\\te.s.t", "C:\\te.s.t.mdb".RemoveExtension());
+            Assert.AreEqual("C:\\te.faef\\fact", "C:\\te.faef\\fact.mdb".RemoveExtension());
+            Assert.AreEqual("C:\\te\\s\\t", "C:\\te\\s\\t.mdb".RemoveExtension());
+        }
+
+        [TestMethod]
+        public void TruncatePathTests()
+        {
+            Assert.AreEqual(@"C:\folder\one\two\three\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(500));
+            Assert.AreEqual(@"C:\folder\one\two\three\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(35));
+            Assert.AreEqual(@"C:\folder\one\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(27));
+            Assert.AreEqual(@"C:\folder\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(23));
+            Assert.AreEqual(@"C:\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(15));
+            Assert.AreEqual(@"C:\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(10));
+            Assert.AreEqual(@"C:\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(5));
+        }
+    }
+}

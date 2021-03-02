@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Extensions;
+using Extensions.StringExtensions;
+using Extensions.Utilities.Csv;
 
 namespace NpgsqlExtensions.Orm
 {

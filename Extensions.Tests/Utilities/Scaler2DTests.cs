@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Extensions.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

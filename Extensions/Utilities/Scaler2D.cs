@@ -2,24 +2,22 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Extensions.Utilities
 {
     public class Scaler2D
     {
-        public double MinX { get; } = double.MaxValue;
-        public double MinY { get; } = double.MaxValue;
-        public double MaxX { get; } = double.MinValue;
-        public double MaxY { get; } = double.MinValue;
+        public double MinX { get; }
+        public double MinY { get; }
+        public double MaxX { get; }
+        public double MaxY { get; }
 
         public double SizeX { get; }
         public double SizeY { get; }
 
         public Scaler2D(IEnumerable<double> xs, IEnumerable<double> ys) : this(double.MaxValue, double.MinValue, double.MaxValue, double.MinValue, xs, ys) { }
 
-        public Scaler2D(double minX, double maxX, double minY, double maxY):this(minX,maxX,minY,maxY, new double[0], new double[0]) { }
+        public Scaler2D(double minX, double maxX, double minY, double maxY) : this(minX, maxX, minY, maxY, new double[0], new double[0]) { }
 
         public Scaler2D(double minX, double maxX, double minY, double maxY, IEnumerable<double> xs, IEnumerable<double> ys)
         {

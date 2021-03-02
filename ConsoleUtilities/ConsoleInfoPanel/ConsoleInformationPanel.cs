@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Markup;
-using Extensions;
+using Extensions.StringExtensions;
+using Extensions.TimeSpanExtensions;
 
 namespace ConsoleUtilities.ConsoleProgressBar
 {
