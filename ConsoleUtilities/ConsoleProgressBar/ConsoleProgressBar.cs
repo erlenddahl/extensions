@@ -165,11 +165,11 @@ namespace ConsoleUtilities.ConsoleProgressBar
             var remainsCount = blockCount - doneCount;
 
             if (start == null)
-                text = $"[{new string(' ', doneCount + 1 + remainsCount)}] {text}";
+                text = $"[{new string(' ', Math.Max(0, doneCount + 1 + remainsCount))}] {text}";
             else if (isFinished)
-                text = $"[{new string('#', doneCount)}] {text}"; 
+                text = $"[{new string('#', Math.Max(0, doneCount))}] {text}"; 
             else
-                text = $"[{new string('#', doneCount)}{Animation[animationIndex % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
+                text = $"[{new string('#', Math.Max(0, doneCount))}{Animation[animationIndex % Animation.Length]}{new string('-', Math.Max(remainsCount - 1, 0))}] {text}";
 
             return text;
         }
