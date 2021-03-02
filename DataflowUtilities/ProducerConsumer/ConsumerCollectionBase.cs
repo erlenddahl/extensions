@@ -97,6 +97,8 @@ namespace DataflowUtilities.ProducerConsumer
         {
             Buffer.Complete();
 
+            if (Consumers?.Any() != true) return;
+
             if(waitForConsumers)
                 Task.WaitAll(Consumers.Select(p => p.task).ToArray<Task>());
         }
@@ -109,6 +111,9 @@ namespace DataflowUtilities.ProducerConsumer
                 performWhileWaiting();
                 Thread.Sleep(waitInterval);
             }
+
+            if (Consumers?.Any() != true) return;
+
             Task.WaitAll(Consumers.Select(p => p.task).ToArray<Task>());
         }
     }
