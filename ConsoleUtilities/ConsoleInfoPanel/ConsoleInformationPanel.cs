@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Markup;
 using Extensions;
 
 namespace ConsoleUtilities.ConsoleProgressBar
@@ -14,9 +15,35 @@ namespace ConsoleUtilities.ConsoleProgressBar
         public int Sequence { get; set; }
     }
 
+    public interface IHideableItem
+    {
+        bool CanBeHidden { get; }
+    }
+
     public class StringInfoItem : ConsoleInfoItem
     {
         public string Value;
+
+        public override string Format(int consoleWidth)
+        {
+            return Value;
+        }
+    }
+
+    public class AppendableStringInfoItem : ConsoleInfoItem
+    {
+        public string Value;
+
+        public AppendableStringInfoItem()
+        {
+            FullWidth = true;
+        }
+
+        public AppendableStringInfoItem AppendLine(string msg, bool prependTimestamp = true, string timestampFormat = "yyyy-MM-dd HH:mm:ss.fff")
+        {
+            Value += Environment.NewLine + (prependTimestamp ? DateTime.Now.ToString(timestampFormat) + ": " : "") + msg;
+            return this;
+        }
 
         public override string Format(int consoleWidth)
         {
@@ -57,7 +84,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
     }
 
-    public class ProgressInfoItem : ConsoleInfoItem, IDisposable
+    public class ProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
     {
         public long Max;
         public long Current;
@@ -142,6 +169,68 @@ namespace ConsoleUtilities.ConsoleProgressBar
         }
     }
 
+    public class UnknownProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
+    {
+        public DateTime StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+
+        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
+
+        private int _animationIndex = 0;
+        private int _animationDirection = 1;
+
+        public UnknownProgressInfoItem()
+        {
+            StartTime = DateTime.Now;
+            FullWidth = true;
+        }
+
+        public override string Format(int consoleWidth)
+        {
+            var isFinished = EndTime != null;
+
+            var endTime = isFinished ? EndTime.Value : DateTime.Now;
+            var time = endTime.Subtract(StartTime);
+
+            var text = $" :: {time.ToShortPrettyFormat()}";
+
+            var blockCount = consoleWidth - text.Length - 5;
+
+            var animationWidth = Math.Min(1, blockCount / 2);
+
+            if (isFinished)
+                text = $"[{new string('#', blockCount)}] {text}";
+            else
+            {
+                _animationIndex += _animationDirection * 2;
+                if (_animationIndex + animationWidth >= blockCount)
+                {
+                    _animationDirection = -1;
+                    _animationIndex = blockCount - animationWidth;
+                }else if (_animationIndex <= 0)
+                {
+                    _animationDirection = 1;
+                    _animationIndex = 0;
+                }
+
+                text = $"[{new string(' ', _animationIndex)}{new string('-', animationWidth)}{new string(' ', blockCount - (_animationIndex + animationWidth))}] {text}";
+            }
+
+            return text;
+        }
+
+        public void Finish()
+        {
+            if (EndTime.HasValue) return;
+            EndTime = DateTime.Now;
+        }
+
+        public void Dispose()
+        {
+            Finish();
+        }
+    }
+
     public class ConsoleInformationPanel : IDisposable
     {
 
@@ -180,12 +269,14 @@ namespace ConsoleUtilities.ConsoleProgressBar
             {
                 var r = new Random();
                 pb.SetProgress("Current", 0, 1000);
+                var unk = pb.SetUnknownProgress("Unknown waiting ...");
                 for (var i = 0; i < 1000; i++)
                 {
                     pb.Set("Route consumers", r.Next(20));
                     pb.Set("Result consumers", r.Next(40));
                     pb.Set("Failed routes", r.Next(20000));
                     pb.SetProgress("Processed", i, 1000);
+                    pb.SetProgress("ProcessedFirst", i*10, 1000);
                     pb.SetProgress("Saved", i, i * 2);
                     pb.SetProgress("Not started", started: false);
                     pb.SetProgress("Finished", 0, 10, started: false);
@@ -202,6 +293,8 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     pb.Set("Time", now.ToString("HH:mm:ss.fff"));
                     pb.Set("Exception", string.Join("", Enumerable.Range(0, r.Next(100)).Select(p => "A")), true);
                     Thread.Sleep(100);
+
+                    if(DateTime.Now.Subtract(unk.StartTime).TotalSeconds > 50) unk.Finish();
                 }
             }
         }
@@ -221,105 +314,106 @@ namespace ConsoleUtilities.ConsoleProgressBar
         private void TimerHandler(object state)
         {
             if (_timer == null || !_isActive) return;
-            lock (_timer)
+            lock (_lockObject)
             {
                 if (_disposed) return;
 
-                var consoleWidth = Console.WindowWidth;
-                var hiddenCount = Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden);
-
-                if (consoleWidth != _previousConsoleWidth || hiddenCount != _previousHiddenCount)
-                    Console.Clear();
-
-                _previousConsoleWidth = consoleWidth;
-                _previousHiddenCount = hiddenCount;
-
-                var items = new List<string>();
-
-                foreach (var item in Items.Where(p => !(p.Value.FullWidth)).OrderBy(p=>p.Value.Sequence))
-                    items.Add(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2));
-                
-                var sb = new StringBuilder();
-                sb.Append("".PadRight(consoleWidth, '='));
-                sb.Append(_title.PadCenter(consoleWidth));
-                sb.Append("".PadRight(consoleWidth, '='));
-                sb.Append("".PadRight(consoleWidth));
-
-                if (items.Any())
+                try
                 {
-                    var maxWidth = items.Max(p => p.Length) + 6;
-                    var lineWidth = 0;
-                    var lastWasNewLine = false;
-                    foreach (var item in items)
+                    var consoleWidth = Console.WindowWidth;
+
+                    if (consoleWidth != _previousConsoleWidth || _hadError)
                     {
-                        if (lineWidth + 2 * maxWidth >= consoleWidth || item == items.Last())
+                        Console.Clear();
+                        _currentText = "";
+                        _hadError = false;
+                    }
+
+                    _previousConsoleWidth = consoleWidth;
+
+                    var items = new List<string>();
+
+                    foreach (var item in Items.Where(p => !(p.Value.FullWidth)).OrderBy(p => p.Value.Sequence))
+                        items.Add(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2));
+
+                    var sb = new StringBuilder();
+                    sb.Append("".PadRight(consoleWidth, '='));
+                    sb.Append(_title.PadCenter(consoleWidth));
+                    sb.Append("".PadRight(consoleWidth, '='));
+                    sb.Append("".PadRight(consoleWidth));
+
+                    if (items.Any())
+                    {
+                        var maxWidth = items.Max(p => p.Length) + 6;
+                        var lineWidth = 0;
+                        var lastWasNewLine = false;
+                        foreach (var item in items)
                         {
-                            sb.AppendLine(item.PadRight(consoleWidth - lineWidth - 1));
-                            lineWidth = 0;
-                            lastWasNewLine = true;
+                            if (lineWidth + 2 * maxWidth >= consoleWidth || item == items.Last())
+                            {
+                                sb.AppendLine(item.PadRight(consoleWidth - lineWidth - 1));
+                                lineWidth = 0;
+                                lastWasNewLine = true;
+                            }
+                            else
+                            {
+                                sb.Append(item.PadRight(maxWidth));
+                                lineWidth += maxWidth;
+                                lastWasNewLine = false;
+                            }
                         }
-                        else
+
+                        if (!lastWasNewLine)
                         {
-                            sb.Append(item.PadRight(maxWidth));
-                            lineWidth += maxWidth;
-                            lastWasNewLine = false;
+                            sb.AppendLine();
                         }
                     }
 
-                    if (!lastWasNewLine)
+                    sb.AppendLine("".PadRight(consoleWidth - 1));
+
+                    foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
                     {
-                        sb.AppendLine();
+                        if (item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
+                        var value = item.Value.Format(consoleWidth - item.Key.Length - 2);
+                        AppendLines(sb, item.Key + ": " + value, consoleWidth - 1);
                     }
+
+                    UpdateText(sb);
                 }
-
-                sb.AppendLine("".PadRight(consoleWidth - 1));
-
-                foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
+                catch (Exception ex)
                 {
-                    if (item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
-                    sb.AppendLine(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2).PadRight(consoleWidth - item.Key.Length - 3));
+                    Console.WriteLine("Failed to update console information. Retrying in a second. (" + ex.Message + ")");
+                    _hadError = true;
                 }
-
-                UpdateText(sb.ToString());
 
                 ResetTimer();
             }
         }
 
+        private void AppendLines(StringBuilder sb, string value, int padTo)
+        {
+            var lines = value.Split(Environment.NewLine);
+            foreach (var line in lines)
+                sb.AppendLine(line.PadRight(padTo));
+        }
+
         private string _currentText = "";
         private int _previousConsoleWidth;
-        private int _previousHiddenCount = 0;
+        private bool _hadError = false;
 
-        private void UpdateText(string text)
+        private void UpdateText(StringBuilder sb)
         {
             Console.SetCursorPosition(0, 0);
-            Console.Write(text);
-            return;//TODO: Fix below
-            // Get length of common portion
-            var commonPrefixLength = 0;
-            var commonLength = Math.Min(_currentText.Length, text.Length);
-            while (commonPrefixLength < commonLength && text[commonPrefixLength] == _currentText[commonPrefixLength])
-            {
-                commonPrefixLength++;
-            }
-
-            // Backtrack to the first differing character
-            var outputBuilder = new StringBuilder();
-            outputBuilder.Append('\b', _currentText.Length - commonPrefixLength);
-
-            // Output new suffix
-            outputBuilder.Append(text.Substring(commonPrefixLength));
-
+            
             // If the new text is shorter than the old one: delete overlapping characters
-            int overlapCount = _currentText.Length - text.Length;
+            var overlapCount = _currentText.Length - sb.Length;
             if (overlapCount > 0)
             {
-                outputBuilder.Append(' ', overlapCount);
-                outputBuilder.Append('\b', overlapCount);
+                sb.Append(' ', overlapCount);
             }
 
-            Console.Write(outputBuilder);
-            _currentText = text;
+            Console.Write(sb);
+            _currentText = sb.ToString();
         }
 
         private void ResetTimer()
@@ -329,7 +423,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
 
         public void Dispose()
         {
-            lock (_timer)
+            lock (_lockObject)
             {
                 Finish();
                 _disposed = true;
@@ -395,6 +489,36 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     ((StringInfoItem) Items[key]).Value = value;
         }
 
+        public AppendableStringInfoItem Log(string key, string value, int? sequence = null)
+        {
+            lock (_lockObject)
+            {
+                if (!Items.ContainsKey(key))
+                    Items.Add(key, new AppendableStringInfoItem() {Sequence = sequence ?? 0}.AppendLine(value));
+                else
+                    ((AppendableStringInfoItem) Items[key]).AppendLine(value);
+                return (AppendableStringInfoItem) Items[key];
+            }
+        }
+
+        public UnknownProgressInfoItem SetUnknownProgress(string key, int? sequence = null)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    var pii = new UnknownProgressInfoItem();
+                    Items.Add(key, pii);
+                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
+                    return pii;
+                }
+                else
+                {
+                    var pii = ((UnknownProgressInfoItem)Items[key]);
+                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    return pii;
+                }
+        }
+
         public ProgressInfoItem SetProgress(string key, long? current = null, long? max = null, bool? started = null, int? sequence = null)
         {
             lock (_lockObject)
@@ -403,7 +527,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     var pii = new ProgressInfoItem();
                         Items.Add(key, pii);
                     pii.Set(current, max, started);
-                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
                     return pii;
                 }
                 else
