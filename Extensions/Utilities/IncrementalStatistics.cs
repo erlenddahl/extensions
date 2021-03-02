@@ -52,5 +52,21 @@ namespace Extensions.Utilities
             Min = Math.Min(Min, observation);
             Max = Math.Max(Max, observation);
         }
+
+        public override string ToString()
+        {
+            return ToString("; ");
+        }
+
+        public string ToString(string separator)
+        {
+            return "Variance: " + Variance + separator +
+                   "Sum: " + Sum + separator +
+                   "StandardDeviation: " + StandardDeviation + separator +
+                   "Average: " + Average + separator +
+                   "Min: " + Min + separator +
+                   "Max: " + Max + separator +
+                   "Count: " + Count + separator;
+        }
     }
 }
