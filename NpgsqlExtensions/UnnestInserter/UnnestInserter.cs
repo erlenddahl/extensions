@@ -12,6 +12,7 @@ namespace NpgsqlExtensions.UnnestInserter
     public class UnnestInserter
     {
         public readonly List<IUnnestableColumn> UnnestColumns = new List<IUnnestableColumn>();
+        public int? InsertTimeout { get; set; }
         private readonly NpgsqlCommandBuilder _cmdBuilder;
         private IEnumerable<IUnnestableColumn> AllColumns => UnnestColumns;
 
@@ -42,6 +43,8 @@ namespace NpgsqlExtensions.UnnestInserter
                 cmdString = string.Format(InsertTemplate, QuoteOrNot(TableName), GetNames(), GetParameters());
                 Debug.WriteLine(cmdString);
                 var cmd = new NpgsqlCommand(cmdString, conn);
+                if(InsertTimeout != null)
+                    cmd.CommandTimeout = InsertTimeout.Value;
                 foreach (var col in AllColumns)
                     col.AddParameters(cmd);
                 cmd.ExecuteNonQuery();
@@ -94,6 +97,80 @@ namespace NpgsqlExtensions.UnnestInserter
             UnnestColumns.Add(new AnonymousUnnestableColumn(key, type, values));
         }
 
+        /// <summary>
+        /// Inserts points with SRID using ST_SetSrid(ST_MakePoint(UNNEST(@geometryX),UNNEST(@geometryY)), @srid)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="srid"></param>
+        public void AddPoint(string key, IEnumerable<double> x, IEnumerable<double> y, int srid)
+        {
+            UnnestColumns.Add(new CustomUnnestableColumn("geometry", "ST_SetSrid(ST_MakePoint(UNNEST(@geometryX),UNNEST(@geometryY)), " + srid + ")", cmd =>
+            {
+                cmd.Parameters.AddWithValue($"@geometryX", x.ToArray());
+                cmd.Parameters.AddWithValue($"@geometryY", y.ToArray());
+            }));
+        }
+
+        /// <summary>
+        /// Inserts points without SRID using ST_MakePoint(UNNEST(@geometryX),UNNEST(@geometryY))
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void AddPoint(string key, IEnumerable<double> x, IEnumerable<double> y)
+        {
+            UnnestColumns.Add(new CustomUnnestableColumn("geometry", "ST_MakePoint(UNNEST(@geometryX),UNNEST(@geometryY))", cmd =>
+            {
+                cmd.Parameters.AddWithValue($"@geometryX", x.ToArray());
+                cmd.Parameters.AddWithValue($"@geometryY", y.ToArray());
+            }));
+        }
+
+        /// <summary>
+        /// Inserts WKT defined geometries using ST_GeomFromText(unnest(@wkt)).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="wkt"></param>
+        public void AddGeometry(string key, IEnumerable<string> wkt)
+        {
+            UnnestColumns.Add(new CustomUnnestableColumn("geometry", "ST_GeomFromText(unnest(@wkt))", cmd =>
+            {
+                cmd.Parameters.AddWithValue("@wkt", wkt.ToArray());
+            }));
+        }
+
+        /// <summary>
+        /// Inserts WKT defined geometries using ST_GeomFromText(unnest(@wkt), @srid).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="wkt"></param>
+        /// <param name="srid"></param>
+        public void AddGeometry(string key, IEnumerable<string> wkt, int srid)
+        {
+            UnnestColumns.Add(new CustomUnnestableColumn("geometry", "ST_GeomFromText(unnest(@wkt), @srid)", cmd =>
+            {
+                cmd.Parameters.AddWithValue("@wkt", wkt.ToArray());
+                cmd.Parameters.AddWithValue("@srid", srid);
+            }));
+        }
+
+        /// <summary>
+        /// Inserts WKT defined geometries using ST_GeomFromText(unnest(@wkt), unnest(@srid)).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="wkt"></param>
+        /// <param name="srid"></param>
+        public void AddGeometry(string key, IEnumerable<string> wkt, IEnumerable<int> srid)
+        {
+            UnnestColumns.Add(new CustomUnnestableColumn("geometry", "ST_GeomFromText(unnest(@wkt), unnest(@srid))", cmd =>
+            {
+                cmd.Parameters.AddWithValue("@wkt", wkt.ToArray());
+                cmd.Parameters.AddWithValue("@srid", srid.ToArray());
+            }));
+        }
+
         public void Add(string key, IEnumerable<TimeSpan> values)
         {
             UnnestColumns.Add(new UnnestableColumn<TimeSpan>() { Name = key, Value = values.ToList() });
@@ -141,7 +218,7 @@ namespace NpgsqlExtensions.UnnestInserter
 
         private string GetParameters()
         {
-            return string.Join(", ", AllColumns.Select(p => p.GetValueString(p.Name)));
+            return string.Join(", ", AllColumns.Select(p => p.GetValueString()));
         }
     }
     
@@ -150,9 +227,9 @@ namespace NpgsqlExtensions.UnnestInserter
         public string Name { get; set; }
         public abstract void AddParameters(NpgsqlCommand cmd);
 
-        public virtual string GetValueString(string name)
+        public virtual string GetValueString()
         {
-            return "@" + name;
+            return "@" + Name;
         }
     }
 
@@ -164,9 +241,32 @@ namespace NpgsqlExtensions.UnnestInserter
             cmd.Parameters.AddWithValue("@" + Name, Value.ToArray());
         }
 
-        public override string GetValueString(string name)
+        public override string GetValueString()
         {
-            return "unnest(@" + name + ")";
+            return "unnest(@" + Name + ")";
+        }
+    }
+
+    public class CustomUnnestableColumn : IUnnestableColumn
+    {
+        private readonly string _valueString;
+        private readonly Action<NpgsqlCommand> _addParametersAction;
+
+        public CustomUnnestableColumn(string name, string valueString, Action<NpgsqlCommand> addParametersAction)
+        {
+            Name = name;
+            _valueString = valueString;
+            _addParametersAction = addParametersAction;
+        }
+
+        public override void AddParameters(NpgsqlCommand cmd)
+        {
+            _addParametersAction(cmd);
+        }
+
+        public override string GetValueString()
+        {
+            return _valueString;
         }
     }
 
@@ -215,9 +315,9 @@ namespace NpgsqlExtensions.UnnestInserter
             throw new NotImplementedException("Unnest inserter not implemented for type " + type.Name);
         }
 
-        public override string GetValueString(string name)
+        public override string GetValueString()
         {
-            return "unnest(@" + name + ")";
+            return "unnest(@" + Name + ")";
         }
     }
 
