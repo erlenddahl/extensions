@@ -29,7 +29,7 @@ namespace Extensions
         }
 
         /// <summary>
-        /// Get the list of all emdedded resources in the assembly.
+        /// Get the list of all embedded resources in the assembly.
         /// </summary>
         /// <returns>An array of fully qualified resource names</returns>
         public static string[] GetEmbeddedResourceNames()
