@@ -106,6 +106,7 @@
     <Compile Include="Lists\FillMissingValuesExtensions.cs" />
     <Compile Include="Lists\SegmentTests.cs" />
     <Compile Include="Lists\BucketizeTests.cs" />
+    <Compile Include="Lists\ThinExtensionTests.cs" />
     <Compile Include="Lists\WeightedAverageTests.cs" />
     <Compile Include="MoreMathTests.cs" />
     <Compile Include="NullableTests.cs" />

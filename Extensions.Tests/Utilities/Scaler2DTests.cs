@@ -9,6 +9,90 @@ namespace Extensions.Tests.Utilities
     public class Scaler2DTests
     {
         [TestMethod]
+        public void Creation()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+
+            Assert.AreEqual(1, scaler.MinX);
+            Assert.AreEqual(2, scaler.MinY);
+            Assert.AreEqual(10, scaler.MaxX);
+            Assert.AreEqual(11, scaler.MaxY);
+        }
+
+        [TestMethod]
+        public void ExpandRadius()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+            scaler = scaler.Expand(7);
+
+            Assert.AreEqual(-6, scaler.MinX);
+            Assert.AreEqual(-5, scaler.MinY);
+            Assert.AreEqual(17, scaler.MaxX);
+            Assert.AreEqual(18, scaler.MaxY);
+        }
+
+        [TestMethod]
+        public void ExpandSame()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+            scaler = scaler.Expand(i, p => x[p], p => y[p]);
+
+            Assert.AreEqual(1, scaler.MinX);
+            Assert.AreEqual(2, scaler.MinY);
+            Assert.AreEqual(10, scaler.MaxX);
+            Assert.AreEqual(11, scaler.MaxY);
+        }
+
+        [TestMethod]
+        public void ExpandLess()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+            scaler = scaler.Expand(i.Skip(2).Take(3).ToArray(), p => x[p], p => y[p]);
+
+            Assert.AreEqual(1, scaler.MinX);
+            Assert.AreEqual(2, scaler.MinY);
+            Assert.AreEqual(10, scaler.MaxX);
+            Assert.AreEqual(11, scaler.MaxY);
+        }
+
+        [TestMethod]
+        public void ExpandMore()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+
+            x = new double[] {0, 1, 2, 3, 4, 5, 17 };
+            y = new double[] {-1, 0, 0, 0, 0, 0, 19 };
+            i = Enumerable.Range(0, x.Length).ToArray();
+
+            scaler = scaler.Expand(i, p => x[p], p => y[p]);
+
+            Assert.AreEqual(0, scaler.MinX);
+            Assert.AreEqual(-1, scaler.MinY);
+            Assert.AreEqual(17, scaler.MaxX);
+            Assert.AreEqual(19, scaler.MaxY);
+        }
+
+        [TestMethod]
         public void PositiveNumbers_ScaleToSameSize()
         {
             var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -21,6 +105,60 @@ namespace Extensions.Tests.Utilities
             Assert.AreEqual(2, scaler.MinY);
             Assert.AreEqual(10, scaler.MaxX);
             Assert.AreEqual(11, scaler.MaxY);
+
+            var res = scaler.Scale(1, 2, 1, 10, 2, 11);
+            Assert.AreEqual(1, res.x);
+            Assert.AreEqual(2, res.y);
+
+            res = scaler.Scale(6, 3, 1, 10, 2, 11);
+            Assert.AreEqual(6, res.x);
+            Assert.AreEqual(3, res.y);
+
+            res = scaler.Scale(10, 11, 1, 10, 2, 11);
+            Assert.AreEqual(10, res.x);
+            Assert.AreEqual(11, res.y);
+        }
+
+        [TestMethod]
+        public void PositiveNumbers_NoXChange_ScaleToSameSize()
+        {
+            var x = new double[] {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+            var y = new double[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+
+            Assert.AreEqual(1, scaler.MinX);
+            Assert.AreEqual(2, scaler.MinY);
+            Assert.AreEqual(1, scaler.MaxX);
+            Assert.AreEqual(11, scaler.MaxY);
+
+            var res = scaler.Scale(1, 2, 1, 10, 2, 11);
+            Assert.AreEqual(1, res.x);
+            Assert.AreEqual(2, res.y);
+
+            res = scaler.Scale(6, 3, 1, 10, 2, 11);
+            Assert.AreEqual(6, res.x);
+            Assert.AreEqual(3, res.y);
+
+            res = scaler.Scale(10, 11, 1, 10, 2, 11);
+            Assert.AreEqual(10, res.x);
+            Assert.AreEqual(11, res.y);
+        }
+
+        [TestMethod]
+        public void PositiveNumbers_NoYChange_ScaleToSameSize()
+        {
+            var x = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var y = new double[] {2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+            var i = Enumerable.Range(0, x.Length).ToArray();
+
+            var scaler = Scaler2D.FromObject<int>(i, p => x[p], p => y[p]);
+
+            Assert.AreEqual(1, scaler.MinX);
+            Assert.AreEqual(2, scaler.MinY);
+            Assert.AreEqual(10, scaler.MaxX);
+            Assert.AreEqual(2, scaler.MaxY);
 
             var res = scaler.Scale(1, 2, 1, 10, 2, 11);
             Assert.AreEqual(1, res.x);

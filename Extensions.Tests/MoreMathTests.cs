@@ -36,6 +36,7 @@ namespace Extensions.Tests
             {
                 Debug.WriteLine(a[0] + ", " + a[1] + " => " + b[0] + ", " + b[1]);
                 var expected = new GeoCoordinate(a[0], a[1]).GetDistanceTo(new GeoCoordinate(b[0], b[1]));
+                Debug.WriteLine(expected);
                 Assert.AreEqual(expected, MoreMath.HaversineDistance(a[0], a[1], b[0], b[1]), 0.0000005);
             }
         }
