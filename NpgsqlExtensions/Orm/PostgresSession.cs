@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using Extensions;
 using Extensions.IEnumerable;
@@ -15,7 +16,7 @@ namespace NpgsqlExtensions.Orm
         private readonly NpgsqlConnection _conn;
         private readonly string _username;
 
-        public PostgresOrmSession(string connString, string username)
+        public PostgresOrmSession(string connString, string username, int commandTimeout = 60)
         {
             _username = username;
             _conn = OpenConnection(connString);
@@ -78,6 +79,22 @@ namespace NpgsqlExtensions.Orm
 
                 return t;
             });
+        }
+
+        /// <summary>
+        /// Retrieves elements matching the given query.
+        /// Note that the query will be prefixed with the ColumnString in order to extract all properties.
+        /// </summary>
+        /// <param name="query">The complete query"</param>
+        /// <param name="func">The function for creating a result items from the current reader row</param>
+        /// <param name="parameters">Parameters for a prepared statement, if any. Must be supplied in pairs: "name1", value1, "name2", value2, etc.</param>
+        /// <returns></returns>
+        public IEnumerable<T> QueryCustom<T>(string query, Func<NpgsqlDataReader, T> func, params object[] parameters)
+        {
+            var cmd = new NpgsqlCommand(query, _conn);
+            cmd.SetParameters(parameters);
+
+            return cmd.ExecuteReaderAndSelect(func);
         }
 
         /// <summary>
@@ -192,6 +209,146 @@ namespace NpgsqlExtensions.Orm
         public object ExecuteScalar(string cmd, params object[] parameters)
         {
             return new NpgsqlCommand(cmd, _conn).SetParameters(parameters).ExecuteScalar();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="query">The part after "SELECT * FROM table"</param>
+        /// <param name="csvPath"></param>
+        /// <param name="separator"></param>
+        /// <param name="ignoreColumns">The name of any columns that should be ignored.</param>
+        /// <param name="parameters">Parameters for a prepared statement, if any. Must be supplied in pairs: "name1", value1, "name2", value2, etc.</param>
+        public void DumpTableAsCsv(string tableName, string csvPath, string separator = ";", string query = "", string[] ignoreColumns = null, params object[] parameters)
+        {
+            var b = new NpgsqlCommandBuilder();
+            var cmd = new NpgsqlCommand("SELECT * FROM public." + b.QuoteIdentifier(tableName), _conn);
+
+            if (!query.StartsWith(" ")) query = " " + query;
+            cmd.CommandTimeout = 0;
+            cmd.CommandText += query;
+            cmd.SetParameters(parameters);
+            cmd.AllResultTypesAreUnknown = true;
+
+            string SerializeToString(object value)
+            {
+                return value?.ToString() ?? "";
+            }
+
+            var csv = new CsvWriter(separator);
+            using (var file = new System.IO.StreamWriter(csvPath))
+            {
+                string[] columns = null;
+                bool[] useColumn = null;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (columns == null)
+                        {
+                            columns = reader.GetColumnSchema().Select(p => p.ColumnName).ToArray();
+                            useColumn = columns.Select((p, i) => ignoreColumns?.Any() != true|| !ignoreColumns.Contains(p)).ToArray();
+                            file.WriteLine(string.Join(separator, columns.Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(p))));
+                        }
+
+                        file.WriteLine(string.Join(separator, Enumerable.Range(0, reader.FieldCount).Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(SerializeToString(reader.GetValue(p))))));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads the given CSV file and inserts it to the given table (empties the table first if emptyTableFirst = true).
+        /// All rows are by default assumed to be of type TEXT. If another type should be used, defined it using the columnData argument.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="csvPath"></param>
+        /// <param name="separator"></param>
+        /// <param name="columns"></param>
+        /// <param name="dropIfExists"></param>
+        /// <param name="subsetSize"></param>
+        /// <param name="progressAction"></param>
+        public void ImportCsv(string tableName, string csvPath, char separator = ';', IList<PostgresOrmCsvColumn> columns = null, bool dropIfExists = true, int subsetSize = 1000, Action<int> progressAction = null)
+        {
+            try
+            {
+                PostgresOrmTable.GetCreationQuery(tableName, columns, p => p, conn: _conn, dropIfExists: dropIfExists).ExecuteNonQuery();
+            }
+            catch (PostgresException pex)
+            {
+                if (pex.SqlState != "42P07") throw;
+            }
+
+            var csv = new CsvReader(separator);
+
+            var count = 0;
+            foreach (var subset in csv.ReadFile(csvPath).Sublists(subsetSize))
+            {
+                var inserter = new UnnestInserter.UnnestInserter(tableName);
+
+                foreach (var col in columns)
+                    col.AddToInserter(inserter, subset);
+
+                inserter.Insert(_conn);
+                count += subset.Count;
+
+                progressAction?.Invoke(count);
+            }
+        }
+
+        /// <summary>
+        /// Generates C# code for creating a PostgresOrmColumnCollection with columns from the given table for the ImportCsv function.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public string GeneratePostgresOrmColumnCollectionCodeFromDatabaseTable(string tableName)
+        {
+            var b = new NpgsqlCommandBuilder();
+            var cmd = new NpgsqlCommand($"SELECT * FROM public.{b.QuoteIdentifier(tableName)} LIMIT 1", _conn);
+            cmd.CommandTimeout = 0;
+            var sb = new StringBuilder();
+            using (var r = cmd.ExecuteReader())
+            {
+                foreach (var g in r.GetColumnSchema().Select(p => new {Name = p.ColumnName, Type = p.DataTypeName}).GroupBy(p => PostgresOrmColumn.GetCTypeName(p.Type)))
+                {
+                    sb.AppendLine("cols." + g.Key.CapitalizeFirst() + "(" + string.Join(", ", g.Select(p => "\"" + p.Name + "\"")) + ");");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public void DuplicateTable(string fromTable, string toTable, bool structureOnly = false)
+        {
+            new NpgsqlCommand($"CREATE TABLE public.{toTable} AS (SELECT * FROM public.{fromTable}){(structureOnly ? " with no data" : "")};", _conn).ExecuteNonQuery();
+        }
+
+        public IEnumerable<string> CleanColumnNames(string tableName, bool removeWhitespace = true, bool toLowerCase = true)
+        {
+            var b = new NpgsqlCommandBuilder();
+            var cmd = new NpgsqlCommand($"SELECT * FROM public.{b.QuoteIdentifier(tableName)} LIMIT 1", _conn);
+            cmd.CommandTimeout = 0;
+            string[] names;
+            using (var r = cmd.ExecuteReader())
+            {
+                names = r.GetColumnSchema().Select(p => p.ColumnName).ToArray();
+            }
+
+            foreach (var col in names)
+            {
+                var newCol = col;
+                if (removeWhitespace) newCol = newCol.Trim();
+                if (toLowerCase) newCol = newCol.ToLower();
+
+                if (newCol == col)
+                    yield return "No change: \"" + col + "\"";
+                else
+                {
+                    new NpgsqlCommand($"ALTER TABLE public.{tableName} RENAME COLUMN \"{col}\" TO \"{newCol}\";", _conn).ExecuteNonQuery();
+                    yield return "\"" + col + "\" => \"" + newCol + "\"";
+                }
+            }
         }
     }
 }

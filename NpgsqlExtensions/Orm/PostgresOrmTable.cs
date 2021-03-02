@@ -65,6 +65,11 @@ namespace NpgsqlExtensions.Orm
 
         public NpgsqlCommand GetCreationQuery(string tableName, string ownerUsername = null, string createIdColumn = null, NpgsqlConnection conn = null, bool dropIfExists = false)
         {
+            return GetCreationQuery(tableName, Columns, p => p.ToCamelCase(), ownerUsername, createIdColumn, conn, dropIfExists);
+        }
+
+        public static NpgsqlCommand GetCreationQuery(string tableName, IEnumerable<PostgresOrmColumn> columns, Func<string, string> columnNameAdjuster, string ownerUsername = null, string createIdColumn = null, NpgsqlConnection conn = null, bool dropIfExists = false)
+        {
             var cmd = "";
 
             if (dropIfExists)
@@ -79,9 +84,10 @@ namespace NpgsqlExtensions.Orm
                 isFirst = false;
             }
 
-            foreach (var col in Columns)
+            var b = new NpgsqlCommandBuilder();
+            foreach (var col in columns)
             {
-                cmd += (isFirst ? "" : ", ") + _cmdBuilder.QuoteIdentifier(col.Name.ToCamelCase()) + " " + (col.IsIdColumn ? "SERIAL NOT NULL" : col.TypeName);
+                cmd += (isFirst ? "" : ", ") + b.QuoteIdentifier(columnNameAdjuster(col.Name)) + " " + (col.IsIdColumn ? "SERIAL NOT NULL" : col.TypeName);
                 isFirst = false;
             }
 
