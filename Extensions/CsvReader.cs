@@ -12,7 +12,6 @@ namespace Extensions
         private char _separator;
         private readonly char _quote;
         private readonly bool _hasHeaders;
-        private string _filename;
 
         public CsvReader(char separator = ';', char quote = '"', bool hasHeaders = true)
         {
@@ -47,7 +46,7 @@ namespace Extensions
             var headers = new Dictionary<string, int>();
             if (_hasHeaders)
                 headers = ParseHeaders(System.IO.File.ReadLines(filename).First());
-            return System.IO.File.ReadLines(_filename).Skip(1).Select(SplitRow).Select(p => new CsvRow(p, headers));
+            return System.IO.File.ReadLines(filename).Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Select(p => new CsvRow(p, headers));
         }
 
         public IEnumerable<CsvRow> ReadString(string filename)
@@ -60,7 +59,7 @@ namespace Extensions
             var headers = new Dictionary<string, int>();
             if (_hasHeaders)
                 headers = ParseHeaders(lines.First());
-            return lines.Skip(1).Select(SplitRow).Where(p => p.Any()).Select(p => new CsvRow(p, headers));
+            return lines.Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Where(p => p.Any()).Select(p => new CsvRow(p, headers));
         }
 
         private Dictionary<string, int> ParseHeaders(string headerRow)
