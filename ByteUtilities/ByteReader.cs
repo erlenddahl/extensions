@@ -31,8 +31,7 @@ namespace ByteUtilities
         public byte[] Take(int n)
         {
             var bytes = new byte[n];
-            for (var i = 0; i < n; i++)
-                bytes[i] = _bytes[i + _position];
+            Array.Copy(_bytes, _position, bytes, 0, n);
             _position += n;
             return bytes;
         }
@@ -156,6 +155,18 @@ namespace ByteUtilities
             var stringLength = PeekInt32();
             if (ByteCount < stringLength) throw new InvalidDataException("Not enough bytes left to peek at this string. Please let erlend.dahl@sintef.no know.");
             return System.Text.Encoding.UTF8.GetString(Peek(4 + stringLength).Skip(4).ToArray());
+        }
+
+        /// <summary>
+        /// Will read and return the string represented by the next n bytes, until a null byte is found.
+        /// </summary>
+        /// <returns>The string represented by the first n-\0 bytes in the stream.</returns>
+        public string TakeNullTerminatedString()
+        {
+            var stringLength = PeekInt32();
+            if (ByteCount < stringLength) throw new InvalidDataException("Not enough bytes left to take this string. Please let erlend.dahl@sintef.no know.");
+            _position += 4;
+            return System.Text.Encoding.UTF8.GetString(Take(stringLength).ToArray());
         }
 
         /// <summary>
