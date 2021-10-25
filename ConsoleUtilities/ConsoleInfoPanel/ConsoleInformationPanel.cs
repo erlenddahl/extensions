@@ -3,235 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Markup;
 using Extensions.StringExtensions;
-using Extensions.TimeSpanExtensions;
 
-namespace ConsoleUtilities.ConsoleProgressBar
+namespace ConsoleUtilities.ConsoleInfoPanel
 {
-    public abstract class ConsoleInfoItem
-    {
-        public bool FullWidth { get; set; }
-        public abstract string Format(int consoleWidth);
-        public int Sequence { get; set; }
-    }
-
-    public interface IHideableItem
-    {
-        bool CanBeHidden { get; }
-    }
-
-    public class StringInfoItem : ConsoleInfoItem
-    {
-        public string Value;
-
-        public override string Format(int consoleWidth)
-        {
-            return Value;
-        }
-    }
-
-    public class AppendableStringInfoItem : ConsoleInfoItem
-    {
-        public string Value;
-
-        public AppendableStringInfoItem()
-        {
-            FullWidth = true;
-        }
-
-        public AppendableStringInfoItem AppendLine(string msg, bool prependTimestamp = true, string timestampFormat = "yyyy-MM-dd HH:mm:ss.fff")
-        {
-            Value += Environment.NewLine + (prependTimestamp ? DateTime.Now.ToString(timestampFormat) + ": " : "") + msg;
-            return this;
-        }
-
-        public override string Format(int consoleWidth)
-        {
-            return Value;
-        }
-    }
-
-    public class IntInfoItem : ConsoleInfoItem
-    {
-        public int Value;
-        public string FormatString = "n0";
-
-        public override string Format(int consoleWidth)
-        {
-            return Value.ToString(FormatString);
-        }
-    }
-
-    public class DoubleInfoItem : ConsoleInfoItem
-    {
-        public double Value;
-        public string FormatString = "n3";
-
-        public override string Format(int consoleWidth)
-        {
-            return Value.ToString(FormatString);
-        }
-    }
-
-    public class DateTimeInfoItem : ConsoleInfoItem
-    {
-        public DateTime Value;
-        public string FormatString = "yyyy-MM-dd HH:mm:ss.fff";
-
-        public override string Format(int consoleWidth)
-        {
-            return Value.ToString(FormatString);
-        }
-    }
-
-    public class ProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
-    {
-        public long Max;
-        public long Current;
-
-        public DateTime? StartTime
-        {
-            get => _start;
-            set
-            {
-                _start = value;
-                if (!_end.HasValue)
-                    _end = null;
-            }
-        }
-
-        public DateTime? EndTime
-        {
-            get => _end;
-            set
-            {
-                _end = value;
-                if (!_start.HasValue)
-                    _start = value;
-            }
-        }
-
-        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
-
-        private int _animationIndex = 0;
-        private DateTime? _end;
-        private DateTime? _start;
-
-        public ProgressInfoItem()
-        {
-            StartTime = DateTime.Now;
-            FullWidth = true;
-        }
-
-        public override string Format(int consoleWidth)
-        {
-            return ConsoleProgressBar.GetAsciiProgress(StartTime, Current / (double)Max, Current, Max, consoleWidth, _animationIndex++, EndTime);
-        }
-
-        public void Set(long? current = null, long? max = null, bool? started = null)
-        {
-            if (current.HasValue) Current = current.Value;
-            if (max.HasValue) Max = max.Value;
-            if (started.HasValue) StartTime = started.Value ? DateTime.Now : (DateTime?)null;
-        }
-
-        public void Start()
-        {
-            StartTime = DateTime.Now;
-        }
-
-        public void Finish()
-        {
-            if (EndTime.HasValue) return;
-            EndTime = DateTime.Now;
-            Current = Max;
-        }
-
-        private object _lock = new object();
-        public void Increment(int inc = 1)
-        {
-            lock (_lock)
-            {
-                Current += inc;
-            }
-        }
-        public void IncrementMax(int inc = 1)
-        {
-            lock (_lock)
-            {
-                Max += inc;
-            }
-        }
-
-        public void Dispose()
-        {
-            Finish();
-        }
-    }
-
-    public class UnknownProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
-    {
-        public DateTime StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
-
-        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
-
-        private int _animationIndex = 0;
-        private int _animationDirection = 1;
-
-        public UnknownProgressInfoItem()
-        {
-            StartTime = DateTime.Now;
-            FullWidth = true;
-        }
-
-        public override string Format(int consoleWidth)
-        {
-            var isFinished = EndTime != null;
-
-            var endTime = isFinished ? EndTime.Value : DateTime.Now;
-            var time = endTime.Subtract(StartTime);
-
-            var text = $" :: {time.ToShortPrettyFormat()}";
-
-            var blockCount = consoleWidth - text.Length - 5;
-
-            var animationWidth = Math.Min(1, blockCount / 2);
-
-            if (isFinished)
-                text = $"[{new string('#', blockCount)}] {text}";
-            else
-            {
-                _animationIndex += _animationDirection * 2;
-                if (_animationIndex + animationWidth >= blockCount)
-                {
-                    _animationDirection = -1;
-                    _animationIndex = blockCount - animationWidth;
-                }else if (_animationIndex <= 0)
-                {
-                    _animationDirection = 1;
-                    _animationIndex = 0;
-                }
-
-                text = $"[{new string(' ', _animationIndex)}{new string('-', animationWidth)}{new string(' ', blockCount - (_animationIndex + animationWidth))}] {text}";
-            }
-
-            return text;
-        }
-
-        public void Finish()
-        {
-            if (EndTime.HasValue) return;
-            EndTime = DateTime.Now;
-        }
-
-        public void Dispose()
-        {
-            Finish();
-        }
-    }
-
     public class ConsoleInformationPanel : IDisposable
     {
 
@@ -264,6 +39,11 @@ namespace ConsoleUtilities.ConsoleProgressBar
             }
         }
 
+        public ConsoleInformationPanelSnapshot GetSnapshot()
+        {
+            return new ConsoleInformationPanelSnapshot(this);
+        }
+
         public static void TestInfoPanel()
         {
             using (var pb = new ConsoleInformationPanel("Testing ..."))
@@ -271,6 +51,27 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 var r = new Random();
                 pb.SetProgress("Current", 0, 1000);
                 var unk = pb.SetUnknownProgress("Unknown waiting ...");
+
+                using (var pb2 = pb.SetProgress("Test twice", max: 50))
+                {
+                    for (var i = 0; i < 50; i++)
+                    {
+                        Thread.Sleep(100);
+                        pb2.Increment();
+                    }
+                }
+
+                Thread.Sleep(1000);
+
+                using (var pb2 = pb.SetProgress("Test twice", max: 50))
+                {
+                    for (var i = 0; i < 50; i++)
+                    {
+                        Thread.Sleep(100);
+                        pb2.Increment();
+                    }
+                }
+
                 for (var i = 0; i < 1000; i++)
                 {
                     pb.Set("Route consumers", r.Next(20));
@@ -375,8 +176,11 @@ namespace ConsoleUtilities.ConsoleProgressBar
                     foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
                     {
                         if (item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
-                        var value = item.Value.Format(consoleWidth - item.Key.Length - 2);
-                        AppendLines(sb, item.Key + ": " + value, consoleWidth - 1);
+                        var key = item.Key;
+                        if (key.Length > consoleWidth / 3)
+                            key = key.Substring(0, consoleWidth / 3) + " [...]";
+                        var value = item.Value.Format(consoleWidth - key.Length - 2);
+                        AppendLines(sb, key + ": " + value, consoleWidth - 1);
                     }
 
                     UpdateText(sb);
@@ -526,7 +330,7 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 if (!Items.ContainsKey(key))
                 {
                     var pii = new ProgressInfoItem();
-                        Items.Add(key, pii);
+                    Items.Add(key, pii);
                     pii.Set(current, max, started);
                     pii.Sequence = sequence ?? (Items.Values.Count + 1);
                     return pii;
@@ -534,6 +338,12 @@ namespace ConsoleUtilities.ConsoleProgressBar
                 else
                 {
                     var pii = ((ProgressInfoItem) Items[key]);
+                    if (pii.EndTime.HasValue)
+                    {
+                        pii.Current = current ?? 0;
+                        pii.EndTime = null;
+                        pii.StartTime = DateTime.Now;
+                    }
                     pii.Set(current, max, started);
                     if (sequence.HasValue) pii.Sequence = sequence.Value;
                     return pii;
@@ -556,6 +366,50 @@ namespace ConsoleUtilities.ConsoleProgressBar
         {
             lock (_lockObject)
                 Items.Remove(key);
+        }
+    }
+
+    public class ConsoleInformationPanelSnapshot
+    {
+        public Dictionary<string, string> Info { get; set; }
+        public Dictionary<string, ProgressSnapshot> Progress { get; set; }
+
+        public ConsoleInformationPanelSnapshot(ConsoleInformationPanel cip)
+        {
+            Progress = cip.Items
+                .Where(p => p.Value is ProgressInfoItem)
+                .OrderBy(p => p.Value.Sequence).ToDictionary(k => k.Key, p => new ProgressSnapshot(p.Value as ProgressInfoItem));
+            
+            Info = cip.Items
+                .Where(p => !(p.Value is ProgressInfoItem)).OrderBy(p => p.Value.Sequence)
+                .ToDictionary(k => k.Key, v => v.Value.Format(80));
+        }
+    }
+
+    public class ProgressSnapshot
+    {
+        public double DurationRemainingS { get; set; }
+        public double DurationS { get; set; }
+        public DateTime? EndTime { get; set; }
+        public DateTime? StartTime { get; set; }
+        public double Percentage { get; set; }
+        public long Max { get; set; }
+        public long Current { get; set; }
+        public string Visualization { get; set; }
+
+        public ProgressSnapshot(ProgressInfoItem pii)
+        {
+            Current = pii.Current;
+            Max = pii.Max;
+            Percentage = Current / (double) Max * 100d;
+            StartTime = pii.StartTime;
+            EndTime = pii.EndTime;
+
+            if (StartTime.HasValue)
+                DurationS = (EndTime ?? DateTime.Now).Subtract(StartTime.Value).TotalSeconds;
+
+            DurationRemainingS = EndTime.HasValue ? 0d : DurationS / Current * Max;
+            Visualization = pii.Format(80);
         }
     }
 }

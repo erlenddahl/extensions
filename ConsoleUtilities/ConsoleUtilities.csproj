@@ -48,7 +48,17 @@
     <Compile Include="ConsoleCommand\InvalidArgumentException.cs" />
     <Compile Include="ConsoleCommand\MissingArgumentException.cs" />
     <Compile Include="ConsoleEx.cs" />
+    <Compile Include="ConsoleInfoPanel\AppendableStringInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\ConsoleInfoItem.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanel.cs" />
+    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelExtensions.cs" />
+    <Compile Include="ConsoleInfoPanel\DateTimeInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\DoubleInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\IHideableItem.cs" />
+    <Compile Include="ConsoleInfoPanel\IntInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\ProgressInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\StringInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\UnknownProgressInfoItem.cs" />
     <Compile Include="ConsoleProgressBar\ConsoleProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

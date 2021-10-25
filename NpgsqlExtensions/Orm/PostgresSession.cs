@@ -18,6 +18,8 @@ namespace NpgsqlExtensions.Orm
         private readonly NpgsqlConnection _conn;
         private readonly string _username;
 
+        public NpgsqlConnection Connection => _conn;
+
         public PostgresOrmSession(string connString, string username, int commandTimeout = 60)
         {
             _username = username;
@@ -201,6 +203,11 @@ namespace NpgsqlExtensions.Orm
         {
             _conn?.Close();
             _conn?.Dispose();
+        }
+
+        public NpgsqlTransaction BeginTransaction()
+        {
+            return _conn.BeginTransaction();
         }
 
         public int ExecuteNonQuery(string cmd, params object[] parameters)
