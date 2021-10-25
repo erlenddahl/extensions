@@ -15,24 +15,50 @@ namespace Extensions.DictionaryExtensions
         /// <param name="list"></param>
         /// <param name="keyFunc"></param>
         /// <param name="valueFunc"></param>
+        /// <param name="duplicateHandling"></param>
         /// <returns></returns>
-        public static Dictionary<string, TV> ToDictionarySafe<TI, TV>(this IEnumerable<TI> list, Func<TI, string> keyFunc, Func<TI, TV> valueFunc)
+        public static Dictionary<string, TV> ToDictionarySafe<TI, TV>(this IEnumerable<TI> list, Func<TI, string> keyFunc, Func<TI, TV> valueFunc, DictionaryDuplicateKeyHandling duplicateHandling = DictionaryDuplicateKeyHandling.AppendNumbers)
         {
             var dict = new Dictionary<string, TV>();
+
+            if (duplicateHandling == DictionaryDuplicateKeyHandling.UseFirstValue)
+            {
+                foreach (var element in list)
+                {
+                    var key = keyFunc(element);
+                    if (dict.ContainsKey(key)) continue;
+                    dict.Add(key, valueFunc(element));
+                }
+
+                return dict;
+            }
+
+            var numberDict = new Dictionary<string, int>();
             foreach (var element in list)
             {
                 var key = keyFunc(element);
                 var value = valueFunc(element);
 
-                var safeKey = key;
-                var safeNumber = 1;
-                while (dict.ContainsKey(safeKey))
-                    safeKey = key + " (" + safeNumber++ + ")";
+                if (!numberDict.TryGetValue(key, out var safeNumber))
+                {
+                    safeNumber = 1;
+                    numberDict.Add(key, safeNumber + 1);
+                }
+                else
+                    numberDict[key]++;
+
+                var safeKey = safeNumber == 1 ? key : key + " (" + safeNumber++ + ")";
 
                 dict.Add(safeKey, value);
             }
 
             return dict;
         }
+    }
+
+    public enum DictionaryDuplicateKeyHandling
+    {
+        AppendNumbers,
+        UseFirstValue
     }
 }
