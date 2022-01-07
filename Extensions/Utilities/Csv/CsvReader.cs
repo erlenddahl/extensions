@@ -17,7 +17,7 @@ namespace Extensions.Utilities.Csv
             _hasHeaders = hasHeaders;
         }
 
-        private IEnumerable<string> SplitRow(string row)
+        protected IEnumerable<string> SplitRow(string row)
         {
             var currStart = 0;
             var insideQuotes = false;
@@ -34,7 +34,7 @@ namespace Extensions.Utilities.Csv
                 }
             }
 
-            if (currStart < row.Length)
+            if (currStart <= row.Length)
                 yield return row.Substring(currStart, row.Length - currStart).Trim(_quote).Replace("\"\"", "\"");
         }
 
