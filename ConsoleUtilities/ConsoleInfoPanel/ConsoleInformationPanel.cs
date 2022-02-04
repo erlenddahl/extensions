@@ -283,12 +283,47 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         iii.Value += inc;
                 }
         }
+
+        public void Max(string key, int value)
+        {
+            lock (_lockObject)
                 if (!Items.ContainsKey(key))
                 {
-                    Items.Add(key, new DoubleInfoItem() {Value = inc});
+                    Items.Add(key, new IntInfoItem() { Value = value });
                 }
                 else
-                    ((DoubleInfoItem) Items[key]).Value += inc;
+                {
+                    if (Items[key] is IntInfoItem iii)
+                        iii.Value = Math.Max(iii.Value, value);
+                }
+        }
+
+        public void Max(string key, long value)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    Items.Add(key, new LongInfoItem() { Value = value });
+                }
+                else
+                {
+                    if (Items[key] is LongInfoItem iii)
+                        iii.Value = Math.Max(iii.Value, value);
+                }
+        }
+
+        public void Max(string key, double value)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    Items.Add(key, new DoubleInfoItem() {Value = value});
+                }
+                else
+                {
+                    if (Items[key] is DoubleInfoItem iii)
+                        iii.Value = Math.Max(iii.Value, value);
+                }
         }
 
         public void Set(string key, int value, int? sequence = null)
