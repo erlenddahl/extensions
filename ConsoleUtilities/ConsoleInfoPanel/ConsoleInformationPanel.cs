@@ -245,7 +245,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             lock (_lockObject)
                 if (!Items.ContainsKey(key))
                 {
-                    Items.Add(key, new IntInfoItem() {Value = inc});
+                    Items.Add(key, new IntInfoItem() { Value = inc });
                 }
                 else
                 {
@@ -256,9 +256,33 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                 }
         }
 
+        public void Increment(string key, long inc)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    Items.Add(key, new LongInfoItem() { Value = inc });
+                }
+                else
+                {
+                    if (Items[key] is LongInfoItem iii)
+                        iii.Value += inc;
+                }
+        }
+
         public void Increment(string key, double inc)
         {
-            lock(_lockObject)
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                {
+                    Items.Add(key, new DoubleInfoItem() { Value = inc });
+                }
+                else
+                {
+                    if (Items[key] is DoubleInfoItem iii)
+                        iii.Value += inc;
+                }
+        }
                 if (!Items.ContainsKey(key))
                 {
                     Items.Add(key, new DoubleInfoItem() {Value = inc});
@@ -271,9 +295,18 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         {
             lock (_lockObject)
                 if (!Items.ContainsKey(key))
-                    Items.Add(key, new IntInfoItem() {Value = value, Sequence = sequence ?? 0});
+                    Items.Add(key, new IntInfoItem() { Value = value, Sequence = sequence ?? 0 });
                 else
-                    ((IntInfoItem) Items[key]).Value = value;
+                    ((IntInfoItem)Items[key]).Value = value;
+        }
+
+        public void Set(string key, long value, int? sequence = null)
+        {
+            lock (_lockObject)
+                if (!Items.ContainsKey(key))
+                    Items.Add(key, new LongInfoItem() { Value = value, Sequence = sequence ?? 0 });
+                else
+                    ((LongInfoItem)Items[key]).Value = value;
         }
 
         public void Set(string key, double value, int? sequence = null)
