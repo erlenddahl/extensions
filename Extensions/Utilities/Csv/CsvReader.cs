@@ -9,12 +9,14 @@ namespace Extensions.Utilities.Csv
         private char _separator;
         private readonly char _quote;
         private readonly bool _hasHeaders;
+        private readonly bool _lowercaseHeaders;
 
-        public CsvReader(char separator = ';', char quote = '"', bool hasHeaders = true)
+        public CsvReader(char separator = ';', char quote = '"', bool hasHeaders = true, bool lowercaseHeaders = false)
         {
             _separator = separator;
             _quote = quote;
             _hasHeaders = hasHeaders;
+            _lowercaseHeaders = lowercaseHeaders;
         }
 
         protected IEnumerable<string> SplitRow(string row)
@@ -56,7 +58,7 @@ namespace Extensions.Utilities.Csv
 
         private Dictionary<string, int> ParseHeaders(string headerRow)
         {
-            return SplitRow(headerRow).Select((a, b) => new { Header = a, Index = b }).ToDictionary(k => k.Header, v => v.Index);
+            return SplitRow(headerRow).Select((a, b) => new {Header = a, Index = b}).ToDictionary(k => _lowercaseHeaders ? k.Header.ToLower() : k.Header, v => v.Index);
         }
     }
 }
