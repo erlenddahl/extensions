@@ -14,7 +14,7 @@ namespace Extensions.Tests.IEnumerableExtensions
         /// <param name="numbers">The numbers to calculate the variance from</param>
         /// <param name="type">The type of variance to calculate</param>
         /// <returns></returns>
-        public static double Variance(this IEnumerable<double> numbers, StandardDeviationType type = StandardDeviationType.Sample)
+        public static double Variance(this IEnumerable<double> numbers, StandardDeviationType type = StandardDeviationType.Population)
         {
             return Math.Pow(numbers.StandardDeviation(type), 2);
         }
@@ -25,7 +25,7 @@ namespace Extensions.Tests.IEnumerableExtensions
         /// <param name="numbers">The numbers to calculate the variance from</param>
         /// <param name="type">The type of variance to calculate</param>
         /// <returns></returns>
-        public static double Variance(this IEnumerable<decimal> numbers, StandardDeviationType type = StandardDeviationType.Sample)
+        public static double Variance(this IEnumerable<decimal> numbers, StandardDeviationType type = StandardDeviationType.Population)
         {
             return numbers.Select(p => (double) p).Variance(type);
         }
@@ -36,7 +36,7 @@ namespace Extensions.Tests.IEnumerableExtensions
         /// <param name="numbers">The numbers to calculate the variance from</param>
         /// <param name="type">The type of variance to calculate</param>
         /// <returns></returns>
-        public static double Variance(this IEnumerable<float> numbers, StandardDeviationType type = StandardDeviationType.Sample)
+        public static double Variance(this IEnumerable<float> numbers, StandardDeviationType type = StandardDeviationType.Population)
         {
             return numbers.Select(p => (double) p).Variance(type);
         }
@@ -47,7 +47,7 @@ namespace Extensions.Tests.IEnumerableExtensions
         /// <param name="numbers">The numbers to calculate the variance from</param>
         /// <param name="type">The type of variance to calculate</param>
         /// <returns></returns>
-        public static double Variance(this IEnumerable<int> numbers, StandardDeviationType type = StandardDeviationType.Sample)
+        public static double Variance(this IEnumerable<int> numbers, StandardDeviationType type = StandardDeviationType.Population)
         {
             return numbers.Select(p => (double) p).Variance(type);
         }
