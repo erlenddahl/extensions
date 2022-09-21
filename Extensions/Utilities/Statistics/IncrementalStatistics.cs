@@ -8,14 +8,18 @@ namespace Extensions.Utilities.Statistics
 
         public double Variance
         {
-            get => Count < 2 ? double.NaN : _variance;
+            get => Count < 1 ? double.NaN : _variance;
             private set => _variance = value;
         }
+        
+        public double Sum { get; private set; }
+        public double WeightSum { get; private set; }
 
-        public double Sum => Count * Average;
+        public double SumSquared { get; private set; }
 
         public double StandardDeviation => System.Math.Sqrt(Variance);
         public double Average { get; private set; }
+        public double WeightedAverage { get; private set; }
         public double Min { get; private set; }
         public double Max { get; private set; }
         public int Count { get; private set; }
@@ -31,22 +35,45 @@ namespace Extensions.Utilities.Statistics
                 AddObservation(value);
         }
 
-        public void AddObservation(double observation)
+        public void AddObservation(double observation, double weight = 1)
         {
             Count++;
+            Sum += observation * weight;
+            WeightSum += weight;
+            SumSquared += observation * observation;
+
             if (Count == 1)
             {
-                Average = Min = Max = observation;
+                WeightedAverage = Average = Min = Max = observation;
                 return;
             }
 
-            var prevAverage = Average;
-            var prevVariance = _variance;
+            Average = Sum / Count;
+            WeightedAverage = Sum / WeightSum;
 
-            Average = (prevAverage * (Count - 1) + observation) / Count;
-            Variance = (Count - 2) * prevVariance / (Count - 1) + System.Math.Pow(observation - prevAverage, 2) / Count;
+            Variance = (SumSquared - 2 * Average * Sum + Count * Average * Average) / Count;
             Min = System.Math.Min(Min, observation);
             Max = System.Math.Max(Max, observation);
+        }
+
+        public void Append(IncrementalStatistics other)
+        {
+            Sum += other.Sum;
+            SumSquared += other.SumSquared;
+            Count += other.Count;
+            Average = Sum / Count;
+            WeightedAverage = Sum / WeightSum;
+
+            if (!double.IsNaN(StandardDeviation) && !double.IsNaN(other.StandardDeviation))
+            {
+                Variance = (SumSquared - 2 * Average * Sum + Count * Average * Average) / Count;
+            }
+            else if (double.IsNaN(StandardDeviation))
+                Variance = other.Variance;
+
+
+            Min = System.Math.Min(Min, other.Min);
+            Max = System.Math.Max(Max, other.Max);
         }
 
         public override string ToString()
@@ -54,15 +81,15 @@ namespace Extensions.Utilities.Statistics
             return ToString("; ");
         }
 
-        public string ToString(string separator)
+        public string ToString(string separator, string linePrefix = "")
         {
-            return "Variance: " + Variance + separator +
-                   "Sum: " + Sum + separator +
-                   "StandardDeviation: " + StandardDeviation + separator +
-                   "Average: " + Average + separator +
-                   "Min: " + Min + separator +
-                   "Max: " + Max + separator +
-                   "Count: " + Count + separator;
+            return linePrefix + "Variance: " + Variance + separator +
+                   linePrefix + "Sum: " + Sum + separator +
+                   linePrefix + "StandardDeviation: " + StandardDeviation + separator +
+                   linePrefix + "Average: " + Average + separator +
+                   linePrefix + "Min: " + Min + separator +
+                   linePrefix + "Max: " + Max + separator +
+                   linePrefix + "Count: " + Count + separator;
         }
     }
 }

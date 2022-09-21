@@ -252,11 +252,11 @@ namespace NpgsqlExtensions.UnnestInserter
         private readonly string _valueString;
         private readonly Action<NpgsqlCommand> _addParametersAction;
 
-        public CustomUnnestableColumn(string name, string valueString, Action<NpgsqlCommand> addParametersAction)
+        public CustomUnnestableColumn(string name, string valueString, Action<NpgsqlCommand> addParametersAction = null)
         {
             Name = name;
             _valueString = valueString;
-            _addParametersAction = addParametersAction;
+            _addParametersAction = addParametersAction ?? (p => {});
         }
 
         public override void AddParameters(NpgsqlCommand cmd)

@@ -19,6 +19,9 @@ namespace NpgsqlExtensions.Orm
 
         public bool CanSet { get; set; }
 
+        public string StaticValue { get; set; } = null;
+        public string QueryValue => StaticValue ?? "@" + Name;
+
         private readonly PropertyInfo _property;
 
         public PostgresOrmColumn(PropertyInfo property)

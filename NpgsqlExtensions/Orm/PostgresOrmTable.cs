@@ -9,31 +9,35 @@ namespace NpgsqlExtensions.Orm
 {
     public class PostgresOrmTable
     {
-        public PostgresOrmColumn[] Columns { get; }
-        public PostgresOrmColumn IdColumn { get; }
+        public List<PostgresOrmColumn> Columns { get; }
+        public PostgresOrmColumn IdColumn { get; private set; }
 
         public bool HasId => IdColumn != null;
 
-        public string ColumnString { get; }
-        public string ParameterString { get; }
+        public string ColumnString { get; private set; }
+        public string ParameterString { get; private set; }
 
-        public string ColumnStringWithoutId { get; }
-        public string ParameterStringWithoutId { get; }
+        public string ColumnStringWithoutId { get; private set; }
+        public string ParameterStringWithoutId { get; private set; }
 
         private readonly NpgsqlCommandBuilder _cmdBuilder;
 
         public PostgresOrmTable(Type t)
         {
             _cmdBuilder = new NpgsqlCommandBuilder();
-            Columns = t.GetProperties().Select(p => new PostgresOrmColumn(p)).ToArray();
+            Columns = t.GetProperties().Select(p => new PostgresOrmColumn(p)).ToList();
+            ApplyColumnChanges();
+        }
 
+        public void ApplyColumnChanges()
+        {
             IdColumn = Columns.FirstOrDefault(p => p.IsIdColumn);
 
             ColumnString = string.Join(",", Columns.Select(p => _cmdBuilder.QuoteIdentifier(p.Name)));
-            ParameterString = string.Join(",", Columns.Select(p => "@" + p.Name));
+            ParameterString = string.Join(",", Columns.Select(p => p.QueryValue));
 
             ColumnStringWithoutId = string.Join(",", Columns.Where(p => !p.IsIdColumn).Select(p => _cmdBuilder.QuoteIdentifier(p.Name)));
-            ParameterStringWithoutId = string.Join(",", Columns.Where(p => !p.IsIdColumn).Select(p => "@" + p.Name));
+            ParameterStringWithoutId = string.Join(",", Columns.Where(p => !p.IsIdColumn).Select(p => p.QueryValue));
         }
 
         public string GetValueString<T>(T element)
@@ -60,7 +64,8 @@ namespace NpgsqlExtensions.Orm
         {
             var cmd = GetInsertQuery(tableName, conn);
             foreach (var p in Columns)
-                cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(element) ?? DBNull.Value);
+                if (p.StaticValue == null)
+                    cmd.Parameters.AddWithValue("@" + p.Name, p.GetValue(element) ?? DBNull.Value);
             return cmd;
         }
 

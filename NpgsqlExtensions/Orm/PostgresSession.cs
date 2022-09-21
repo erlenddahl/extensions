@@ -10,6 +10,7 @@ using Extensions.Reflection;
 using Extensions.StringExtensions;
 using Extensions.Utilities.Csv;
 using Npgsql;
+using NpgsqlExtensions.UnnestInserter;
 
 namespace NpgsqlExtensions.Orm
 {
@@ -73,7 +74,7 @@ namespace NpgsqlExtensions.Orm
             return cmd.ExecuteReaderAndSelect(p =>
             {
                 var t = new T();
-                for (var i = 0; i < ormType.Columns.Length; i++)
+                for (var i = 0; i < ormType.Columns.Count; i++)
                 {
                     if (!ormType.Columns[i].CanSet) continue;
                     var v = p.GetValue(i);
@@ -168,10 +169,10 @@ namespace NpgsqlExtensions.Orm
             return ormType;
         }
 
-        public void Insert<T>(T element, string tableName = null)
+        public void Insert<T>(T element, string tableName = null, PostgresOrmTable ormType = null)
         {
             tableName = GetTableName<T>(tableName);
-            var ormType = GetOrmType<T>();
+            ormType = ormType ?? GetOrmType<T>();
 
             ormType.InsertAndUpdateId(tableName, element, _conn);
         }
@@ -183,17 +184,22 @@ namespace NpgsqlExtensions.Orm
         /// <param name="elements"></param>
         /// <param name="subsetSize"></param>
         /// <param name="tableName"></param>
-        public void InsertRange<T>(IList<T> elements, int subsetSize = 1000, string tableName = null)
+        public void InsertRange<T>(IList<T> elements, int subsetSize = 1000, string tableName = null, PostgresOrmTable ormType = null)
         {
             tableName = GetTableName<T>(tableName);
-            var ormType = GetOrmType<T>();
+            ormType = ormType ?? GetOrmType<T>();
 
             foreach (var subset in elements.Sublists(subsetSize))
             {
                 var inserter = new UnnestInserter.UnnestInserter(tableName);
 
                 foreach (var col in ormType.Columns.Where(p => !p.IsIdColumn))
-                    inserter.Add(col.Name, col.PropertyType, subset.Select(p => col.GetValue(p)));
+                {
+                    if (col.StaticValue != null)
+                        inserter.UnnestColumns.Add(new CustomUnnestableColumn(col.Name, col.StaticValue));
+                    else
+                        inserter.Add(col.Name, col.PropertyType, subset.Select(p => col.GetValue(p)));
+                }
 
                 inserter.Insert(_conn);
             }

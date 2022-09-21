@@ -24,6 +24,47 @@ namespace Extensions.Tests.Utilities.Statistics
         }
 
         [TestMethod]
+        public void IdenticallyWeightedAverageTests()
+        {
+            var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+
+            var inc = new IncrementalStatistics();
+            for (var i = 0; i < list.Length; i++)
+            {
+                inc.AddObservation(list[i], 2);
+
+                var target = list.Take(i + 1).Average();
+                Assert.AreEqual(target, inc.WeightedAverage);
+            }
+        }
+
+        [TestMethod]
+        public void WeightedAverageTests_ZeroWeightIsIgnored()
+        {
+            var inc = new IncrementalStatistics();
+            inc.AddObservation(5, 0);
+            inc.AddObservation(3);
+            Assert.AreEqual(3, inc.WeightedAverage);
+        }
+
+        [TestMethod]
+        public void WeightedAverageTests_SingleObservation()
+        {
+            var inc = new IncrementalStatistics();
+            inc.AddObservation(5, 100);
+            Assert.AreEqual(5, inc.WeightedAverage, 0.05);
+        }
+
+        [TestMethod]
+        public void WeightedAverageTests_WeightWorks()
+        {
+            var inc = new IncrementalStatistics();
+            inc.AddObservation(5, 100);
+            inc.AddObservation(3);
+            Assert.AreEqual(5, inc.WeightedAverage, 0.05);
+        }
+
+        [TestMethod]
         public void MinTests()
         {
             var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
@@ -96,6 +137,63 @@ namespace Extensions.Tests.Utilities.Statistics
                 if (double.IsNaN(target)) Assert.IsTrue(double.IsNaN(inc.StandardDeviation));
                 else Assert.AreEqual(target, inc.StandardDeviation, 0.0000005);
             }
+        }
+
+        [TestMethod]
+        public void AppendEmpty()
+        {
+            var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+            var correct = new IncrementalStatistics(list);
+
+            var inc = new IncrementalStatistics(list);
+            var inc2 = new IncrementalStatistics();
+            inc.Append(inc2);
+
+            Assert.AreEqual(correct.Count, inc.Count);
+            Assert.AreEqual(correct.Min, inc.Min);
+            Assert.AreEqual(correct.Max, inc.Max);
+            Assert.AreEqual(correct.Average, inc.Average);
+            Assert.AreEqual(correct.Sum, inc.Sum);
+            Assert.AreEqual(correct.StandardDeviation, inc.StandardDeviation);
+            Assert.AreEqual(correct.Variance, inc.Variance);
+        }
+
+        [TestMethod]
+        public void AppendFromEmpty()
+        {
+            var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+            var correct = new IncrementalStatistics(list);
+
+            var inc = new IncrementalStatistics();
+            var inc2 = new IncrementalStatistics(list);
+            inc.Append(inc2);
+
+            Assert.AreEqual(correct.Count, inc.Count);
+            Assert.AreEqual(correct.Min, inc.Min);
+            Assert.AreEqual(correct.Max, inc.Max);
+            Assert.AreEqual(correct.Average, inc.Average);
+            Assert.AreEqual(correct.Sum, inc.Sum);
+            Assert.AreEqual(correct.Variance, inc.Variance);
+            Assert.AreEqual(correct.StandardDeviation, inc.StandardDeviation);
+        }
+
+        [TestMethod]
+        public void Append()
+        {
+            var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+            var correct = new IncrementalStatistics(list);
+
+            var inc = new IncrementalStatistics(list.Take(5));
+            var inc2 = new IncrementalStatistics(list.Skip(5));
+            inc.Append(inc2);
+
+            Assert.AreEqual(correct.Count, inc.Count);
+            Assert.AreEqual(correct.Min, inc.Min);
+            Assert.AreEqual(correct.Max, inc.Max);
+            Assert.AreEqual(correct.Average, inc.Average);
+            Assert.AreEqual(correct.Sum, inc.Sum);
+            Assert.AreEqual(correct.Variance, inc.Variance);
+            Assert.AreEqual(correct.StandardDeviation, inc.StandardDeviation);
         }
     }
 }
