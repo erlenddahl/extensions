@@ -367,6 +367,31 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             lock (_lockObject)
                 Items.Remove(key);
         }
+
+        public CipTimer Time(string key)
+        {
+            return new CipTimer(this, key);
+        }
+    }
+
+    public class CipTimer : IDisposable
+    {
+        private readonly ConsoleInformationPanel _cip;
+        private readonly string _key;
+        private readonly Stopwatch _sw;
+
+        public CipTimer(ConsoleInformationPanel cip, string key)
+        {
+            _cip = cip;
+            _key = key;
+            _sw = new Stopwatch();
+        }
+
+        public void Dispose()
+        {
+            var elapsed = _sw.ElapsedMilliseconds;
+            _cip.Increment(_key, elapsed);
+        }
     }
 
     public class ConsoleInformationPanelSnapshot
