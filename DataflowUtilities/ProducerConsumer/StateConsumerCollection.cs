@@ -26,7 +26,7 @@ namespace DataflowUtilities.ProducerConsumer
         public override void Run()
         {
             if (States == null || !States.Any())
-                States = Enumerable.Range(0, ConsumerCount).Select(p => StateGenerator()).ToArray();
+                States = Enumerable.Range(0, ConsumerCount).Select(p => StateGenerator()).AsParallel().ToArray();
             Consumers = States.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction, OnException))).ToList();
         }
     }
