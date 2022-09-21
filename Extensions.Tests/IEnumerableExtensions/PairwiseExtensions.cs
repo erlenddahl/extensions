@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Extensions.ListExtensions;
+using Extensions.IEnumerableExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Extensions.Tests.ListExtensions
+namespace Extensions.Tests.IEnumerableExtensions
 {
     [TestClass]
     public class PairwiseExtensions
