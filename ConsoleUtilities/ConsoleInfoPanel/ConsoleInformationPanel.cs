@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -243,23 +244,69 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         public void Increment(string key, int inc)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
+                if (Items.TryGetValue(key, out var value))
                 {
-                    Items.Add(key, new IntInfoItem() {Value = inc});
+                    switch (value)
+                    {
+                        case IntInfoItem item:
+                            item.Value += inc;
+                            break;
+                        case LongInfoItem item:
+                            item.Value += inc;
+                            break;
+                        case DoubleInfoItem item:
+                            item.Value += inc;
+                            break;
+                        case ProgressInfoItem item:
+                            item.Increment(inc);
+                            break;
+                    }
                 }
                 else
                 {
-                    if (Items[key] is IntInfoItem iii)
-                        iii.Value += inc;
-                    else if (Items[key] is ProgressInfoItem pii)
-                        pii.Increment(inc);
+                    Items.Add(key, new IntInfoItem() { Value = inc });
+                }
+        }
+
+        public void Increment(string key, long inc)
+        {
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var value))
+                {
+                    switch (value)
+                    {
+                        case LongInfoItem item:
+                            item.Value += inc;
+                            break;
+                        case DoubleInfoItem item:
+                            item.Value += inc;
+                            break;
+                    }
+                }
+                else
+                {
+                    Items.Add(key, new LongInfoItem() { Value = inc });
                 }
         }
 
         public void Increment(string key, double inc)
         {
-            lock(_lockObject)
-                if (!Items.ContainsKey(key))
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var value))
+                {
+                    switch (value)
+                    {
+                        case DoubleInfoItem item:
+                            item.Value += inc;
+                            break;
+                    }
+                }
+                else
+                {
+                    Items.Add(key, new DoubleInfoItem() { Value = inc });
+                }
+        }
+
         public void Max(string key, int newValue)
         {
             lock (_lockObject)
@@ -326,56 +373,88 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         public void Set(string key, int value, int? sequence = null)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
-                    Items.Add(key, new IntInfoItem() {Value = value, Sequence = sequence ?? 0});
+                if (Items.TryGetValue(key, out var item))
+                {
+                    ((IntInfoItem)item).Value = value;
+                }
                 else
-                    ((IntInfoItem) Items[key]).Value = value;
+                {
+                    Items.Add(key, new IntInfoItem() { Value = value, Sequence = sequence ?? 0 });
+                }
+        }
+
+        public void Set(string key, long value, int? sequence = null)
+        {
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var item))
+                {
+                    ((LongInfoItem)item).Value = value;
+                }
+                else
+                {
+                    Items.Add(key, new LongInfoItem() { Value = value, Sequence = sequence ?? 0 });
+                }
         }
 
         public void Set(string key, double value, int? sequence = null)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
-                    Items.Add(key, new DoubleInfoItem() {Value = value, Sequence = sequence ?? 0});
+                if (Items.TryGetValue(key, out var item))
+                {
+                    ((DoubleInfoItem)item).Value = value;
+                }
                 else
-                    ((DoubleInfoItem) Items[key]).Value = value;
+                {
+                    Items.Add(key, new DoubleInfoItem() { Value = value, Sequence = sequence ?? 0 });
+                }
         }
 
         public void Set(string key, string value, bool fullWidth = false, int? sequence = null)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
-                    Items.Add(key, new StringInfoItem() {Value = value, FullWidth = fullWidth, Sequence = sequence ?? 0});
+                if (Items.TryGetValue(key, out var item))
+                {
+                    ((StringInfoItem)item).Value = value;
+                }
                 else
-                    ((StringInfoItem) Items[key]).Value = value;
+                {
+                    Items.Add(key, new StringInfoItem() { Value = value, FullWidth = fullWidth, Sequence = sequence ?? 0 });
+                }
         }
 
         public AppendableStringInfoItem Log(string key, string value, int? sequence = null)
         {
             lock (_lockObject)
             {
-                if (!Items.ContainsKey(key))
-                    Items.Add(key, new AppendableStringInfoItem() {Sequence = sequence ?? 0}.AppendLine(value));
+                if (Items.TryGetValue(key, out var item))
+                {
+                    var casted = (AppendableStringInfoItem)item;
+                    casted.AppendLine(value);
+                    return casted;
+                }
                 else
-                    ((AppendableStringInfoItem) Items[key]).AppendLine(value);
-                return (AppendableStringInfoItem) Items[key];
+                {
+                    var casted = new AppendableStringInfoItem() { Sequence = sequence ?? 0 }.AppendLine(value);
+                    Items.Add(key, casted);
+                    return casted;
+                }
             }
         }
 
         public UnknownProgressInfoItem SetUnknownProgress(string key, int? sequence = null)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
+                if (Items.TryGetValue(key, out var progressItem))
                 {
-                    var pii = new UnknownProgressInfoItem();
-                    Items.Add(key, pii);
-                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
+                    var pii = ((UnknownProgressInfoItem)progressItem);
+                    if (sequence.HasValue) pii.Sequence = sequence.Value;
                     return pii;
                 }
                 else
                 {
-                    var pii = ((UnknownProgressInfoItem)Items[key]);
-                    if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    var pii = new UnknownProgressInfoItem();
+                    Items.Add(key, pii);
+                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
                     return pii;
                 }
         }
@@ -383,17 +462,9 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         public ProgressInfoItem SetProgress(string key, long? current = null, long? max = null, bool? started = null, int? sequence = null)
         {
             lock (_lockObject)
-                if (!Items.ContainsKey(key))
+                if (Items.TryGetValue(key, out var progressItem))
                 {
-                    var pii = new ProgressInfoItem();
-                    Items.Add(key, pii);
-                    pii.Set(current, max, started);
-                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
-                    return pii;
-                }
-                else
-                {
-                    var pii = ((ProgressInfoItem) Items[key]);
+                    var pii = ((ProgressInfoItem)progressItem);
                     if (pii.EndTime.HasValue)
                     {
                         pii.Current = current ?? 0;
@@ -402,6 +473,14 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     }
                     pii.Set(current, max, started);
                     if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    return pii;
+                }
+                else
+                {
+                    var pii = new ProgressInfoItem();
+                    Items.Add(key, pii);
+                    pii.Set(current, max, started);
+                    pii.Sequence = sequence ?? (Items.Values.Count + 1);
                     return pii;
                 }
         }
