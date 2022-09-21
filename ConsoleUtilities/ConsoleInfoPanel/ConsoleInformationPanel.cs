@@ -260,11 +260,67 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         {
             lock(_lockObject)
                 if (!Items.ContainsKey(key))
+        public void Max(string key, int newValue)
+        {
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var value))
                 {
-                    Items.Add(key, new DoubleInfoItem() {Value = inc});
+                    switch (value)
+                    {
+                        case IntInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                        case LongInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                        case DoubleInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                    }
                 }
                 else
-                    ((DoubleInfoItem) Items[key]).Value += inc;
+                {
+                    Items.Add(key, new IntInfoItem() { Value = newValue });
+                }
+        }
+
+        public void Max(string key, long newValue)
+        {
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var value))
+                {
+                    switch (value)
+                    {
+                        case LongInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                        case DoubleInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                    }
+                }
+                else
+                {
+                    Items.Add(key, new LongInfoItem() { Value = newValue });
+                }
+        }
+
+        public void Max(string key, double newValue)
+        {
+            lock (_lockObject)
+                if (Items.TryGetValue(key, out var value))
+                {
+                    switch (value)
+                    {
+                        case DoubleInfoItem item:
+                            item.Value = Math.Max(item.Value, newValue);
+                            break;
+                    }
+                }
+                else
+                {
+                    Items.Add(key, new DoubleInfoItem() { Value = newValue });
+                }
         }
 
         public void Set(string key, int value, int? sequence = null)
