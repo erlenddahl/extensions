@@ -66,6 +66,7 @@ namespace DataflowUtilities.ProducerConsumer
 
         public void Post(TItem item, bool ignoreBufferLimit = false, Action performWhileWaiting = null)
         {
+            if (ConsumerCount < 1) throw new Exception("ConsumerCount cannot be less than 1.");
             if (Consumers == null || !Consumers.Any()) Run();
 
             if (!ignoreBufferLimit)
