@@ -12,5 +12,12 @@ namespace Extensions.ArrayExtensions
             Array.Copy(data, index, result, 0, length);
             return result;
         }
+
+        public static T[] GetRangeByIndex<T>(this T[] array, int fromIndex, int toIndex)
+        {
+            if (fromIndex == toIndex) return Array.Empty<T>();
+            var length = toIndex - fromIndex + 1;
+            return array.GetRange(fromIndex, length);
+        }
     }
 }

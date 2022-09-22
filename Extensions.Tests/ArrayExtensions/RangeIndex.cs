@@ -1,29 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Extensions.ArrayExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.ArrayExtensions
 {
     [TestClass]
-    public class Range
+    public class RangeIndex
     {
         [TestMethod]
         public void GetRange_Simple()
         {
             var arr = new[] { 1, 2, 3, 4, 5 };
-            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, arr.GetRange(0, 3));
-            CollectionAssert.AreEqual(new[] { 2, 3, 4 }, arr.GetRange(1, 3));
-            CollectionAssert.AreEqual(new[] { 3, 4, 5 }, arr.GetRange(2, 3));
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, arr.GetRangeByIndex(0, 2));
+            CollectionAssert.AreEqual(new[] { 2, 3, 4 }, arr.GetRangeByIndex(1, 3));
+            CollectionAssert.AreEqual(new[] { 3, 4, 5 }, arr.GetRangeByIndex(2, 4));
         }
 
         [TestMethod]
         public void GetRange_Full()
         {
             var arr = new[] { 1, 2, 3, 4, 5 };
-            CollectionAssert.AreEqual(arr, arr.GetRange(0, 5));
+            CollectionAssert.AreEqual(arr, arr.GetRangeByIndex(0, 4));
         }
 
         [TestMethod]
@@ -32,7 +29,7 @@ namespace Extensions.Tests.ArrayExtensions
             var arr = new[] { 1, 2, 3, 4, 5 };
             try
             {
-                arr.GetRange(0, 6);
+                arr.GetRangeByIndex(0, 6);
                 Assert.Fail();
             }
             catch (ArgumentException aex)
@@ -45,7 +42,7 @@ namespace Extensions.Tests.ArrayExtensions
         public void GetRange_Empty()
         {
             var arr = new[] { 1, 2, 3, 4, 5 };
-            CollectionAssert.AreEqual(Array.Empty<int>(), arr.GetRange(0, 0));
+            CollectionAssert.AreEqual(Array.Empty<int>(), arr.GetRangeByIndex(0, 0));
         }
     }
 }
