@@ -10,7 +10,7 @@ namespace Extensions.Tests.IEnumerableExtensions
         [TestMethod]
         public void EveryTests()
         {
-            var l = new[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+            var l = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
             var a = l.Every(1).ToList();
             Assert.AreEqual(16, a.Count);
