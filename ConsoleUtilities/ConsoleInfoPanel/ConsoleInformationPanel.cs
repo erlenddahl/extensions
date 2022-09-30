@@ -22,6 +22,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         private DateTime _start;
         
         public Dictionary<string, ConsoleInfoItem> Items = new Dictionary<string,ConsoleInfoItem>();
+        public bool HideOldProgressBars { get; set; } = true;
 
         public ConsoleInformationPanel(string title = "Processing ...", bool isActive = true)
         {
@@ -176,7 +177,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
 
                     foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
                     {
-                        if (item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
+                        if (HideOldProgressBars && item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
                         var key = item.Key;
                         if (key.Length > consoleWidth / 3)
                             key = key.Substring(0, consoleWidth / 3) + " [...]";
@@ -195,6 +196,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                 ResetTimer();
             }
         }
+
 
         private void AppendLines(StringBuilder sb, string value, int padTo)
         {
@@ -448,6 +450,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                 {
                     var pii = ((UnknownProgressInfoItem)progressItem);
                     if (sequence.HasValue) pii.Sequence = sequence.Value;
+                    pii.EndTime = null;
                     return pii;
                 }
                 else
