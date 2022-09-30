@@ -52,5 +52,23 @@ namespace Extensions.Tests.IEnumerableExtensions
                 Console.WriteLine(tex.Message);
             }
         }
+
+        [TestMethod]
+        public void AFewNulls()
+        {
+            var a = new object();
+            var b = new object();
+            var l = new[] { null, null, null, a, a, a, a, a, b, b, b, b, b, b, b, b, b, b, b, b };
+            Assert.AreEqual(b, l.Majority());
+        }
+
+        [TestMethod]
+        public void MostNulls()
+        {
+            var a = new object();
+            var b = new object();
+            var l = new[] { null, null, null,null,null,null,null, a, a, a, a, a, b, b, b, b, b };
+            Assert.AreEqual(null, l.Majority());
+        }
     }
 }
