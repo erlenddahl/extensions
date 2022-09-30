@@ -116,6 +116,21 @@ namespace Extensions.ListExtensions
         }
 
         /// <summary>
+        /// Will smooth the given property on the given list using a median filter with the given radius.
+        /// Note: uses reflection, may be slower than doing it manually.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static void MedianSmooth<T>(this IList<T> list, Func<T, double> getValue, Action<T, double> setValue, int radius = 5)
+        {
+            if (list == null || !list.Any()) return;
+
+            var smoothedValues = list.Select((p, i) => list.MedianAround(i, radius, getValue)).ToList();
+            for (var i = 0; i < list.Count; i++)
+                setValue(list[i], smoothedValues[i]);
+        }
+
+        /// <summary>
         /// Will smooth the given list using a median filter with the given radius.
         /// </summary>
         /// <returns></returns>
