@@ -24,9 +24,9 @@ namespace Extensions.IEnumerableExtensions
             }
         }
 
-        public static IEnumerable<Tuple<TSource, TSource>> Pairwise<TSource>(this IEnumerable<TSource> list)
+        public static IEnumerable<(TSource, TSource)> Pairwise<TSource>(this IEnumerable<TSource> list)
         {
-            return list.Pairwise(Tuple.Create);
+            return list.Pairwise((a, b) => (a, b));
         }
     }
 }
