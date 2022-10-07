@@ -36,6 +36,19 @@ namespace Extensions.StringExtensions
         }
 
         /// <summary>
+        /// Adds the given suffix to the filename directly before the extension.
+        /// </summary>
+        /// <param name="filename">The original path/filename</param>
+        /// <param name="suffix">The suffix to add before the extension</param>
+        /// <returns></returns>
+        public static string AddSuffixBeforeExtension(this string filename, string suffix)
+        {
+            var extension = Path.GetExtension(filename);
+            if (string.IsNullOrWhiteSpace(extension)) return filename + suffix;
+            return filename.Substring(0, filename.Length - extension.Length) + suffix + extension;
+        }
+
+        /// <summary>
         /// Will remove the file extension of the given filename.
         /// </summary>
         /// <param name="oldFilename">Full path</param>

@@ -55,5 +55,13 @@ namespace Extensions.Tests.StringExtensions
             Assert.AreEqual(@"C:\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(10));
             Assert.AreEqual(@"C:\...\file.txt", @"C:\folder\one\two\three\file.txt".TruncatePath(5));
         }
+
+        [TestMethod]
+        public void AddSuffixBeforeExtension()
+        {
+            Assert.AreEqual(@"C:\folder\one\two\three\file-123.txt", @"C:\folder\one\two\three\file.txt".AddSuffixBeforeExtension("-123"));
+            Assert.AreEqual(@"C:\folder\one\two\three\file.txt", @"C:\folder\one\two\three\file.txt".AddSuffixBeforeExtension(""));
+            Assert.AreEqual(@"C:\folder\one\two\three\file.tar-123.gz", @"C:\folder\one\two\three\file.tar.gz".AddSuffixBeforeExtension("-123"));
+        }
     }
 }
