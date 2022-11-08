@@ -251,8 +251,7 @@ namespace NpgsqlExtensions.Orm
                 return value?.ToString() ?? "";
             }
 
-            var csv = new CsvWriter(separator);
-            using (var file = new System.IO.StreamWriter(csvPath))
+            using (var csv= new CsvWriter(csvPath, separator))
             {
                 string[] columns = null;
                 bool[] useColumn = null;
@@ -264,10 +263,10 @@ namespace NpgsqlExtensions.Orm
                         {
                             columns = reader.GetColumnSchema().Select(p => p.ColumnName).ToArray();
                             useColumn = columns.Select((p, i) => ignoreColumns?.Any() != true|| !ignoreColumns.Contains(p)).ToArray();
-                            file.WriteLine(string.Join(separator, columns.Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(p))));
+                            csv.WriteLine(columns.Where((p, i) => useColumn[i]));
                         }
 
-                        file.WriteLine(string.Join(separator, Enumerable.Range(0, reader.FieldCount).Where((p, i) => useColumn[i]).Select(p => csv.QuoteValue(SerializeToString(reader.GetValue(p))))));
+                        csv.WriteLine(Enumerable.Range(0, reader.FieldCount).Where((p, i) => useColumn[i]).Select(p => SerializeToString(reader.GetValue(p))));
                     }
                 }
             }
