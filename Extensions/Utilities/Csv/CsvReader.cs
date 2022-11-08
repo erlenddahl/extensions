@@ -23,21 +23,34 @@ namespace Extensions.Utilities.Csv
         {
             var currStart = 0;
             var insideQuotes = false;
+            var isEscaped = false;
             for (var i = 0; i < row.Length; i++)
             {
+                if (!isEscaped && row[i] == '\\')
+                {
+                    isEscaped = true;
+                    continue;
+                }
+
+                if (isEscaped)
+                {
+                    isEscaped = false;
+                    continue;
+                }
+
                 if (row[i] == _quote)
                 {
                     insideQuotes = !insideQuotes;
                 }
                 else if (!insideQuotes && row[i] == _separator)
                 {
-                    yield return row.Substring(currStart, i - currStart).Trim(_quote).Replace("\"\"", "\"");
+                    yield return row.Substring(currStart, i - currStart).Trim(_quote);
                     currStart = i + 1;
                 }
             }
 
             if (currStart <= row.Length)
-                yield return row.Substring(currStart, row.Length - currStart).Trim(_quote).Replace("\"\"", "\"");
+                yield return row.Substring(currStart, row.Length - currStart).Trim(_quote);
         }
 
         public IEnumerable<CsvRow> ReadFile(string filename)

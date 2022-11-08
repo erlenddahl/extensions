@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Extensions.Utilities.Csv
@@ -24,6 +26,43 @@ namespace Extensions.Utilities.Csv
         {
             Raw = row.ToArray();
             _headers = headers;
+        }
+    }
+
+    public static class CsvRowExtensions
+    {
+        public static string GetString(this CsvRow row, object indexOrColumn)
+        {
+            if (indexOrColumn is string s)
+                return row[s];
+            if (indexOrColumn is int i)
+                return row[i];
+            throw new Exception("Column must be given either as an int index or as a string column name (not '" + indexOrColumn.GetType().Name + "').");
+        }
+
+        public static int GetInt32(this CsvRow row, object indexOrColumn)
+        {
+            return int.Parse(GetString(row, indexOrColumn));
+        }
+
+        public static double GetDouble(this CsvRow row, object indexOrColumn, IFormatProvider provider = null)
+        {
+            return double.Parse(GetString(row, indexOrColumn), provider ?? CultureInfo.InvariantCulture);
+        }
+
+        public static DateTime GetDateTime(this CsvRow row, object indexOrColumn, string format, IFormatProvider provider = null)
+        {
+            return DateTime.ParseExact(GetString(row, indexOrColumn), format, provider ?? CultureInfo.InvariantCulture);
+        }
+
+        public static DateTime GetDateTime(this CsvRow row, object indexOrColumn)
+        {
+            return DateTime.Parse(GetString(row, indexOrColumn));
+        }
+
+        public static DateTime GetDateTime(this CsvRow row, object indexOrColumn, IFormatProvider provider)
+        {
+            return DateTime.Parse(GetString(row, indexOrColumn), provider);
         }
     }
 }
