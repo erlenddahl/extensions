@@ -43,6 +43,13 @@ namespace Extensions.Utilities.Csv
             _targetFile.WriteLine(QuoteValues(values));
         }
 
+        public void WriteAllLines(IEnumerable<IEnumerable<string>> lines)
+        {
+            if (_targetFile == null) _targetFile = new StreamWriter(_targetPath);
+            foreach(var line in lines)
+                _targetFile.WriteLine(QuoteValues(line));
+        }
+
         public void Dispose()
         {
             _targetFile?.Dispose();
