@@ -91,5 +91,12 @@ namespace Extensions.Utilities.Statistics
                    linePrefix + "Max: " + Max + separator +
                    linePrefix + "Count: " + Count + separator;
         }
+
+        public static IncrementalStatistics Concatenate(IEnumerable<IncrementalStatistics> stats)
+        {
+            var sum = new IncrementalStatistics();
+            foreach (var s in stats) sum.Append(s);
+            return sum;
+        }
     }
 }

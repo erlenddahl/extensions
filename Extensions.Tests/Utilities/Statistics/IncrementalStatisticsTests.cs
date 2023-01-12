@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Extensions.Tests.IEnumerableExtensions;
+using Extensions.Utilities.Csv;
 using Extensions.Utilities.Statistics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -180,7 +181,7 @@ namespace Extensions.Tests.Utilities.Statistics
         [TestMethod]
         public void Append()
         {
-            var list = new[] { 0d, 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+            var list = new[] { 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
             var correct = new IncrementalStatistics(list);
 
             var inc = new IncrementalStatistics(list.Take(5));
@@ -194,6 +195,25 @@ namespace Extensions.Tests.Utilities.Statistics
             Assert.AreEqual(correct.Sum, inc.Sum);
             Assert.AreEqual(correct.Variance, inc.Variance);
             Assert.AreEqual(correct.StandardDeviation, inc.StandardDeviation);
+        }
+
+        [TestMethod]
+        public void Concatenate()
+        {
+            var list = new[] { 1d, 2d, 3d, 4d, 5d, 5d, 5d, 5d, 5d, 10d };
+            var correct = new IncrementalStatistics(list);
+
+            var partA = new IncrementalStatistics(list.Take(5));
+            var partB = new IncrementalStatistics(list.Skip(5));
+            var conc = IncrementalStatistics.Concatenate(new[] { partA, partB });
+
+            Assert.AreEqual(correct.Count, conc.Count);
+            Assert.AreEqual(correct.Min, conc.Min);
+            Assert.AreEqual(correct.Max, conc.Max);
+            Assert.AreEqual(correct.Average, conc.Average);
+            Assert.AreEqual(correct.Sum, conc.Sum);
+            Assert.AreEqual(correct.Variance, conc.Variance);
+            Assert.AreEqual(correct.StandardDeviation, conc.StandardDeviation);
         }
     }
 }
