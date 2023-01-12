@@ -19,30 +19,15 @@ namespace Extensions.Utilities.Csv
             _lowercaseHeaders = lowercaseHeaders;
         }
 
-        protected IEnumerable<string> SplitRow(string row)
+        public IEnumerable<string> SplitRow(string row)
         {
             var currStart = 0;
             var insideQuotes = false;
             var isEscaped = false;
             for (var i = 0; i < row.Length; i++)
             {
-                if (!isEscaped && row[i] == '\\')
-                {
-                    isEscaped = true;
-                    continue;
-                }
-
-                if (isEscaped)
-                {
-                    isEscaped = false;
-                    continue;
-                }
-
-                if (row[i] == _quote)
-                {
-                    insideQuotes = !insideQuotes;
-                }
-                else if (!insideQuotes && row[i] == _separator)
+                if (CheckEscape(row[i], ref isEscaped)) continue;
+                if (IsNewColumn(row[i], ref insideQuotes))
                 {
                     yield return row.Substring(currStart, i - currStart).Trim(_quote);
                     currStart = i + 1;
@@ -51,6 +36,56 @@ namespace Extensions.Utilities.Csv
 
             if (currStart <= row.Length)
                 yield return row.Substring(currStart, row.Length - currStart).Trim(_quote);
+        }
+
+        private bool CheckEscape(char c, ref bool isEscaped)
+        {
+            if (!isEscaped && c == '\\')
+            {
+                isEscaped = true;
+                return true;
+            }
+
+            if (isEscaped)
+            {
+                isEscaped = false;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsNewColumn(char c, ref bool insideQuotes)
+        {
+            if (c == _quote)
+                insideQuotes = !insideQuotes;
+            else if (!insideQuotes && c == _separator)
+                return true;
+
+            return false;
+        }
+
+        public string SplitRowAndRetrieveSingleColumn(string row, int column)
+        {
+            var currStart = 0;
+            var insideQuotes = false;
+            var isEscaped = false;
+            int currentColumn = 0;
+            for (var i = 0; i < row.Length; i++)
+            {
+                if (CheckEscape(row[i], ref isEscaped)) continue;
+                if (IsNewColumn(row[i], ref insideQuotes))
+                {
+                    if (currentColumn == column) return row.Substring(currStart, i - currStart).Trim(_quote);
+                    currentColumn++;
+                    currStart = i + 1;
+                }
+            }
+
+            if (currStart <= row.Length && currentColumn == column)
+                return row.Substring(currStart, row.Length - currStart).Trim(_quote);
+
+            throw new Exception($"Column {column:n0} not found.");
         }
 
         public IEnumerable<CsvRow> ReadFile(string filename)
