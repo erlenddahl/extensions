@@ -1,4 +1,6 @@
-﻿namespace Extensions.StringExtensions
+﻿using System;
+
+namespace Extensions.StringExtensions
 {
     public static class Replacing
     {
@@ -12,7 +14,7 @@
         /// <returns></returns>
         public static string ReplaceFirst(this string text, string needle, string replace)
         {
-            var pos = text.IndexOf(needle);
+            var pos = text.IndexOf(needle, StringComparison.InvariantCulture);
             if (pos < 0)
                 return text;
             return text.Substring(0, pos) + replace + text.Substring(pos + needle.Length);

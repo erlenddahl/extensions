@@ -17,7 +17,7 @@ namespace Extensions.Utilities.Statistics
 
         public double SumSquared { get; private set; }
 
-        public double StandardDeviation => System.Math.Sqrt(Variance);
+        public double StandardDeviation => Math.Sqrt(Variance);
         public double Average { get; private set; }
         public double WeightedAverage { get; private set; }
         public double Min { get; private set; }
