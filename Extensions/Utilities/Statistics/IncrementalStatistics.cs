@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Extensions.Utilities.Csv;
 
 namespace Extensions.Utilities.Statistics
 {
@@ -20,8 +24,8 @@ namespace Extensions.Utilities.Statistics
         public double StandardDeviation => Math.Sqrt(Variance);
         public double Average { get; private set; }
         public double WeightedAverage { get; private set; }
-        public double Min { get; private set; }
-        public double Max { get; private set; }
+        public double Min { get; private set; } = double.MaxValue;
+        public double Max { get; private set; } = double.MinValue;
         public int Count { get; private set; }
 
         public IncrementalStatistics()
@@ -72,8 +76,8 @@ namespace Extensions.Utilities.Statistics
                 Variance = other.Variance;
 
 
-            Min = System.Math.Min(Min, other.Min);
-            Max = System.Math.Max(Max, other.Max);
+            Min = Math.Min(Min, other.Min);
+            Max = Math.Max(Max, other.Max);
         }
 
         public override string ToString()
