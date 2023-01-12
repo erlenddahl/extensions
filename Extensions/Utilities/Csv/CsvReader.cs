@@ -92,7 +92,7 @@ namespace Extensions.Utilities.Csv
         {
             var headers = new Dictionary<string, int>();
             if (_hasHeaders)
-                headers = ParseHeaders(System.IO.File.ReadLines(filename).First());
+                headers = ReadHeaders(filename);
             return System.IO.File.ReadLines(filename).Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Select(p => new CsvRow(p, headers));
         }
 
@@ -102,6 +102,11 @@ namespace Extensions.Utilities.Csv
             if (_hasHeaders)
                 headers = ParseHeaders(lines.First());
             return lines.Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Where(p => p.Any()).Select(p => new CsvRow(p, headers));
+        }
+
+        public Dictionary<string, int> ReadHeaders(string filename)
+        {
+            return ParseHeaders(System.IO.File.ReadLines(filename).First());
         }
 
         private Dictionary<string, int> ParseHeaders(string headerRow)

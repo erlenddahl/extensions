@@ -27,6 +27,11 @@ namespace Extensions.Utilities.Csv
             Raw = row.ToArray();
             _headers = headers;
         }
+
+        public bool HasHeader(string header)
+        {
+            return _headers.ContainsKey(header);
+        }
     }
 
     public static class CsvRowExtensions
