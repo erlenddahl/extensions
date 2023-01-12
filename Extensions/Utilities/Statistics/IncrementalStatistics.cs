@@ -87,13 +87,47 @@ namespace Extensions.Utilities.Statistics
 
         public string ToString(string separator, string linePrefix = "")
         {
-            return linePrefix + "Variance: " + Variance + separator +
-                   linePrefix + "Sum: " + Sum + separator +
-                   linePrefix + "StandardDeviation: " + StandardDeviation + separator +
-                   linePrefix + "Average: " + Average + separator +
-                   linePrefix + "Min: " + Min + separator +
-                   linePrefix + "Max: " + Max + separator +
-                   linePrefix + "Count: " + Count + separator;
+            return linePrefix + string.Join(separator + linePrefix, GetKeyValues().Select(p => p.Key + ": " + p.Value)) + separator;
+        }
+
+        public IEnumerable<(string Key, double Value)> GetKeyValues()
+        {
+            yield return (nameof(Count), Count);
+            yield return (nameof(Min), Min);
+            yield return (nameof(Max), Max);
+            yield return (nameof(Sum), Sum);
+            yield return (nameof(SumSquared), SumSquared);
+            yield return (nameof(Average), Average);
+            if (Math.Abs(WeightedAverage - Average) > 0.000001)
+                yield return (nameof(WeightedAverage), WeightedAverage);
+            yield return (nameof(StandardDeviation), StandardDeviation);
+            yield return (nameof(Variance), Variance);
+        }
+
+        public static IncrementalStatistics FromCsv(CsvRow row, CultureInfo c = null)
+        {
+            c = c ?? CultureInfo.InvariantCulture;
+
+            var stats = new IncrementalStatistics()
+            {
+                Sum = row.GetDouble(nameof(Sum), c),
+                SumSquared = row.GetDouble(nameof(SumSquared), c),
+                Min = row.GetDouble(nameof(Min), c),
+                Max = row.GetDouble(nameof(Max), c),
+                Count = row.GetInt32(nameof(Count)),
+                Average = row.GetDouble(nameof(Average), c),
+                Variance = row.GetDouble(nameof(Variance), c)
+            };
+
+            if (row.HasHeader(nameof(WeightedAverage)))
+            {
+                stats.WeightedAverage = row.GetDouble(nameof(WeightedAverage), c);
+                stats.WeightSum = stats.WeightedAverage * stats.Count;
+            }
+
+            stats.Variance = (stats.SumSquared - 2 * stats.Average * stats.Sum + stats.Count * stats.Average * stats.Average) / stats.Count;
+
+            return stats;
         }
 
         public static IncrementalStatistics Concatenate(IEnumerable<IncrementalStatistics> stats)

@@ -39,5 +39,58 @@ namespace Extensions.Utilities.Statistics
 
             return sb.ToString();
         }
+
+        public void WriteCsv(string targetFile, params string[] keyTitles)
+        {
+            using (var csv = new CsvWriter(targetFile, ";"))
+                WriteCsv(csv, keyTitles);
+        }
+
+        public void WriteCsv(CsvWriter csv, params string[] keyTitles)
+        {
+            WriteCsv(csv, CultureInfo.InvariantCulture, keyTitles);
+        }
+
+        public void WriteCsv(CsvWriter csv, CultureInfo c, params string[] keyTitles)
+        {
+            csv.WriteLine(keyTitles.Concat(Stats.First().Value.GetKeyValues().Select(p => p.Key)));
+            foreach (var kvp in Stats)
+            {
+                csv.WriteLine(kvp.Key.Select(p => p.ToString()).Concat(kvp.Value.GetKeyValues().Select(p => p.Value.ToString(c))));
+            }
+        }
+
+        public static IncrementalStatisticsCollection FromCsv(string file, CultureInfo c = null, Func<int, string, object> keyParserFunc = null)
+        {
+            return FromCsv(new CsvReader(), file, c, keyParserFunc);
+        }
+
+        public static IncrementalStatisticsCollection FromCsv(CsvReader reader, string file, CultureInfo c = null, Func<int, string, object> keyParserFunc = null)
+        {
+            c = c ?? CultureInfo.InvariantCulture;
+            keyParserFunc = keyParserFunc ?? ((i, v) => v);
+
+            var headers = reader.ReadHeaders(file);
+            foreach (var statsHeader in new IncrementalStatistics().GetKeyValues().Select(p => p.Key))
+                headers.Remove(statsHeader);
+            var keyHeaderIndices = headers.Select(p => p.Value).OrderBy(p => p).ToArray();
+
+            var coll = new IncrementalStatisticsCollection();
+
+            foreach (var row in reader.ReadFile(file))
+            {
+                try
+                {
+                    var stats = IncrementalStatistics.FromCsv(row, c);
+                    coll.Stats.Add(keyHeaderIndices.Select(p => keyParserFunc(p, row[p])).ToArray(), stats);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to parse row with headers=[{string.Join("; ", row.Headers)}] and values=[{string.Join("; ", row.Raw)}]", ex);
+                }
+            }
+
+            return coll;
+        }
     }
 }
