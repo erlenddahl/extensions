@@ -54,5 +54,27 @@ namespace Extensions.Utilities
 
             return d;
         }
+
+        /// <summary>
+        /// Calculates a transition between the minValue and the maxValue.
+        /// If the value is below the minThreshold, the minValue will be returned.
+        /// If the value is above the maxThreshold, the maxValue will be returned.
+        /// If the value is between the thresholds, a linearly weighted average between
+        /// the minValue and the maxValue will be returned.
+        /// </summary>
+        /// <param name="value">The value that decides which section to be returned (lower, transitioned, or higher).</param>
+        /// <param name="minValue">The value to be returned if we are in the lower section (below minThreshold).</param>
+        /// <param name="minThreshold">The limit between the lower and transitioned sections.</param>
+        /// <param name="maxThreshold">The limit between the transitioned and higher sections.</param>
+        /// <param name="maxValue">The value to be returned if we are in the higher section (above maxThreshold).</param>
+        /// <returns></returns>
+        public static double Transition(double value, double minValue, double minThreshold, double maxThreshold, double maxValue)
+        {
+            if (value <= minThreshold) return minValue;
+            if (value >= maxThreshold) return maxValue;
+
+            var factor = (value - minThreshold) / (maxThreshold - minThreshold);
+            return maxValue * factor + minValue * (1 - factor);
+        }
     }
 }

@@ -1,38 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using Extensions.IEnumerableExtensions;
+﻿using Extensions.IEnumerableExtensions;
 using Extensions.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Extensions.Tests.Utilities
+namespace Extensions.Tests.Utilities.MoreMathTests
 {
     [TestClass]
-    public class MoreMathTests
+    public class HaversineTests
     {
-        [TestMethod]
-        public void CalculateAngleCTests()
-        {
-            Assert.AreEqual(37, MoreMath.CalculateAngleC(8, 11, 6.67), 0.1);
-            Assert.AreEqual(60, MoreMath.CalculateAngleC(10, 10, 10), 0.1);
-            Assert.AreEqual(62.2, MoreMath.CalculateAngleC(9, 5, 8), 0.1);
-            Assert.AreEqual(180, MoreMath.CalculateAngleC(10, 10, 20), 0.1);
-        }
-
-        [TestMethod]
-        public void ToRadians()
-        {
-            for (var i = -720; i < 720; i++)
-                Assert.AreEqual(i / 360d * 2 * Math.PI, MoreMath.ToRadians(i), 0.000000001);
-        }
-
-        [TestMethod]
-        public void ToDegrees()
-        {
-            for (var i = -4 * Math.PI; i < 4 * Math.PI; i += 1 / 360d)
-                Assert.AreEqual(i / (2 * Math.PI) * 360d, MoreMath.ToDegrees(i), 0.000000001);
-        }
 
         [TestMethod]
         public void HaversineDistanceTests()
