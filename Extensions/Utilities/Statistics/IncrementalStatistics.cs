@@ -26,7 +26,7 @@ namespace Extensions.Utilities.Statistics
         public double WeightedAverage { get; private set; }
         public double Min { get; private set; } = double.MaxValue;
         public double Max { get; private set; } = double.MinValue;
-        public int Count { get; private set; }
+        public long Count { get; private set; }
 
         public IncrementalStatistics()
         {
