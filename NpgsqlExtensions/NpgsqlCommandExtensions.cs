@@ -18,6 +18,17 @@ namespace NpgsqlExtensions
                     yield return func(reader);
             }
         }
+        public static async Task<Dictionary<TKey, TValue>> ExecuteReaderToDictionary<TKey, TValue>(this NpgsqlCommand cmd, Func<NpgsqlDataReader, TKey> keyFunc, Func<NpgsqlDataReader, TValue> valueFunc)
+        {
+            var dict = new Dictionary<TKey, TValue>();
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (reader.Read())
+                    dict.Add(keyFunc(reader), valueFunc(reader));
+            }
+
+            return dict;
+        }
 
         public static void ExecuteReaderForEach(this NpgsqlCommand cmd, Action<NpgsqlDataReader> action)
         {
