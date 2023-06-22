@@ -19,6 +19,11 @@ namespace Extensions.Utilities.Csv
             _lowercaseHeaders = lowercaseHeaders;
         }
 
+        public static IEnumerable<CsvRow> FromFile(string filename, char separator = ';', char quote = '"', bool hasHeaders = true, bool lowercaseHeaders = false)
+        {
+            return new CsvReader(separator, quote, hasHeaders, lowercaseHeaders).ReadFile(filename);
+        }
+
         public IEnumerable<string> SplitRow(string row)
         {
             var currStart = 0;
