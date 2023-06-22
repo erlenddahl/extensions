@@ -1,4 +1,6 @@
-﻿namespace ConsoleUtilities.ConsoleInfoPanel
+﻿using System.Threading;
+
+namespace ConsoleUtilities.ConsoleInfoPanel
 {
     public class IntInfoItem : ConsoleInfoItem
     {
@@ -8,6 +10,11 @@
         public override string Format(int consoleWidth)
         {
             return Value.ToString(FormatString);
+        }
+
+        public void Increment(int inc = 1)
+        {
+            Interlocked.Add(ref Value, inc);
         }
     }
 }

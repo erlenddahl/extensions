@@ -243,6 +243,45 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             Increment(key, 1);
         }
 
+        public IntInfoItem GetOrCreate(string key, int defaultValue)
+        {
+            lock (_lockObject)
+            {
+                if (!Items.TryGetValue(key, out var item))
+                {
+                    item = new IntInfoItem() { Value = defaultValue };
+                    Items.Add(key, item);
+                }
+                return (IntInfoItem)item;
+            }
+        }
+
+        public LongInfoItem GetOrCreate(string key, long defaultValue)
+        {
+            lock (_lockObject)
+            {
+                if (!Items.TryGetValue(key, out var item))
+                {
+                    item = new LongInfoItem() { Value = defaultValue };
+                    Items.Add(key, item);
+                }
+                return (LongInfoItem)item;
+            }
+        }
+
+        public DoubleInfoItem GetOrCreate(string key, double defaultValue)
+        {
+            lock (_lockObject)
+            {
+                if (!Items.TryGetValue(key, out var item))
+                {
+                    item = new DoubleInfoItem() { Value = defaultValue };
+                    Items.Add(key, item);
+                }
+                return (DoubleInfoItem)item;
+            }
+        }
+
         public void Increment(string key, int inc)
         {
             lock (_lockObject)
