@@ -103,7 +103,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
 
                     var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is IHideableItem pii && pii.CanBeHidden) : 0;
                     var infoItemLineCount = 0;
-                    var maxInfoItemLineCount = Math.Max(availableRows - fullWidthItems.Length - (hiddenCompleted > 0 ? 1 : 0), availableRows / 2);
+                    var maxInfoItemLineCount = Math.Max(availableRows - fullWidthItems.Length - (hiddenCompleted > 0 ? 1 : 0) - (fullWidthItems.Any() ? 1 : 0) - 1, availableRows / 2);
                     var infoSb = new StringBuilder();
                     if (infoItems.Any())
                     {
