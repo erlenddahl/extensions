@@ -28,7 +28,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         {
             _title = title;
             _isActive = isActive;
-            _timer = new Timer(TimerHandler);
+            _timer = new Timer(DrawPanel);
             _start = DateTime.Now;
 
             // A progress bar is only for temporary display in a console window.
@@ -111,11 +111,11 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                 (item as ProgressInfoItem)?.Finish();
 
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            TimerHandler(null);
+            DrawPanel(null);
             _disposed = true;
         }
 
-        private void TimerHandler(object state)
+        private void DrawPanel(object state)
         {
             if (_timer == null || !_isActive) return;
             lock (_lockObject)
