@@ -88,7 +88,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
 
                     var fullWidthItems = Items
                         .Where(p => p.Value.FullWidth)
-                        .Where(p => !(HideOldProgressBars && p.Value is ProgressInfoItem pii && pii.CanBeHidden))
+                        .Where(p => !(HideOldProgressBars && p.Value is IHideableItem pii && pii.CanBeHidden))
                         .OrderBy(p => p.Value.Sequence)
                         .ThenBy(p => p.GetType())
                         .ThenBy(p => p.Key)
@@ -101,7 +101,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     sb.Append("".PadRight(consoleWidth));
                     availableRows -= 4;
 
-                    var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden) : 0;
+                    var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is IHideableItem pii && pii.CanBeHidden) : 0;
                     var infoItemLineCount = 0;
                     var maxInfoItemLineCount = Math.Max(availableRows - fullWidthItems.Length - (hiddenCompleted > 0 ? 1 : 0), availableRows / 2);
                     var infoSb = new StringBuilder();
