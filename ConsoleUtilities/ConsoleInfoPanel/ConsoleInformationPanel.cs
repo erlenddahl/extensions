@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+using ConsoleUtilities.ConsoleInfoPanel.Items;
 using Extensions.StringExtensions;
 
 namespace ConsoleUtilities.ConsoleInfoPanel
@@ -558,70 +559,6 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         public CipTimer Time(string key)
         {
             return new CipTimer(this, key);
-        }
-    }
-
-    public class CipTimer : IDisposable
-    {
-        private readonly ConsoleInformationPanel _cip;
-        private readonly string _key;
-        private readonly Stopwatch _sw;
-
-        public CipTimer(ConsoleInformationPanel cip, string key)
-        {
-            _cip = cip;
-            _key = key;
-            _sw = new Stopwatch();
-        }
-
-        public void Dispose()
-        {
-            var elapsed = _sw.ElapsedMilliseconds;
-            _cip.Increment(_key, elapsed);
-        }
-    }
-
-    public class ConsoleInformationPanelSnapshot
-    {
-        public Dictionary<string, string> Info { get; set; }
-        public Dictionary<string, ProgressSnapshot> Progress { get; set; }
-
-        public ConsoleInformationPanelSnapshot(ConsoleInformationPanel cip)
-        {
-            Progress = cip.Items
-                .Where(p => p.Value is ProgressInfoItem)
-                .OrderBy(p => p.Value.Sequence).ToDictionary(k => k.Key, p => new ProgressSnapshot(p.Value as ProgressInfoItem));
-            
-            Info = cip.Items
-                .Where(p => !(p.Value is ProgressInfoItem)).OrderBy(p => p.Value.Sequence)
-                .ToDictionary(k => k.Key, v => v.Value.Format(80));
-        }
-    }
-
-    public class ProgressSnapshot
-    {
-        public double DurationRemainingS { get; set; }
-        public double DurationS { get; set; }
-        public DateTime? EndTime { get; set; }
-        public DateTime? StartTime { get; set; }
-        public double Percentage { get; set; }
-        public long Max { get; set; }
-        public long Current { get; set; }
-        public string Visualization { get; set; }
-
-        public ProgressSnapshot(ProgressInfoItem pii)
-        {
-            Current = pii.Current;
-            Max = pii.Max;
-            Percentage = Current / (double) Max * 100d;
-            StartTime = pii.StartTime;
-            EndTime = pii.EndTime;
-
-            if (StartTime.HasValue)
-                DurationS = (EndTime ?? DateTime.Now).Subtract(StartTime.Value).TotalSeconds;
-
-            DurationRemainingS = EndTime.HasValue ? 0d : DurationS / Current * Max;
-            Visualization = pii.Format(80);
         }
     }
 }

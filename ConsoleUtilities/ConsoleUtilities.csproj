@@ -49,19 +49,22 @@
     <Compile Include="ConsoleCommand\MissingArgumentException.cs" />
     <Compile Include="ConsoleConfigHelper.cs" />
     <Compile Include="ConsoleEx.cs" />
-    <Compile Include="ConsoleInfoPanel\AppendableStringInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\CipTimer.cs" />
+    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelSnapshot.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\AppendableStringInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\ItemBases\ConsoleInfoItem.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanel.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelExtensions.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelTests.cs" />
-    <Compile Include="ConsoleInfoPanel\DateTimeInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\DoubleInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\IHideableItem.cs" />
-    <Compile Include="ConsoleInfoPanel\IntInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\LongInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ProgressInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\StringInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\UnknownProgressInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\DateTimeInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\DoubleInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\ItemBases\IHideableItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\IntInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\LongInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\ProgressInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\StringInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\Items\UnknownProgressInfoItem.cs" />
+    <Compile Include="ConsoleInfoPanel\ProgressSnapshot.cs" />
     <Compile Include="ConsoleProgressBar\ConsoleProgressBar.cs" />
     <Compile Include="IRunnable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,5 +75,6 @@
       <Name>Extensions</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
