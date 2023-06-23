@@ -68,8 +68,9 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                 try
                 {
                     var consoleWidth = Console.WindowWidth;
+                    var availableRows = Console.WindowHeight - 1;
 
-                    if (consoleWidth != _previousConsoleWidth || _hadError)
+                    if (consoleWidth != _previousConsoleWidth || availableRows != _previousConsoleHeight || _hadError)
                     {
                         Console.Clear();
                         _currentText = "";
@@ -77,11 +78,21 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     }
 
                     _previousConsoleWidth = consoleWidth;
+                    _previousConsoleHeight = availableRows;
 
-                    var items = new List<string>();
+                    var infoItems = Items
+                        .Where(p => !(p.Value.FullWidth))
+                        .OrderBy(p => p.Value.Sequence)
+                        .Select(p => p.Key + ": " + p.Value.Format(consoleWidth - p.Key.Length - 2))
+                        .ToArray();
 
-                    foreach (var item in Items.Where(p => !(p.Value.FullWidth)).OrderBy(p => p.Value.Sequence))
-                        items.Add(item.Key + ": " + item.Value.Format(consoleWidth - item.Key.Length - 2));
+                    var progressItems = Items
+                        .Where(p => p.Value.FullWidth)
+                        .Where(p => !(HideOldProgressBars && p.Value is ProgressInfoItem pii && pii.CanBeHidden))
+                        .OrderBy(p => p.Value.Sequence)
+                        .ThenBy(p => p.GetType())
+                        .ThenBy(p => p.Key)
+                        .ToArray();
 
                     var sb = new StringBuilder();
                     sb.Append("".PadRight(consoleWidth, '='));
@@ -89,14 +100,26 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     sb.Append("".PadRight(consoleWidth, '='));
                     sb.Append("".PadRight(consoleWidth));
 
-                    if (items.Any())
+                    availableRows -= 4;
+                    var removedItems = 0;
+                    var infoItemCount = infoItems.Any() ? infoItems.Length + 1 : 0;
+                    var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden) : 0;
+
+                    if (availableRows < infoItemCount + progressItems.Length)
                     {
-                        var maxWidth = items.Max(p => p.Length) + 6;
+                        var progressCount = progressItems.Length;
+                        progressItems = progressItems.Take(availableRows - infoItemCount - 1).ToArray();
+                        removedItems = progressCount - progressItems.Length;
+                    }
+
+                    if (infoItems.Any())
+                    {
+                        var maxWidth = infoItems.Max(p => p.Length) + 6;
                         var lineWidth = 0;
                         var lastWasNewLine = false;
-                        foreach (var item in items)
+                        foreach (var item in infoItems)
                         {
-                            if (lineWidth + 2 * maxWidth >= consoleWidth || item == items.Last())
+                            if (lineWidth + 2 * maxWidth >= consoleWidth || item == infoItems.Last())
                             {
                                 sb.AppendLine(item.PadRight(consoleWidth - lineWidth - 1));
                                 lineWidth = 0;
@@ -114,18 +137,26 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         {
                             sb.AppendLine();
                         }
+
+                        sb.AppendLine("".PadRight(consoleWidth - 1));
                     }
 
-                    sb.AppendLine("".PadRight(consoleWidth - 1));
-
-                    foreach (var item in Items.Where(p => p.Value.FullWidth).OrderBy(p => p.Value.Sequence).ThenBy(p => p.GetType()).ThenBy(p => p.Key))
+                    foreach (var item in progressItems)
                     {
-                        if (HideOldProgressBars && item.Value is ProgressInfoItem pii && pii.CanBeHidden) continue;
                         var key = item.Key;
                         if (key.Length > consoleWidth / 3)
                             key = key.Substring(0, consoleWidth / 3) + " [...]";
                         var value = item.Value.Format(consoleWidth - key.Length - 2);
                         AppendLines(sb, key + ": " + value, consoleWidth - 1);
+                    }
+
+                    if (hiddenCompleted > 0 || removedItems > 0)
+                    {
+                        sb.AppendLine(("[ " +
+                                      (hiddenCompleted > 0 ? $"{hiddenCompleted:n0} completed progress bar(s)" : "") +
+                                      (hiddenCompleted > 0 && removedItems > 0 ? "; " : "") +
+                                      (removedItems > 0 ? $"{removedItems:n0} overflowing items" : "") +
+                                      " ]").PadCenter(consoleWidth - 1));
                     }
 
                     UpdateText(sb);
@@ -141,15 +172,17 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         }
 
 
-        private void AppendLines(StringBuilder sb, string value, int padTo)
+        private int AppendLines(StringBuilder sb, string value, int padTo)
         {
             var lines = value.Split(Environment.NewLine);
             foreach (var line in lines)
                 sb.AppendLine(line.PadRight(padTo));
+            return lines.Length;
         }
 
         private string _currentText = "";
         private int _previousConsoleWidth;
+        private int _previousConsoleHeight;
         private bool _hadError = false;
 
         private void UpdateText(StringBuilder sb)

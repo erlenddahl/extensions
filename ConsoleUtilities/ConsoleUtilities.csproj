@@ -53,6 +53,7 @@
     <Compile Include="ConsoleInfoPanel\ConsoleInfoItem.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanel.cs" />
     <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelExtensions.cs" />
+    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelTests.cs" />
     <Compile Include="ConsoleInfoPanel\DateTimeInfoItem.cs" />
     <Compile Include="ConsoleInfoPanel\DoubleInfoItem.cs" />
     <Compile Include="ConsoleInfoPanel\IHideableItem.cs" />
