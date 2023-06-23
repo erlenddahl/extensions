@@ -104,7 +104,6 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is IHideableItem pii && pii.CanBeHidden) : 0;
                     var infoItemLineCount = 0;
                     var maxInfoItemLineCount = Math.Max(availableRows - fullWidthItems.Length - (hiddenCompleted > 0 ? 1 : 0) - (fullWidthItems.Any() ? 1 : 0) - 1, availableRows / 2);
-                    var infoSb = new StringBuilder();
                     if (infoItems.Any())
                     {
                         // Calculate the number of characters in the widest item (including a margin)
@@ -123,14 +122,20 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                             var thisIsTheLastItem = item == lastItem;
                             if (currentLineWidth + 2 * itemWidth >= consoleWidth || thisIsTheLastItem)
                             {
-                                if (!thisIsTheLastItem && infoItemLineCount >= maxInfoItemLineCount)
+                                // If the current number of info lines are equal to the maximum number of
+                                // info lines, the rest of the info items must be hidden (unless this is
+                                // actually the very last info item).
+                                if (infoItemLineCount >= maxInfoItemLineCount && !thisIsTheLastItem)
                                 {
-                                    infoSb.AppendLine($"[ + {infoItems.Length - printedItems:n0} hidden ]".PadRight(consoleWidth - currentLineWidth - 1));
+                                    // Count how many items are remaining, and add a short message about hidden items in the last place.
+                                    sb.AppendLine($"[ + {infoItems.Length - printedItems:n0} hidden ]".PadRight(consoleWidth - currentLineWidth - 1));
                                     infoItemLineCount++;
                                     break;
                                 }
 
-                                infoSb.AppendLine(item.PadRight(consoleWidth - currentLineWidth - 1));
+                                // This is either the very last item, or the last item that can fit on
+                                // the current line. Print it, and move to the next line.
+                                sb.AppendLine(item.PadRight(consoleWidth - currentLineWidth - 1));
                                 currentLineWidth = 0;
                                 infoItemLineCount++;
                                 printedItems++;
@@ -140,7 +145,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                             // next item should start.
                             else
                             {
-                                infoSb.Append(item.PadRight(itemWidth));
+                                sb.Append(item.PadRight(itemWidth));
                                 currentLineWidth += itemWidth;
                                 printedItems++;
                             }
@@ -149,15 +154,18 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         // Add a final empty line to separate the info items from any FullWidth items
                         if (fullWidthItems.Any())
                         {
-                            infoSb.AppendLine("".PadRight(consoleWidth - 1));
+                            sb.AppendLine("".PadRight(consoleWidth - 1));
                             infoItemLineCount++;
                         }
                     }
 
                     var removedItems = 0;
 
+                    // If there are any hidden progress bars, there will be a line at the bottom
+                    // reporting how many. Subtract this line from the available rows.
                     if (hiddenCompleted > 0) availableRows -= 1;
 
+                    // If there isn't room for all fullWidth items, hide the overflowing items.
                     if (availableRows < infoItemLineCount + fullWidthItems.Length)
                     {
                         var progressCount = fullWidthItems.Length;
@@ -165,11 +173,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         removedItems = progressCount - fullWidthItems.Length;
                     }
 
-                    if (infoItems.Any())
-                    {
-                        sb.Append(infoSb);
-                    }
-
+                    // Print all full width items.
                     foreach (var item in fullWidthItems)
                     {
                         var key = item.Key;
@@ -179,15 +183,17 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         AppendLines(sb, key + ": " + value, consoleWidth - 1);
                     }
 
+                    // Print a report line at the bottom summarizing hidden and overflowing full width items.
                     if (hiddenCompleted > 0 || removedItems > 0)
                     {
                         sb.AppendLine(("[ " +
-                                      (hiddenCompleted > 0 ? $"{hiddenCompleted:n0} completed progress bar(s)" : "") +
+                                      (hiddenCompleted > 0 ? ($"{hiddenCompleted:n0} completed progress bar" + (hiddenCompleted > 1 ? "s" : "")) : "") +
                                       (hiddenCompleted > 0 && removedItems > 0 ? "; " : "") +
                                       (removedItems > 0 ? $"{removedItems:n0} overflowing items" : "") +
                                       " ]").PadCenter(consoleWidth - 1));
                     }
 
+                    // Update the text in the console
                     UpdateText(sb);
                 }
                 catch (Exception ex)
@@ -201,12 +207,11 @@ namespace ConsoleUtilities.ConsoleInfoPanel
         }
 
 
-        private int AppendLines(StringBuilder sb, string value, int padTo)
+        private void AppendLines(StringBuilder sb, string value, int padTo)
         {
             var lines = value.Split(Environment.NewLine);
             foreach (var line in lines)
                 sb.AppendLine(line.PadRight(padTo));
-            return lines.Length;
         }
 
         private string _currentText = "";
