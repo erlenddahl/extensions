@@ -158,13 +158,13 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             
             // If the new text is shorter than the old one: delete overlapping characters
             var overlapCount = _currentText.Length - sb.Length;
+            _currentText = sb.ToString();
             if (overlapCount > 0)
             {
                 sb.Append(' ', overlapCount);
             }
 
             Console.Write(sb);
-            _currentText = sb.ToString();
         }
 
         private void ResetTimer()
