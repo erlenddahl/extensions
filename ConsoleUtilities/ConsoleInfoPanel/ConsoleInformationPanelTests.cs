@@ -29,6 +29,27 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             }
         }
 
+        public static void TestInfoPanelLargeNumberOfProgressbarsAndInfoItems()
+        {
+            var r = new Random();
+            using (var cip = new ConsoleInformationPanel())
+            {
+                Enumerable.Range(0, 160).AsParallel().WithDegreeOfParallelism(100).ForAll(p =>
+                {
+                    Thread.Sleep(r.Next(10_000));
+                    using (var pb = cip.SetProgress("Progressbar " + p, max: 100))
+                    {
+                        for (var i = 0; i < 100; i++)
+                        {
+                            Thread.Sleep(r.Next(500));
+                            pb.Increment();
+                            cip.Set("Info item " + p, i);
+                        }
+                    }
+                });
+            }
+        }
+
         public static void TestInfoPanel()
         {
             using (var pb = new ConsoleInformationPanel("Testing ..."))

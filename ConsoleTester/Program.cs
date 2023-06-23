@@ -12,7 +12,9 @@ namespace ConsoleTester
     {
         static void Main(string[] args)
         {
-            ConsoleInformationPanel.TestInfoPanel();
+            ConsoleInformationPanelTests.TestInfoPanelLargeNumberOfProgressbarsAndInfoItems();
+            //ConsoleInformationPanelTests.TestInfoPanelLargeNumberOfProgressbars();
+            //ConsoleInformationPanelTests.TestInfoPanel();
         }
     }
 }

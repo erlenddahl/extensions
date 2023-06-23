@@ -86,7 +86,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                         .Select(p => p.Key + ": " + p.Value.Format(consoleWidth - p.Key.Length - 2))
                         .ToArray();
 
-                    var progressItems = Items
+                    var fullWidthItems = Items
                         .Where(p => p.Value.FullWidth)
                         .Where(p => !(HideOldProgressBars && p.Value is ProgressInfoItem pii && pii.CanBeHidden))
                         .OrderBy(p => p.Value.Sequence)
@@ -99,49 +99,78 @@ namespace ConsoleUtilities.ConsoleInfoPanel
                     sb.Append(_title.PadCenter(consoleWidth));
                     sb.Append("".PadRight(consoleWidth, '='));
                     sb.Append("".PadRight(consoleWidth));
-
                     availableRows -= 4;
+
+                    var infoItemLineCount = 0;
+                    var maxInfoItemLineCount = Math.Max(availableRows - fullWidthItems.Length, availableRows / 2);
+                    var infoSb = new StringBuilder();
+                    if (infoItems.Any())
+                    {
+                        // Calculate the number of characters in the widest item (including a margin)
+                        var itemWidth = infoItems.Max(p => p.Length) + 6;
+                        var printedItems = 0;
+
+                        var currentLineWidth = 0;
+                        var lastItem = infoItems.Last();
+
+                        // Enumerate all info items, and print them in as many columns as possible.
+                        foreach (var item in infoItems)
+                        {
+                            // If this item is the last item that can fit on the current line (or the
+                            // last item in the list), add it to the end of the current line and add
+                            // a line break.
+                            var thisIsTheLastItem = item == lastItem;
+                            if (currentLineWidth + 2 * itemWidth >= consoleWidth || thisIsTheLastItem)
+                            {
+                                if (!thisIsTheLastItem && infoItemLineCount >= maxInfoItemLineCount)
+                                {
+                                    infoSb.AppendLine($"[ + {infoItems.Length - printedItems:n0} hidden ]".PadRight(consoleWidth - currentLineWidth - 1));
+                                    infoItemLineCount++;
+                                    break;
+                                }
+
+                                infoSb.AppendLine(item.PadRight(consoleWidth - currentLineWidth - 1));
+                                currentLineWidth = 0;
+                                infoItemLineCount++;
+                                printedItems++;
+                            }
+
+                            // Otherwise, print this item on the current line, and pad until the
+                            // next item should start.
+                            else
+                            {
+                                infoSb.Append(item.PadRight(itemWidth));
+                                currentLineWidth += itemWidth;
+                                printedItems++;
+                            }
+                        }
+
+                        // Add a final empty line to separate the info items from any FullWidth items
+                        if (fullWidthItems.Any())
+                        {
+                            infoSb.AppendLine("".PadRight(consoleWidth - 1));
+                            infoItemLineCount++;
+                        }
+                    }
+
                     var removedItems = 0;
-                    var infoItemCount = infoItems.Any() ? infoItems.Length + 1 : 0;
                     var hiddenCompleted = HideOldProgressBars ? Items.Count(p => p.Value is ProgressInfoItem pii && pii.CanBeHidden) : 0;
 
-                    if (availableRows < infoItemCount + progressItems.Length)
+                    if (hiddenCompleted > 0) availableRows -= 1;
+
+                    if (availableRows < infoItemLineCount + fullWidthItems.Length)
                     {
-                        var progressCount = progressItems.Length;
-                        progressItems = progressItems.Take(availableRows - infoItemCount - 1).ToArray();
-                        removedItems = progressCount - progressItems.Length;
+                        var progressCount = fullWidthItems.Length;
+                        fullWidthItems = fullWidthItems.Take(availableRows - infoItemLineCount - (hiddenCompleted > 0 ? 0 : 1)).ToArray();
+                        removedItems = progressCount - fullWidthItems.Length;
                     }
 
                     if (infoItems.Any())
                     {
-                        var maxWidth = infoItems.Max(p => p.Length) + 6;
-                        var lineWidth = 0;
-                        var lastWasNewLine = false;
-                        foreach (var item in infoItems)
-                        {
-                            if (lineWidth + 2 * maxWidth >= consoleWidth || item == infoItems.Last())
-                            {
-                                sb.AppendLine(item.PadRight(consoleWidth - lineWidth - 1));
-                                lineWidth = 0;
-                                lastWasNewLine = true;
-                            }
-                            else
-                            {
-                                sb.Append(item.PadRight(maxWidth));
-                                lineWidth += maxWidth;
-                                lastWasNewLine = false;
-                            }
-                        }
-
-                        if (!lastWasNewLine)
-                        {
-                            sb.AppendLine();
-                        }
-
-                        sb.AppendLine("".PadRight(consoleWidth - 1));
+                        sb.Append(infoSb);
                     }
 
-                    foreach (var item in progressItems)
+                    foreach (var item in fullWidthItems)
                     {
                         var key = item.Key;
                         if (key.Length > consoleWidth / 3)
