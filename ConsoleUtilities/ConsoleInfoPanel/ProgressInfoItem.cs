@@ -29,7 +29,7 @@ namespace ConsoleUtilities.ConsoleInfoPanel
             }
         }
 
-        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 15;
+        public bool CanBeHidden => EndTime != null && DateTime.Now.Subtract(EndTime.Value).TotalSeconds > 5;
 
         private int _animationIndex = 0;
         private DateTime? _end;
