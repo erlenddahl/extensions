@@ -31,6 +31,14 @@ namespace Extensions.Tests.StringExtensions
         }
 
         [TestMethod]
+        public void ChangeExtensionFromNoExtension()
+        {
+            Assert.AreEqual("C:\\a\\b\\c.ldb", "C:\\a\\b\\c".ChangeExtension(".ldb"));
+            Assert.AreEqual("C:\\a.txt\\b\\c.ldb", "C:\\a.txt\\b\\c".ChangeExtension(".ldb"));
+            Assert.AreEqual("C:\\a\\b.txt\\c.ldb", "C:\\a\\b.txt\\c".ChangeExtension(".ldb"));
+        }
+
+        [TestMethod]
         public void RemoveExtensionTests()
         {
             Assert.AreEqual("", "".RemoveExtension());

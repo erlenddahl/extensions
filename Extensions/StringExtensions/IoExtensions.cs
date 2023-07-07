@@ -30,9 +30,11 @@ namespace Extensions.StringExtensions
         public static string ChangeExtension(this string oldFilename, string newExtension)
         {
             if (string.IsNullOrEmpty(oldFilename)) return oldFilename;
-            if (!oldFilename.Contains(".")) return oldFilename + newExtension;
-            var parts = oldFilename.Split('.');
-            return string.Join(".", parts.Take(parts.Length - 1)) + newExtension;
+            var dotIx = oldFilename.LastIndexOf(".", StringComparison.InvariantCulture);
+            if (dotIx < 0) return oldFilename + newExtension;
+            var dir = Path.GetDirectoryName(oldFilename);
+            if (dir != null && dotIx < dir.Length) return oldFilename + newExtension;
+            return oldFilename.Substring(0, dotIx) + newExtension;
         }
 
         /// <summary>
