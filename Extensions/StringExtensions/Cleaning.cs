@@ -5,6 +5,10 @@ namespace Extensions.StringExtensions
 {
     public static class Cleaning
     {
+        public static string StripSpecialCharacters(this string s)
+        {
+            return new string(s.ToCharArray().Where(p => !char.IsControl(p) && !char.IsLowSurrogate(p) && !char.IsHighSurrogate(p) && (p == ' ' || !char.IsWhiteSpace(p))).ToArray());
+        }
 
         /// <summary>
         /// Will remove any chars that are not digits or alphabetic characters.
@@ -13,7 +17,7 @@ namespace Extensions.StringExtensions
         /// <returns></returns>
         public static string CleanAlphaNumeric(this string s)
         {
-            return new string(s.ToCharArray().Where(Char.IsLetterOrDigit).ToArray());
+            return new string(s.ToCharArray().Where(char.IsLetterOrDigit).ToArray());
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace Extensions.StringExtensions
         public static string CleanNumeric(this string s, bool removeStartingZeroes = true)
         {
             var sign = s.Trim().StartsWith("-") ? "-" : "";
-            var cleaned = new string(s.ToCharArray().Where(Char.IsDigit).ToArray());
+            var cleaned = new string(s.ToCharArray().Where(char.IsDigit).ToArray());
             if (removeStartingZeroes)
                 while (cleaned.StartsWith("0") && cleaned.Length > 1)
                     cleaned = cleaned.Substring(1);
@@ -76,7 +80,7 @@ namespace Extensions.StringExtensions
         /// <returns></returns>
         public static string CleanLetters(this string s)
         {
-            var cleaned = new string(s.ToCharArray().Where(Char.IsLetter).ToArray());
+            var cleaned = new string(s.ToCharArray().Where(char.IsLetter).ToArray());
             return cleaned;
         }
     }

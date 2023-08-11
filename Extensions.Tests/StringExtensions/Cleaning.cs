@@ -81,5 +81,16 @@ namespace Extensions.Tests.StringExtensions
             Assert.AreEqual("HR", "    HR-0101   ".CleanLetters());
             Assert.AreEqual("HR", "    HR-00101   ".CleanLetters());
         }
+
+        [TestMethod]
+        public void StripSpecialCharactersTests()
+        {
+            Assert.AreEqual("", "".StripSpecialCharacters());
+            Assert.AreEqual("This is a normal, sentence!? This too.", "This is a normal, sentence!? This too.".StripSpecialCharacters());
+            Assert.AreEqual(" ", " ".StripSpecialCharacters());
+            Assert.AreEqual("", "\r\n\t".StripSpecialCharacters());
+            Assert.AreEqual("a.,.a¤%#a;:_a.a", "a.,.a¤%#a;:_a.a".StripSpecialCharacters());
+            Assert.AreEqual("    HR-0101   ", "    HR-0101   ".StripSpecialCharacters());
+        }
     }
 }
