@@ -45,6 +45,8 @@ namespace Extensions.Utilities.Csv
 
         public static string Stringify(object o, IFormatProvider provider = null, string numericFormat = null, string datetimeFormat = null)
         {
+            if (o == null) return string.Empty;
+            if (o is bool b) return b ? "true" : "false";
             if (o is string s) return s;
             if (o is short sh) return sh.ToString();
             if (o is int i) return i.ToString();
