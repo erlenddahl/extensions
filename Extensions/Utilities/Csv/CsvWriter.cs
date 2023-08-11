@@ -88,6 +88,11 @@ namespace Extensions.Utilities.Csv
             new CsvWriter(targetPath, separator, quote, replaceNewLinesWith).WriteAllLines(contents);
         }
 
+        public static void Write(string targetPath, IEnumerable<IEnumerable<object>> contents, string separator = ";", string quote = "\"", string replaceNewLinesWith = " ")
+        {
+            new CsvWriter(targetPath, separator, quote, replaceNewLinesWith).WriteAllLines(contents);
+        }
+
         public void Dispose()
         {
             _targetFile?.Dispose();
