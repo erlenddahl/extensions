@@ -7,7 +7,7 @@ namespace Extensions.StringExtensions
     {
         public static string StripSpecialCharacters(this string s)
         {
-            return new string(s.ToCharArray().Where(p => !char.IsControl(p) && !char.IsLowSurrogate(p) && !char.IsHighSurrogate(p) && (p == ' ' || !char.IsWhiteSpace(p))).ToArray());
+            return new string(s.ToCharArray().Where(p => !char.IsControl(p) && !char.IsLowSurrogate(p) && !char.IsHighSurrogate(p) && (p == ' ' || !char.IsWhiteSpace(p))).Select(p => p == '\"' ? '\'' : p).ToArray());
         }
 
         /// <summary>

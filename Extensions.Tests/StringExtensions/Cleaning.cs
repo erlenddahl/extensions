@@ -87,6 +87,7 @@ namespace Extensions.Tests.StringExtensions
         {
             Assert.AreEqual("", "".StripSpecialCharacters());
             Assert.AreEqual("This is a normal, sentence!? This too.", "This is a normal, sentence!? This too.".StripSpecialCharacters());
+            Assert.AreEqual("'Double quotes' are safified.", "\"Double quotes\" are safified.".StripSpecialCharacters());
             Assert.AreEqual(" ", " ".StripSpecialCharacters());
             Assert.AreEqual("", "\r\n\t".StripSpecialCharacters());
             Assert.AreEqual("a.,.a¤%#a;:_a.a", "a.,.a¤%#a;:_a.a".StripSpecialCharacters());
