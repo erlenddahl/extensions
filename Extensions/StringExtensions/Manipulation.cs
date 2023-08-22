@@ -19,5 +19,20 @@ namespace Extensions.StringExtensions
             if (str.Length <= limit) return str;
             return str.Substring(0, limit) + suffix;
         }
+
+        /// <summary>
+        /// Returns the replacement string if the given string is null
+        /// or white space (string.IsNullOrWhiteSpace(str)).
+        /// If it's not null or white space, the original string is
+        /// returned unchanged.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="replacement"></param>
+        /// <returns></returns>
+        public static string Or(this string str, string replacement)
+        {
+            if (!string.IsNullOrWhiteSpace(str)) return str;
+            return replacement;
+        }
     }
 }
