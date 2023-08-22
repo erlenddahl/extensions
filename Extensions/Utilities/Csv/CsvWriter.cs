@@ -14,6 +14,11 @@ namespace Extensions.Utilities.Csv
         private readonly string _targetPath;
         private StreamWriter _targetFile;
 
+        public IFormatProvider NumericFormatProvider { get; set; } = CultureInfo.InvariantCulture;
+        public string NumericFormat { get; set; } = null;
+        public string DateTimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss.fff";
+
+
         public CsvWriter(string targetPath, string separator, string quote = "\"", string replaceNewLinesWith = " ")
         {
             _separator = separator;
@@ -43,6 +48,21 @@ namespace Extensions.Utilities.Csv
             return string.Join(_separator, values.Select(p => QuoteValue(Stringify(p))));
         }
 
+        public string QuoteValues(params string[] values)
+        {
+            return string.Join(_separator, values.Select(QuoteValue));
+        }
+
+        public string QuoteValues(params object[] values)
+        {
+            return string.Join(_separator, values.Select(p => QuoteValue(Stringify(p))));
+        }
+
+        public string Stringify(object o)
+        {
+            return Stringify(o, NumericFormatProvider, NumericFormat, DateTimeFormat);
+        }
+
         public static string Stringify(object o, IFormatProvider provider = null, string numericFormat = null, string datetimeFormat = null)
         {
             if (o == null) return string.Empty;
@@ -61,7 +81,25 @@ namespace Extensions.Utilities.Csv
             throw new NotImplementedException("CsvWriter has no Stringify implementation for type " + o.GetType());
         }
 
+        public void WriteLine(params string[] values)
+        {
+            if (_targetFile == null) _targetFile = new StreamWriter(_targetPath);
+            _targetFile.WriteLine(QuoteValues(values));
+        }
+
+        public void WriteLine(params object[] values)
+        {
+            if (_targetFile == null) _targetFile = new StreamWriter(_targetPath);
+            _targetFile.WriteLine(QuoteValues(values));
+        }
+
         public void WriteLine(IEnumerable<string> values)
+        {
+            if (_targetFile == null) _targetFile = new StreamWriter(_targetPath);
+            _targetFile.WriteLine(QuoteValues(values));
+        }
+
+        public void WriteLine(IEnumerable<object> values)
         {
             if (_targetFile == null) _targetFile = new StreamWriter(_targetPath);
             _targetFile.WriteLine(QuoteValues(values));
