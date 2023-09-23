@@ -91,16 +91,18 @@ namespace Extensions.Utilities
         /// Appends timings from the given timer to this timer. Any keys that are not in the current timer will be added.
         /// </summary>
         /// <param name="other"></param>
-        public void Append(TaskTimer other)
+        /// <param name="prefix"></param>
+        public void Append(TaskTimer other, string prefix = "")
         {
             lock (_watch)
             {
                 foreach (var kvp in other.Timings)
                 {
-                    if(Timings.ContainsKey(kvp.Key))
-                        Timings[kvp.Key] += kvp.Value;
+                    var key = prefix + kvp.Key;
+                    if (Timings.ContainsKey(key))
+                        Timings[key] += kvp.Value;
                     else
-                        Timings.Add(kvp.Key, kvp.Value);
+                        Timings.Add(key, kvp.Value);
                 }
             }
         }
