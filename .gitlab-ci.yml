@@ -1,0 +1,35 @@
+stages:
+  - restore
+  - build
+  - test
+
+restore:
+  stage: restore
+  script:
+    - $ErrorActionPreference = "Stop"
+    - dotnet restore Extensions.sln --source "https://api.nuget.org/v3/index.json"
+
+build:
+  stage: build
+  script:
+    - $ErrorActionPreference = "Stop"
+    - dotnet build Extensions.sln
+
+tests:
+  stage: test
+  script:
+    - $ErrorActionPreference = "SilentlyContinue"
+    - dotnet test Extensions.sln --logger "trx;LogFileName=TestResults.trx" --verbosity minimal; if ($LASTEXITCODE -ne 0) { $LASTEXITCODE = 0 }
+    - C:\Users\erlendd\.dotnet\tools\trx2junit.exe ByteUtilities.Tests/TestResults/TestResults.trx
+    - C:\Users\erlendd\.dotnet\tools\trx2junit.exe Extensions.Tests/TestResults/TestResults.trx
+    - C:\Users\erlendd\.dotnet\tools\trx2junit.exe ConsoleUtilities.Tests/TestResults/TestResults.trx
+    - C:\Users\erlendd\.dotnet\tools\trx2junit.exe NpgsqlExtensions.Tests/TestResults/TestResults.trx
+    - Get-ChildItem -Path './**/TestResults/*.trx' -Recurse | C:\Code\Gitlab\badge-tests.ps1 -labelValue "extensions" -fileValue "tests.svg"
+  artifacts:
+    when: always
+    reports:
+      junit: 
+        - ByteUtilities.Tests/TestResults/TestResults.xml
+        - Extensions.Tests/TestResults/TestResults.xml
+        - ConsoleUtilities.Tests/TestResults/TestResults.xml
+        - NpgsqlExtensions.Tests/TestResults/TestResults.xml
