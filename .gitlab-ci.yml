@@ -21,7 +21,7 @@ tests:
     - $ErrorActionPreference = "SilentlyContinue"
     - dotnet test ExtensionsNetOnly.sln --logger "trx;LogFileName=TestResults.trx" --verbosity minimal; if ($LASTEXITCODE -ne 0) { $LASTEXITCODE = 0 }
     - C:\Users\erlendd\.dotnet\tools\trx2junit.exe Extensions.Tests/TestResults/TestResults.trx
-    - Get-ChildItem -Path './**/TestResults/*.trx' -Recurse | C:\Code\Gitlab\badge-tests.ps1 -labelValue "extensions" -fileValue "tests.svg"
+    - Get-ChildItem -Path './**/TestResults/*.trx' -Recurse | C:\Code\Gitlab\badge-tests.ps1 -label "extensions"
   artifacts:
     when: always
     reports:
