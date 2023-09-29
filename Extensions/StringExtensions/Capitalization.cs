@@ -2,7 +2,6 @@
 {
     public static class Capitalization
     {
-
         /// <summary>
         /// Will capitalize the first letter in the given string.
         /// </summary>
@@ -12,6 +11,17 @@
         {
             if (string.IsNullOrEmpty(text)) return text;
             return text[0].ToString().ToUpper() + (text.Length > 1 ? text.Substring(1, text.Length - 1) : "");
+        }
+
+        /// <summary>
+        /// Will lowercase the first letter in the given string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string ToLowerFirst(this string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            return text[0].ToString().ToLower() + (text.Length > 1 ? text.Substring(1, text.Length - 1) : "");
         }
 
         /// <summary>
