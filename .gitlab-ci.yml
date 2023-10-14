@@ -1,0 +1,29 @@
+stages:
+  - restore
+  - build
+  - test
+
+restore:
+  stage: restore
+  script:
+    - $ErrorActionPreference = "Stop"
+    - dotnet restore ExtensionsNetOnly.sln --source "https://api.nuget.org/v3/index.json"
+
+build:
+  stage: build
+  script:
+    - $ErrorActionPreference = "Stop"
+    - dotnet build ExtensionsNetOnly.sln
+
+tests:
+  stage: test
+  script:
+    - $ErrorActionPreference = "SilentlyContinue"
+    - dotnet test ExtensionsNetOnly.sln --logger "trx;LogFileName=TestResults.trx" --verbosity minimal; if ($LASTEXITCODE -ne 0) { $LASTEXITCODE = 0 }
+    - C:\Users\erlendd\.dotnet\tools\trx2junit.exe Extensions.Tests/TestResults/TestResults.trx
+    - Get-ChildItem -Path './**/TestResults/*.trx' -Recurse | C:\Code\Gitlab\badge-tests.ps1 -label "extensions"
+  artifacts:
+    when: always
+    reports:
+      junit: 
+        - Extensions.Tests/TestResults/TestResults.xml

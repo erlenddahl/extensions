@@ -78,12 +78,16 @@ namespace Extensions.Utilities
         /// <param name="keyValueFormat">How the keys and values should be formatted (<code>string.Format(keyValueFormat, key, value)</code>)</param>
         /// <param name="lineSeparator">Separator between lines (or not lines)</param>
         /// <param name="factor">Any conversion factor for the timing. It is originally in ticks, and will be divided by this value. A millisecond is 10 000 ticks, so the default value returns timings in ms.</param>
+        /// <param name="reorder">If true, entries will be ordered by their value, descending.</param>
         /// <returns></returns>
-        public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, double factor = 10_000)
+        public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, double factor = 10_000, bool reorder = false)
         {
             lock (_watch)
             {
-                return string.Join(lineSeparator, Timings.OrderByDescending(p => p.Value).Select(p => string.Format(keyValueFormat, p.Key, p.Value / factor)));
+                var timings = Timings.Select(p => p);
+                if (reorder)
+                    timings = timings.OrderByDescending(p => p.Value);
+                return string.Join(lineSeparator, timings.Select(p => string.Format(keyValueFormat, p.Key, p.Value / factor)));
             }
         }
 
@@ -91,16 +95,18 @@ namespace Extensions.Utilities
         /// Appends timings from the given timer to this timer. Any keys that are not in the current timer will be added.
         /// </summary>
         /// <param name="other"></param>
-        public void Append(TaskTimer other)
+        /// <param name="prefix"></param>
+        public void Append(TaskTimer other, string prefix = "")
         {
             lock (_watch)
             {
                 foreach (var kvp in other.Timings)
                 {
-                    if(Timings.ContainsKey(kvp.Key))
-                        Timings[kvp.Key] += kvp.Value;
+                    var key = prefix + kvp.Key;
+                    if (Timings.ContainsKey(key))
+                        Timings[key] += kvp.Value;
                     else
-                        Timings.Add(kvp.Key, kvp.Value);
+                        Timings.Add(key, kvp.Value);
                 }
             }
         }

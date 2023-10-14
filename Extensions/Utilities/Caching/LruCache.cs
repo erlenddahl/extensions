@@ -153,6 +153,14 @@ namespace Extensions.Utilities.Caching
             }
         }
 
+        public bool ContainsKey(TKey key)
+        {
+            lock (_cacheMap)
+            {
+                return _cacheMap.ContainsKey(key);
+            }
+        }
+
         private void RemoveFirst()
         {
             // Remove from LRUPriority
