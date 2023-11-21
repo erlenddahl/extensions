@@ -13,6 +13,8 @@ namespace Extensions.Utilities
         public Dictionary<string, long> Timings = new Dictionary<string, long>();
         private readonly Stopwatch _watch = new Stopwatch();
 
+        private static double _msPerTick = 1000d / Stopwatch.Frequency;
+
         public TaskTimer(bool startImmediately = true)
         {
             if (startImmediately) 
@@ -52,6 +54,18 @@ namespace Extensions.Utilities
         }
 
         /// <summary>
+        /// Adds a totals entry, that is the sum of all entries currently stored in Timings.
+        /// </summary>
+        /// <param name="name"></param>
+        public void AddTotal(string name = "total")
+        {
+            lock (_watch)
+            {
+                Timings.Add(name, Timings.Sum(p => p.Value));
+            }
+        }
+
+        /// <summary>
         /// Returns a dictionary with the timings measured in milliseconds.
         /// </summary>
         /// <returns></returns>
@@ -59,7 +73,7 @@ namespace Extensions.Utilities
         {
             lock (_watch)
             {
-                return Timings.ToDictionary(k => k.Key, v => v.Value / 10_000d);
+                return Timings.ToDictionary(k => k.Key, v => v.Value * _msPerTick);
             }
         }
 
@@ -69,7 +83,7 @@ namespace Extensions.Utilities
         /// <returns></returns>
         public override string ToString()
         {
-            return ToString("{0}: {1}", Environment.NewLine, 10_000);
+            return ToString("{0}: {1}", Environment.NewLine);
         }
 
         /// <summary>
@@ -77,17 +91,17 @@ namespace Extensions.Utilities
         /// </summary>
         /// <param name="keyValueFormat">How the keys and values should be formatted (<code>string.Format(keyValueFormat, key, value)</code>)</param>
         /// <param name="lineSeparator">Separator between lines (or not lines)</param>
-        /// <param name="factor">Any conversion factor for the timing. It is originally in ticks, and will be divided by this value. A millisecond is 10 000 ticks, so the default value returns timings in ms.</param>
+        /// <param name="factor">Any conversion factor for the timing. It is originally in ticks, and will be divided by this value. A millisecond is usually 10 000 ticks (but it depends), so the default value returns timings in ms.</param>
         /// <param name="reorder">If true, entries will be ordered by their value, descending.</param>
         /// <returns></returns>
-        public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, double factor = 10_000, bool reorder = false)
+        public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, bool reorder = false)
         {
             lock (_watch)
             {
                 var timings = Timings.Select(p => p);
                 if (reorder)
                     timings = timings.OrderByDescending(p => p.Value);
-                return string.Join(lineSeparator, timings.Select(p => string.Format(keyValueFormat, p.Key, p.Value / factor)));
+                return string.Join(lineSeparator, timings.Select(p => string.Format(keyValueFormat, p.Key, p.Value * _msPerTick)));
             }
         }
 
