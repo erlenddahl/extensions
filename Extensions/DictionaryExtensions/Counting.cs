@@ -49,5 +49,20 @@ namespace Extensions.DictionaryExtensions
             else
                 dictionary[key] += increment;
         }
+
+        /// <summary>
+        /// Increments the value of the given key, or sets it to the default value (increment) if it didn't exist.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <param name="increment"></param>
+        public static void Increment<T>(this Dictionary<T, long> dictionary, T key, long increment = 1)
+        {
+            if (!dictionary.ContainsKey(key))
+                dictionary.Add(key, increment);
+            else
+                dictionary[key] += increment;
+        }
     }
 }

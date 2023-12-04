@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Extensions.DateTimeExtensions;
+using Extensions.DictionaryExtensions;
+using Extensions.DoubleExtensions;
 using Extensions.Utilities.Csv;
 
 namespace Extensions.Utilities.Statistics
@@ -9,6 +12,13 @@ namespace Extensions.Utilities.Statistics
     public class IncrementalStatistics
     {
         private double _variance;
+
+        /// <summary>
+        /// If configured when creating the object (using the countInBucketsOfSize parameter), these buckets will represent
+        /// a histogram of the observed values.
+        /// </summary>
+        public Dictionary<long, double> Buckets { get; }
+        private readonly long _bucketSize;
 
         public double Variance
         {
@@ -28,12 +38,16 @@ namespace Extensions.Utilities.Statistics
         public double Max { get; private set; } = double.MinValue;
         public long Count { get; private set; }
 
-        public IncrementalStatistics()
+        public IncrementalStatistics(long? countInBucketsOfSize = null)
         {
-
+            if (countInBucketsOfSize.HasValue)
+            {
+                Buckets = new Dictionary<long, double>();
+                _bucketSize = countInBucketsOfSize.Value;
+            }
         }
 
-        public IncrementalStatistics(IEnumerable<double> values)
+        public IncrementalStatistics(IEnumerable<double> values, long? countInBucketsOfSize = null) : this(countInBucketsOfSize)
         {
             foreach (var value in values)
                 AddObservation(value);
@@ -46,6 +60,8 @@ namespace Extensions.Utilities.Statistics
             WeightSum += weight;
             SumSquared += observation * observation;
 
+            Buckets?.Increment(observation.Round(_bucketSize, RoundingDirection.Down), weight);
+
             if (Count == 1)
             {
                 WeightedAverage = Average = Min = Max = observation;
@@ -56,12 +72,15 @@ namespace Extensions.Utilities.Statistics
             WeightedAverage = Sum / WeightSum;
 
             Variance = (SumSquared - 2 * Average * Sum + Count * Average * Average) / Count;
-            Min = System.Math.Min(Min, observation);
-            Max = System.Math.Max(Max, observation);
+            Min = Math.Min(Min, observation);
+            Max = Math.Max(Max, observation);
         }
 
         public void Append(IncrementalStatistics other)
         {
+            if (_bucketSize != other._bucketSize)
+                throw new Exception("Incompatible bucket sizes. IncrementalStatistics can only be merged if they have the same bucket size configuration.");
+
             Sum += other.Sum;
             SumSquared += other.SumSquared;
             Count += other.Count;
@@ -78,6 +97,12 @@ namespace Extensions.Utilities.Statistics
 
             Min = Math.Min(Min, other.Min);
             Max = Math.Max(Max, other.Max);
+
+            if (other.Buckets != null)
+            {
+                foreach (var kvp in other.Buckets)
+                    Buckets.Increment(kvp.Key, kvp.Value);
+            }
         }
 
         public override string ToString()

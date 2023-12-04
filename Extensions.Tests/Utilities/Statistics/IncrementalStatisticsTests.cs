@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Extensions.Tests.IEnumerableExtensions;
 using Extensions.Utilities.Csv;
 using Extensions.Utilities.Statistics;
@@ -214,6 +215,86 @@ namespace Extensions.Tests.Utilities.Statistics
             Assert.AreEqual(correct.Sum, conc.Sum);
             Assert.AreEqual(correct.Variance, conc.Variance);
             Assert.AreEqual(correct.StandardDeviation, conc.StandardDeviation);
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_FromList()
+        {
+            var inc = new IncrementalStatistics(new double[] { 1, 2, 3, 4, 5, 11, 16, 19, 25 }, 10);
+
+            CollectionAssert.AreEquivalent(new long[] { 0, 10, 20 }, inc.Buckets.Keys);
+            Assert.AreEqual(5, inc.Buckets[0]);
+            Assert.AreEqual(3, inc.Buckets[10]);
+            Assert.AreEqual(1, inc.Buckets[20]);
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_Added()
+        {
+            var inc = new IncrementalStatistics(10);
+
+            foreach (var v in new double[] { 1, 2, 3, 4, 5, 11, 16, 19, 25 })
+                inc.AddObservation(v);
+
+            CollectionAssert.AreEquivalent(new long[] { 0, 10, 20 }, inc.Buckets.Keys);
+            Assert.AreEqual(5, inc.Buckets[0]);
+            Assert.AreEqual(3, inc.Buckets[10]);
+            Assert.AreEqual(1, inc.Buckets[20]);
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_Merged()
+        {
+            var inc = new IncrementalStatistics(new double[] { 1, 2, 3, 4, 5, 11, 16, 19, 25 }, 10);
+            var inc2 = new IncrementalStatistics(new double[] { 1, 2, 7, 8, 11, 17, 14, 16, 19, 55 }, 10);
+
+            inc.Append(inc2);
+
+            CollectionAssert.AreEquivalent(new long[] { 0, 10, 20, 50 }, inc.Buckets.Keys);
+            Assert.AreEqual(9, inc.Buckets[0]);
+            Assert.AreEqual(8, inc.Buckets[10]);
+            Assert.AreEqual(1, inc.Buckets[20]);
+            Assert.AreEqual(1, inc.Buckets[50]);
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_MergeWithDifferentBuckets_Fails()
+        {
+            var inc = new IncrementalStatistics(new double[] { 1, 2, 3, 4, 5, 11, 16, 19, 25 }, 10);
+            var inc2 = new IncrementalStatistics(new double[] { 1, 2, 7, 8, 11, 17, 14, 16, 19, 55 }, 100);
+
+            try
+            {
+                inc.Append(inc2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return;
+            }
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_DifferentBucketSize()
+        {
+            var inc = new IncrementalStatistics(new double[] { 1, 2, 7, 8, 11, 17, 14, 16, 19, 55, 548 }, 100);
+
+            CollectionAssert.AreEquivalent(new long[] { 0, 500 }, inc.Buckets.Keys);
+            Assert.AreEqual(10, inc.Buckets[0]);
+            Assert.AreEqual(1, inc.Buckets[500]);
+        }
+
+        [TestMethod]
+        public void SimpleHistogram_NegativeNumbers()
+        {
+            var inc = new IncrementalStatistics(new double[] { -1, -2, -7, 8, 11, 17, 14, 16, 19, 55, -548, 499 }, 100);
+
+            CollectionAssert.AreEquivalent(new long[] { -600, -100, 0, 400 }, inc.Buckets.Keys);
+            Assert.AreEqual(1, inc.Buckets[-600]);
+            Assert.AreEqual(3, inc.Buckets[-100]);
+            Assert.AreEqual(7, inc.Buckets[0]);
+            Assert.AreEqual(1, inc.Buckets[400]);
         }
     }
 }
