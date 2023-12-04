@@ -8,7 +8,9 @@ namespace Extensions.DateTimeExtensions
     {
         Nearest,
         Up,
-        Down
+        Down,
+        TowardsZero,
+        AwayFromZero
     }
 
     public static class Rounding
