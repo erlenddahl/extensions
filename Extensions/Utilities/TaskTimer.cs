@@ -13,7 +13,7 @@ namespace Extensions.Utilities
         public Dictionary<string, long> Timings = new Dictionary<string, long>();
         private readonly Stopwatch _watch = new Stopwatch();
 
-        private static double _msPerTick = 1000d / Stopwatch.Frequency;
+        public static double MsPerTick { get; } = 1000d / Stopwatch.Frequency;
 
         public TaskTimer(bool startImmediately = true)
         {
@@ -40,7 +40,7 @@ namespace Extensions.Utilities
             }
         }
 
-        public void Time(string key)
+        public long Time(string key)
         {
             var elapsed = _watch.ElapsedTicks;
             lock (_watch)
@@ -51,6 +51,7 @@ namespace Extensions.Utilities
                     Timings.Add(key, elapsed);
             }
             Restart();
+            return elapsed;
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace Extensions.Utilities
         {
             lock (_watch)
             {
-                return Timings.ToDictionary(k => k.Key, v => v.Value * _msPerTick);
+                return Timings.ToDictionary(k => k.Key, v => v.Value * MsPerTick);
             }
         }
 
@@ -91,7 +92,6 @@ namespace Extensions.Utilities
         /// </summary>
         /// <param name="keyValueFormat">How the keys and values should be formatted (<code>string.Format(keyValueFormat, key, value)</code>)</param>
         /// <param name="lineSeparator">Separator between lines (or not lines)</param>
-        /// <param name="factor">Any conversion factor for the timing. It is originally in ticks, and will be divided by this value. A millisecond is usually 10 000 ticks (but it depends), so the default value returns timings in ms.</param>
         /// <param name="reorder">If true, entries will be ordered by their value, descending.</param>
         /// <returns></returns>
         public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, bool reorder = false)
@@ -101,7 +101,7 @@ namespace Extensions.Utilities
                 var timings = Timings.Select(p => p);
                 if (reorder)
                     timings = timings.OrderByDescending(p => p.Value);
-                return string.Join(lineSeparator, timings.Select(p => string.Format(keyValueFormat, p.Key, p.Value * _msPerTick)));
+                return string.Join(lineSeparator, timings.Select(p => string.Format(keyValueFormat, p.Key, p.Value * MsPerTick)));
             }
         }
 
