@@ -18,7 +18,8 @@ namespace Extensions.Utilities.Statistics
         /// a histogram of the observed values.
         /// </summary>
         public Dictionary<long, double> Buckets { get; }
-        private readonly long _bucketSize;
+
+        public long? BucketSize { get; }
 
         public double Variance
         {
@@ -43,7 +44,7 @@ namespace Extensions.Utilities.Statistics
             if (countInBucketsOfSize.HasValue)
             {
                 Buckets = new Dictionary<long, double>();
-                _bucketSize = countInBucketsOfSize.Value;
+                BucketSize = countInBucketsOfSize.Value;
             }
         }
 
@@ -60,7 +61,7 @@ namespace Extensions.Utilities.Statistics
             WeightSum += weight;
             SumSquared += observation * observation;
 
-            Buckets?.Increment(observation.Round(_bucketSize, RoundingDirection.Down), weight);
+            Buckets?.Increment(observation.Round(BucketSize.Value, RoundingDirection.Down), weight);
 
             if (Count == 1)
             {
@@ -78,7 +79,7 @@ namespace Extensions.Utilities.Statistics
 
         public void Append(IncrementalStatistics other)
         {
-            if (_bucketSize != other._bucketSize)
+            if (BucketSize != other.BucketSize)
                 throw new Exception("Incompatible bucket sizes. IncrementalStatistics can only be merged if they have the same bucket size configuration.");
 
             Sum += other.Sum;

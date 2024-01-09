@@ -10,10 +10,21 @@ namespace Extensions.Utilities.Statistics
 {
     public class IncrementalStatisticsCollection
     {
+        private readonly int? _countInBucketsOfSize;
         public Dictionary<object[], IncrementalStatistics> Stats { get; set; } = new Dictionary<object[], IncrementalStatistics>(new ArrayEqualityComparer<object>());
         private object _locker = new object();
 
+        public IncrementalStatisticsCollection(int? countInBucketsOfSize = null)
+        {
+            _countInBucketsOfSize = countInBucketsOfSize;
+        }
+
         public void AddObservation(double observation, params object[] key)
+        {
+            AddObservation(observation, null, key);
+        }
+
+        public void AddObservation(double observation, int? countInBucketsOfSize, params object[] key)
         {
             lock (_locker)
             {
@@ -21,7 +32,7 @@ namespace Extensions.Utilities.Statistics
                     stats.AddObservation(observation);
                 else
                 {
-                    var s = new IncrementalStatistics();
+                    var s = new IncrementalStatistics(countInBucketsOfSize ?? _countInBucketsOfSize);
                     s.AddObservation(observation);
                     Stats.Add(key, s);
                 }
@@ -30,11 +41,16 @@ namespace Extensions.Utilities.Statistics
 
         public override string ToString()
         {
+            return ToString("; ");
+        }
+
+        public string ToString(string separator, string linePrefix = "")
+        {
             var sb = new StringBuilder();
             foreach (var kvp in Stats)
             {
-                sb.AppendLine(kvp.Key + ":");
-                sb.AppendLine(kvp.Value.ToString(Environment.NewLine, "\t"));
+                sb.AppendLine(string.Join(", ", kvp.Key.Select(p => p.ToString())) + ":");
+                sb.AppendLine(kvp.Value.ToString(separator, linePrefix));
             }
 
             return sb.ToString();
@@ -53,6 +69,7 @@ namespace Extensions.Utilities.Statistics
 
         public void WriteCsv(CsvWriter csv, CultureInfo c, params string[] keyTitles)
         {
+            if (_countInBucketsOfSize.HasValue) throw new Exception("Statistics with histograms cannot currently be saved as CSV.");
             csv.WriteLine(keyTitles.Concat(Stats.First().Value.GetKeyValues().Select(p => p.Key)));
             foreach (var kvp in Stats)
             {
