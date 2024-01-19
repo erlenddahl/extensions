@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "Extensions\Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Tests", "Extensions.Tests\Extensions.Tests.csproj", "{274B8DBA-3E01-49AD-8E7F-8BBA4C78E950}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpgsqlExtensions", "NpgsqlExtensions\NpgsqlExtensions.csproj", "{6597BCA6-5EC9-43E2-907C-2DEF33C601F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{274B8DBA-3E01-49AD-8E7F-8BBA4C78E950}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{274B8DBA-3E01-49AD-8E7F-8BBA4C78E950}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{274B8DBA-3E01-49AD-8E7F-8BBA4C78E950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6597BCA6-5EC9-43E2-907C-2DEF33C601F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6597BCA6-5EC9-43E2-907C-2DEF33C601F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6597BCA6-5EC9-43E2-907C-2DEF33C601F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6597BCA6-5EC9-43E2-907C-2DEF33C601F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

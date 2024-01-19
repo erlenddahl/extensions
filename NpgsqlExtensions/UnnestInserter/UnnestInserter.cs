@@ -43,15 +43,42 @@ namespace NpgsqlExtensions.UnnestInserter
                 cmdString = string.Format(InsertTemplate, QuoteOrNot(TableName), GetNames(), GetParameters());
                 Debug.WriteLine(cmdString);
                 var cmd = new NpgsqlCommand(cmdString, conn);
-                if(InsertTimeout != null)
+                if (InsertTimeout != null)
                     cmd.CommandTimeout = InsertTimeout.Value;
                 foreach (var col in AllColumns)
                     col.AddParameters(cmd);
                 cmd.ExecuteNonQuery();
 #if !DEBUG
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                throw new Exception("Failed to unnest insert with command '" + cmdString + "'." ,ex);
+                throw new Exception("Failed to unnest insert with command '" + cmdString + "'.", ex);
+            }
+#endif
+        }
+
+        public async Task InsertAsync(NpgsqlConnection conn)
+        {
+            var cmdString = "";
+#if !DEBUG
+            try
+            {
+#endif
+                cmdString = string.Format(InsertTemplate, QuoteOrNot(TableName), GetNames(), GetParameters());
+                Debug.WriteLine(cmdString);
+                using (var cmd = new NpgsqlCommand(cmdString, conn))
+                {
+                    if (InsertTimeout != null)
+                        cmd.CommandTimeout = InsertTimeout.Value;
+                    foreach (var col in AllColumns)
+                        col.AddParameters(cmd);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+#if !DEBUG
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to unnest insert with command '" + cmdString + "'.", ex);
             }
 #endif
         }
