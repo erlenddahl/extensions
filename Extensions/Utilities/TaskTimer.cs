@@ -12,6 +12,8 @@ namespace Extensions.Utilities
         /// </summary>
         public Dictionary<string, long> Timings = new Dictionary<string, long>();
         private readonly Stopwatch _watch = new Stopwatch();
+        private string _prefix = "";
+        private TaskTimer _inner;
 
         public static double MsPerTick { get; } = 1000d / Stopwatch.Frequency;
 
@@ -40,9 +42,35 @@ namespace Extensions.Utilities
             }
         }
 
+        /// <summary>
+        /// Creates a "wrapped" TaskTimer that can be used to both time to an existing timer,
+        /// and at the same time keep the timings separate for logging an individual operation.
+        /// </summary>
+        /// <param name="inner"></param>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public static TaskTimer Wrap(TaskTimer inner, string prefix)
+        {
+            return new TaskTimer(true)
+            {
+                _prefix = prefix,
+                _inner = inner
+            };
+        }
+
         public long Time(string key)
         {
             var elapsed = _watch.ElapsedTicks;
+            key = _prefix + key;
+            Time(key, elapsed);
+            _inner?.Time(key, elapsed);
+            _inner?.Restart();
+            Restart();
+            return elapsed;
+        }
+
+        private void Time(string key, long elapsed)
+        {
             lock (_watch)
             {
                 if (Timings.ContainsKey(key))
@@ -50,8 +78,6 @@ namespace Extensions.Utilities
                 else
                     Timings.Add(key, elapsed);
             }
-            Restart();
-            return elapsed;
         }
 
         /// <summary>
