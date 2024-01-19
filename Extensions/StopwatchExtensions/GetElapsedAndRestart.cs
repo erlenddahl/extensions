@@ -7,6 +7,12 @@ namespace Extensions.StopwatchExtensions
 {
     public static class StopwatchExtensions
     {
+        public static Stopwatch StartAndReturn(this Stopwatch stopwatch)
+        {
+            stopwatch.Start();
+            return stopwatch;
+        }
+
         public static long GetElapsedAndRestart(this Stopwatch watch)
         {
             var elapsed = watch.ElapsedMilliseconds;
