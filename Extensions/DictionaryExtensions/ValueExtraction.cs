@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace Extensions.DictionaryExtensions
 {
-    public static class ValueExtraction { 
-
+    public static class ValueExtraction {
         /// <summary>
         /// Returns the value of the given key if it exists, or the default value otherwise.
         /// </summary>
@@ -13,11 +12,15 @@ namespace Extensions.DictionaryExtensions
         /// <param name="dictionary"></param>
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
+        /// <param name="useDefaultOnEmptyString"></param>
         /// <returns></returns>
-        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default(TValue))
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default, bool useDefaultOnEmptyString = true)
         {
             TValue value;
-            return dictionary.TryGetValue(key, out value) ? value : defaultValue;
+            if (!dictionary.TryGetValue(key, out value)) return defaultValue;
+            if (useDefaultOnEmptyString && value is string s && string.IsNullOrWhiteSpace(s)) return defaultValue;
+
+            return value;
         }
 
         /// <summary>
