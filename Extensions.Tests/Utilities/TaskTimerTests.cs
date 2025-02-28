@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Extensions.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -116,5 +117,47 @@ public class TaskTimerTests
         Assert.AreEqual(150, ms["wrapper.three"], 20);
         Assert.AreEqual(150, wms["wrapper.three"], 20);
         Assert.AreEqual(0, ms["four"], 20);
+    }
+
+    [TestMethod]
+    public async Task AppendTest()
+    {
+        var timer = new TaskTimer();
+        var timer2 = new TaskTimer();
+
+        await Task.Delay(100);
+        timer.Time("one");
+
+        await Task.Delay(50);
+        timer2.Time("two");
+
+        timer.Append(timer2);
+
+        Console.WriteLine(timer.ToString());
+        Assert.AreEqual(2, timer.Timings.Count);
+        var ms = timer.GetTimingsInMs();
+        Assert.AreEqual(100, ms["one"], 30);
+        Assert.AreEqual(150, ms["two"], 30);
+    }
+
+    [TestMethod]
+    public async Task AppendInsideWrapperTest()
+    {
+        var timer = new TaskTimer();
+        var timer2 = new TaskTimer();
+        var wrapper = TaskTimer.Wrap(timer, "wrapper.");
+
+        await Task.Delay(100);
+        timer.Time("one");
+
+        await Task.Delay(50);
+        timer2.Time("two");
+        wrapper.Append(timer2);
+
+        Console.WriteLine(timer.ToString());
+        Assert.AreEqual(2, timer.Timings.Count);
+        var ms = timer.GetTimingsInMs();
+        Assert.AreEqual(100, ms["one"], 30);
+        Assert.AreEqual(150, ms["wrapper.two"], 30);
     }
 }
