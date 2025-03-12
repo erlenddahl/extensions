@@ -24,6 +24,12 @@ namespace Extensions.IEnumerableExtensions
             }
         }
 
+        /// <summary>
+        /// Returns the given list [A, B, C] as a set of pairs [A, B], [B, C], and [C, D].
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static IEnumerable<(TSource A, TSource B)> Pairwise<TSource>(this IEnumerable<TSource> list)
         {
             return list.Pairwise((a, b) => (a, b));

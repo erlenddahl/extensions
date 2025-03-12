@@ -91,7 +91,19 @@ namespace Extensions.Utilities.Csv
                 throw new Exception("Missing column: " + indexOrColumn);
             }
             if (int.TryParse(s, out var v)) return v;
-            throw new Exception("The string '" + s + "' could not be parsed as an integer.");
+            throw new Exception("The string '" + s + "' could not be parsed as an int32.");
+        }
+
+        public static long GetInt64(this CsvRow row, object indexOrColumn, long? defaultValue = null)
+        {
+            var s = GetString(row, indexOrColumn, null);
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                if (defaultValue.HasValue) return defaultValue.Value;
+                throw new Exception("Missing column: " + indexOrColumn);
+            }
+            if (long.TryParse(s, out var v)) return v;
+            throw new Exception("The string '" + s + "' could not be parsed as an int64.");
         }
 
         public static double GetDouble(this CsvRow row, object indexOrColumn, IFormatProvider provider = null, double? defaultValue = null)

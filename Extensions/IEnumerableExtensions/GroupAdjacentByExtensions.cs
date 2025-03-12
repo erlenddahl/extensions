@@ -5,7 +5,7 @@ namespace Extensions.IEnumerableExtensions
 {
     public static class GroupAdjacentByExtensions
     {
-        public static IEnumerable<List<T>> GroupAdjacentBy<T>(this IEnumerable<T> source, Func<T, T, bool> predicate)
+        public static IEnumerable<List<T>> GroupAdjacentBy<T>(this IEnumerable<T> source, Func<T, T, bool> predicate, bool includeFirstMismatch = false)
         {
             using (var e = source.GetEnumerator())
             {
@@ -21,6 +21,10 @@ namespace Extensions.IEnumerableExtensions
                         }
                         else
                         {
+                            if (includeFirstMismatch)
+                            {
+                                list.Add(e.Current);
+                            }
                             yield return list;
                             list = new List<T> { e.Current };
                         }
@@ -31,7 +35,7 @@ namespace Extensions.IEnumerableExtensions
             }
         }
 
-        public static IEnumerable<TOut> GroupAdjacentBy<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TIn, bool> predicate, Func<List<TIn>, TOut> mergeFunc)
+        public static IEnumerable<TOut> GroupAdjacentBy<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TIn, bool> predicate, Func<List<TIn>, TOut> mergeFunc, bool includeFirstMismatch = false)
         {
             using (var e = source.GetEnumerator())
             {
@@ -47,6 +51,10 @@ namespace Extensions.IEnumerableExtensions
                         }
                         else
                         {
+                            if (includeFirstMismatch)
+                            {
+                                list.Add(e.Current);
+                            }
                             yield return mergeFunc(list);
                             list.Clear();
                             list.Add(e.Current);
@@ -58,7 +66,7 @@ namespace Extensions.IEnumerableExtensions
             }
         }
 
-        public static IEnumerable<TOut> GroupAdjacentBy<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, object> comparer, Func<List<TIn>, TOut> mergeFunc)
+        public static IEnumerable<TOut> GroupAdjacentBy<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, object> comparer, Func<List<TIn>, TOut> mergeFunc, bool includeFirstMismatch = false)
         {
             using (var e = source.GetEnumerator())
             {
@@ -74,6 +82,10 @@ namespace Extensions.IEnumerableExtensions
                         }
                         else
                         {
+                            if (includeFirstMismatch)
+                            {
+                                list.Add(e.Current);
+                            }
                             yield return mergeFunc(list);
                             list.Clear();
                             list.Add(e.Current);

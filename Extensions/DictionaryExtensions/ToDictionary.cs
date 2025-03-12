@@ -54,6 +54,30 @@ namespace Extensions.DictionaryExtensions
 
             return dict;
         }
+
+        /// <summary>
+        /// Creates a dictionary from the given enumerable, using the key function to extract keys, and the value function to extract values.
+        /// Works like the normal ToDictionary, but if there are duplicate keys, this version will keep the first item.
+        /// </summary>
+        /// <typeparam name="TI"></typeparam>
+        /// <typeparam name="TK"></typeparam>
+        /// <typeparam name="TV"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="keyFunc"></param>
+        /// <param name="valueFunc"></param>
+        /// <returns></returns>
+        public static Dictionary<TK, TV> ToDictionarySafe<TI, TK, TV>(this IEnumerable<TI> list, Func<TI, TK> keyFunc, Func<TI, TV> valueFunc)
+        {
+            var dict = new Dictionary<TK, TV>();
+            foreach (var element in list)
+            {
+                var key = keyFunc(element);
+                if (dict.ContainsKey(key)) continue;
+                dict.Add(key, valueFunc(element));
+            }
+
+            return dict;
+        }
     }
 
     public enum DictionaryDuplicateKeyHandling

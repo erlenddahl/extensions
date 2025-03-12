@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using Extensions.StringExtensions;
 
 namespace Extensions.Utilities.Csv
 {
@@ -22,6 +24,16 @@ namespace Extensions.Utilities.Csv
         public static IEnumerable<CsvRow> FromFile(string filename, char separator = ';', char quote = '"', bool hasHeaders = true, bool lowercaseHeaders = false)
         {
             return new CsvReader(separator, quote, hasHeaders, lowercaseHeaders).ReadFile(filename);
+        }
+
+        public static IEnumerable<CsvRow> FromString(string csvString, char separator = ';', char quote = '"', bool hasHeaders = true, bool lowercaseHeaders = false)
+        {
+            return new CsvReader(separator, quote, hasHeaders, lowercaseHeaders).ReadString(csvString);
+        }
+
+        public static IEnumerable<CsvRow> FromLines(IEnumerable<string> lines, char separator = ';', char quote = '"', bool hasHeaders = true, bool lowercaseHeaders = false)
+        {
+            return new CsvReader(separator, quote, hasHeaders, lowercaseHeaders).ReadLines(lines);
         }
 
         public IEnumerable<string> SplitRow(string row)
@@ -101,12 +113,17 @@ namespace Extensions.Utilities.Csv
             return System.IO.File.ReadLines(filename).Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Select(p => new CsvRow(p, headers));
         }
 
-        public IEnumerable<CsvRow> ReadLines(string[] lines)
+        public IEnumerable<CsvRow> ReadLines(IEnumerable<string> lines)
         {
             var headers = new Dictionary<string, int>();
             if (_hasHeaders)
                 headers = ParseHeaders(lines.First());
             return lines.Skip(_hasHeaders ? 1 : 0).Select(SplitRow).Where(p => p.Any()).Select(p => new CsvRow(p, headers));
+        }
+
+        public IEnumerable<CsvRow> ReadString(string csvString)
+        {
+            return ReadLines(csvString.GetLines());
         }
 
         public Dictionary<string, int> ReadHeaders(string filename)

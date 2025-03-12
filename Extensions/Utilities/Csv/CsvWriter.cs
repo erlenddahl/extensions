@@ -133,8 +133,14 @@ namespace Extensions.Utilities.Csv
             new CsvWriter(targetPath, separator, quote, replaceNewLinesWith).WriteAllLines(contents);
         }
 
+        public static void Write(string targetPath, IEnumerable<string> headers, IEnumerable<IEnumerable<object>> contents, string separator = ";", string quote = "\"", string replaceNewLinesWith = " ")
+        {
+            new CsvWriter(targetPath, separator, quote, replaceNewLinesWith).WriteAllLines(new[] { headers.Cast<object>() }.Concat(contents));
+        }
+
         public void Dispose()
         {
+            _targetFile?.Flush();
             _targetFile?.Dispose();
         }
     }
