@@ -116,6 +116,11 @@ namespace Extensions.Utilities.Statistics
             return linePrefix + string.Join(separator + linePrefix, GetKeyValues().Select(p => p.Key + ": " + p.Value)) + separator;
         }
 
+        public string PrettyPrint(string header, string separator = "\r\n", string linePrefix = "\t")
+        {
+            return header + Environment.NewLine + ToString(separator, linePrefix);
+        }
+
         public IEnumerable<(string Key, double Value)> GetKeyValues()
         {
             yield return (nameof(Count), Count);
@@ -161,6 +166,47 @@ namespace Extensions.Utilities.Statistics
             var sum = new IncrementalStatistics();
             foreach (var s in stats) sum.Append(s);
             return sum;
+        }
+
+        public IEnumerable<(long x, double y)> BucketsCutOff(double cutoffPercentage = 95)
+        {
+            // Calculate the total count
+            var totalCount = Buckets.Values.Sum();
+
+            // Calculate the cumulative threshold
+            var threshold = (long)(totalCount * (cutoffPercentage / 100.0));
+
+            // Sort the dictionary by key (x value)
+            var sortedData = Buckets.OrderBy(kvp => kvp.Key);
+
+            var cumulativeCount = 0d;
+            var lastXValue = 0L;
+            foreach (var kvp in sortedData)
+            {
+                cumulativeCount += kvp.Value;
+                if (cumulativeCount >= threshold)
+                {
+                    // Once we hit the threshold, we stop and add the "x+" bucket
+                    yield return (lastXValue + 1, sortedData.Where(d => d.Key > lastXValue).Sum(d => d.Value));
+                    yield break; // Stop the iteration
+                }
+
+                yield return (kvp.Key, kvp.Value);
+                lastXValue = kvp.Key;
+            }
+
+            // In case the threshold is never reached (e.g., cutoffPercentage is set very high),
+            // return all data without grouping into "x+"
+        }
+
+        public IEnumerable<(long x, double y)> BucketsMinMax(long min = long.MinValue, long max = long.MaxValue)
+        {
+            return Buckets.GroupBy(p =>
+            {
+                if (p.Key <= min) return min;
+                if (p.Key >= max) return max;
+                return p.Key;
+            }).Select(p => (p.Key, p.Sum(c => c.Value)));
         }
     }
 }

@@ -30,6 +30,13 @@ namespace Extensions.ListExtensions
             return a + slope * distA;
         }
 
+        public static double WeightedAverage(this IEnumerable<MatchingNeighbour<double?>> list)
+        {
+            var a = list.First();
+            var b = list.Last();
+            return WeightedAverage(a.Neighbour.Value, b.Neighbour.Value, a.Distance, b.Distance);
+        }
+
         public static double WeightedAverage(this IEnumerable<MatchingNeighbour<double>> list)
         {
             var a = list.First();

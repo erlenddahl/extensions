@@ -1,5 +1,8 @@
-﻿using System.Globalization;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace Extensions.StringExtensions
 {
@@ -51,6 +54,48 @@ namespace Extensions.StringExtensions
                 return value;
             if (defaultValue != null) return defaultValue.Value;
             throw new InvalidDataException("Couldn't parse the string '" + text + "' to an int.");
+        }
+
+        /// <summary>
+        /// Splits the given text using the given separator, and parses each part as a double using
+        /// the given CultureInfo (or InvariantCulture if none is given).
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="separator"></param>
+        /// <param name="ci"></param>
+        /// <returns></returns>
+        public static double[] Doubles(this string text, char separator, CultureInfo ci = null)
+        {
+            ci = ci ?? CultureInfo.InvariantCulture;
+            return text.Split(separator).Select(p => double.Parse(p, ci)).ToArray();
+        }
+
+        /// <summary>
+        /// Splits the given text into lines, the splits each line using the given separator, and parses each
+        /// part as a double using the given CultureInfo (or InvariantCulture if none is given).
+        /// Returns a 2D array where each row represents the lines in the input string, and the contents
+        /// of each row is the parsed numbers of this row.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="separator"></param>
+        /// <param name="ci"></param>
+        /// <returns></returns>
+        public static double[][] LinesWithDoubles(this string text, char separator, CultureInfo ci = null)
+        {
+            ci = ci ?? CultureInfo.InvariantCulture;
+            return text.Lines().Select(p => p.Doubles(separator, ci)).ToArray();
+        }
+
+        /// <summary>
+        /// Splits the given text using the given separator, and parses each part as an int.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="separator"></param>
+        /// <param name="ci"></param>
+        /// <returns></returns>
+        public static int[] Ints(this string text, char separator)
+        {
+            return text.Split(separator).Select(int.Parse).ToArray();
         }
     }
 }

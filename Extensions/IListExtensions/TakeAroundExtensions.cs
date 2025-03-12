@@ -1,10 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using Extensions.ListExtensions;
 
 namespace Extensions.IListExtensions
 {
     public static class TakeAroundExtensions
     {
+        public static T[] TakeAround<T>(this IList<T> list, int ix, int radius)
+        {
+            var startIx = Math.Max(0, ix - radius);
+            var endIx = Math.Min(list.Count - 1, ix + radius);
+            var count = endIx - startIx + 1;
+            var arr = new T[count];
+            for (var i = 0; i < count; i++)
+            {
+                arr[i] = list[i + startIx];
+            }
+
+            return arr;
+        }
 
         /// <summary>
         /// Returns a list of all elements around the given start index that fulfills the given conditions.

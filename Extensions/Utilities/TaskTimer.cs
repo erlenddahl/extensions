@@ -15,6 +15,9 @@ namespace Extensions.Utilities
         private string _prefix = "";
         private TaskTimer _inner;
 
+        public long ElapsedTicks => _watch.ElapsedTicks;
+        public long ElapsedMs => _watch.ElapsedMilliseconds;
+
         public static double MsPerTick { get; } = 1000d / Stopwatch.Frequency;
 
         public TaskTimer(bool startImmediately = true)
@@ -61,12 +64,17 @@ namespace Extensions.Utilities
         public long Time(string key)
         {
             var elapsed = _watch.ElapsedTicks;
+            AddManual(key, elapsed);
+            return elapsed;
+        }
+
+        public void AddManual(string key, long elapsedTicks)
+        {
             key = _prefix + key;
-            Time(key, elapsed);
-            _inner?.Time(key, elapsed);
+            Time(key, elapsedTicks);
+            _inner?.Time(key, elapsedTicks);
             _inner?.Restart();
             Restart();
-            return elapsed;
         }
 
         private void Time(string key, long elapsed)
@@ -143,10 +151,7 @@ namespace Extensions.Utilities
                 foreach (var kvp in other.Timings)
                 {
                     var key = prefix + kvp.Key;
-                    if (Timings.ContainsKey(key))
-                        Timings[key] += kvp.Value;
-                    else
-                        Timings.Add(key, kvp.Value);
+                    AddManual(key, kvp.Value);
                 }
             }
         }
