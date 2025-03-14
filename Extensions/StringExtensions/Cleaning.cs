@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Extensions.StringExtensions
@@ -14,10 +15,12 @@ namespace Extensions.StringExtensions
         /// Will remove any chars that are not digits or alphabetic characters.
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="alsoAllow">If given, these characters will also be allowed</param>
         /// <returns></returns>
-        public static string CleanAlphaNumeric(this string s)
+        public static string CleanAlphaNumeric(this string s, string alsoAllow = null)
         {
-            return new string(s.ToCharArray().Where(char.IsLetterOrDigit).ToArray());
+            var alsoAllowSet = new HashSet<char>(alsoAllow ?? "");
+            return new string(s.ToCharArray().Where(p => char.IsLetterOrDigit(p) || alsoAllowSet.Contains(p)).ToArray());
         }
 
         /// <summary>

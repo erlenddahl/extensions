@@ -33,6 +33,15 @@ namespace Extensions.Tests.StringExtensions
         }
 
         [TestMethod]
+        public void CleanAlphaNumeric_WithAlsoAllows_Tests()
+        {
+            Assert.AreEqual("", "".CleanAlphaNumeric(":"));
+            Assert.AreEqual("::", ".,;:;:_\"(/¤%)(!%".CleanAlphaNumeric(":"));
+            Assert.AreEqual(";:;:", ".,;:;:_\"(/¤%)(!%".CleanAlphaNumeric(":;"));
+            Assert.AreEqual(";:;:!", ".,;:;:_\"(/¤%)(!%".CleanAlphaNumeric(":!;"));
+        }
+
+        [TestMethod]
         public void CleanNumericTests()
         {
             Assert.AreEqual("", "".CleanNumeric());
