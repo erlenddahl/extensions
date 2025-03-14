@@ -21,7 +21,7 @@ namespace Extensions.Tests.DictionaryExtensions
         public void ToDictionarySafe_Duplicates_AppendNumbers()
         {
             var arr = new int[] { 1, 2, 3, 4, 5, 5 };
-            var d = arr.ToDictionarySafe(k => k.ToString(), v => v);
+            var d = arr.ToDictionarySafe(k => k.ToString(), v => v, DictionaryDuplicateKeyHandling.AppendNumbers);
 
             Assert.AreEqual(6, d.Count);
             for (var i = 1; i < 6; i++)
