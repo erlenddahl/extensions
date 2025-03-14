@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Extensions.Tests.IEnumerableExtensions
 {
     [TestClass]
-    public class Range
+    public class RangeTests
     {
         [TestMethod]
         public void CompressToConsecutiveGroupsTests()
