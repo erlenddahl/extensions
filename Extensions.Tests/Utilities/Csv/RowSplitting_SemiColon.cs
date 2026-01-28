@@ -8,7 +8,7 @@ namespace Extensions.Tests.Utilities.Csv
     [TestClass]
     public class RowSplitting_SemiColon: CsvReader
     {
-        public RowSplitting_SemiColon() : base(';', '\"')
+        public RowSplitting_SemiColon() : base(new CsvSettings() { Separator = ';' })
         {
 
         }

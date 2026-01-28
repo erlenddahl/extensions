@@ -7,29 +7,34 @@ namespace Extensions.Utilities.Csv
 {
     public class CsvRow
     {
-        private readonly Dictionary<string, int> _headers;
+        public Dictionary<string, int> HeaderColumnRelation { get; internal set; }
 
-        public string[] Raw { get; set; }
-        public string[] Headers => _headers.Keys.ToArray();
+        public string[] Raw { get; internal set; }
+        public string[] Headers => HeaderColumnRelation.Keys.ToArray();
+        public string Debug { get; set; }
 
         public string this[int index] => Raw[index];
         public string this[string column] => Raw[GetHeaderIndex(column)];
 
         private int GetHeaderIndex(string column)
         {
-            if (_headers.TryGetValue(column, out var index)) return index;
+            if (HeaderColumnRelation.TryGetValue(column, out var index)) return index;
             throw new KeyNotFoundException("The header '" + column + "' does not exist. See the Headers property for available headers.");
+        }
+
+        public CsvRow()
+        {
         }
 
         public CsvRow(IEnumerable<string> row, Dictionary<string, int> headers)
         {
             Raw = row.ToArray();
-            _headers = headers;
+            HeaderColumnRelation = headers;
         }
 
         public bool HasHeader(string header)
         {
-            return _headers.ContainsKey(header);
+            return HeaderColumnRelation.ContainsKey(header);
         }
 
         public bool TryGetString(int ix, out string value)
@@ -45,7 +50,7 @@ namespace Extensions.Utilities.Csv
         public bool TryGetString(string column, out string value)
         {
             value = null;
-            if (!_headers.TryGetValue(column, out var ix))
+            if (!HeaderColumnRelation.TryGetValue(column, out var ix))
                 return false;
 
             value = Raw[ix];

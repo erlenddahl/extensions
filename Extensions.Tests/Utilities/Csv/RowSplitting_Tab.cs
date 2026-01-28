@@ -8,7 +8,7 @@ namespace Extensions.Tests.Utilities.Csv
     [TestClass]
     public class RowSplitting_Tab: CsvReader
     {
-        public RowSplitting_Tab() : base('\t', '\"')
+        public RowSplitting_Tab() : base(new CsvSettings() { Separator = '\t' })
         {
 
         }

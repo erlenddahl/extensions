@@ -9,7 +9,7 @@ namespace Extensions.Tests.Utilities.Csv
     [TestClass]
     public class RetrieveSingleColumn : CsvReader
     {
-        public RetrieveSingleColumn() : base(';', '\"')
+        public RetrieveSingleColumn() : base(new CsvSettings() { Separator = ';' })
         {
 
         }
