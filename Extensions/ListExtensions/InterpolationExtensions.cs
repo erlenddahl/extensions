@@ -108,12 +108,12 @@ namespace Extensions.ListExtensions
             }
         }
 
-        public static void Interpolate<T>(this IEnumerable<T> list, Func<T, double?> getter, Action<T, double?> setter)
+        public static int Interpolate<T>(this IEnumerable<T> list, Func<T, double?> getter, Action<T, double?> setter)
         {
-            list.Interpolate(p => p == null, getter, setter);
+            return list.Interpolate(p => p == null, getter, setter);
         }
 
-        public static void Interpolate<T>(this IEnumerable<T> list, Func<double?, bool> needsToBeInterpolated, Func<T, double?> getter, Action<T, double?> setter)
+        public static int Interpolate<T>(this IEnumerable<T> list, Func<double?, bool> needsToBeInterpolated, Func<T, double?> getter, Action<T, double?> setter)
         {
             var interpolated = list
                 .Select(getter)
@@ -127,6 +127,8 @@ namespace Extensions.ListExtensions
                     setter(enumerator1.Current, enumerator2.Current);
                 }
             }
+
+            return 0;
         }
     }
 }

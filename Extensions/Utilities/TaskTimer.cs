@@ -122,7 +122,8 @@ namespace Extensions.Utilities
         }
 
         /// <summary>
-        /// Returns timings written in the given format, 
+        /// Returns timings written in the given format.
+        /// Timings are printed as milliseconds.
         /// </summary>
         /// <param name="keyValueFormat">How the keys and values should be formatted (<code>string.Format(keyValueFormat, key, value)</code>)</param>
         /// <param name="lineSeparator">Separator between lines (or not lines)</param>
