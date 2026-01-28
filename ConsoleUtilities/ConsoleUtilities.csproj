@@ -1,70 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{75D521B4-5230-4136-BDBF-A0C03474ECF2}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleUtilities</RootNamespace>
-    <AssemblyName>ConsoleUtilities</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <!-- Let SDK include source files implicitly to avoid duplicate Compile items -->
+  <PropertyGroup>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="ConsoleCommand\ConsoleCommand.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandInterpreter.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandParameter.cs" />
-    <Compile Include="ConsoleCommand\ConsoleCommandParameterType.cs" />
-    <Compile Include="ConsoleCommand\InvalidArgumentException.cs" />
-    <Compile Include="ConsoleCommand\MissingArgumentException.cs" />
-    <Compile Include="ConsoleConfigHelper.cs" />
-    <Compile Include="ConsoleEx.cs" />
-    <Compile Include="ConsoleInfoPanel\CipTimer.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelSnapshot.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\AppendableStringInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ItemBases\ConsoleInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanel.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelExtensions.cs" />
-    <Compile Include="ConsoleInfoPanel\ConsoleInformationPanelTests.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\DateTimeInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\DoubleInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ItemBases\IHideableItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\IntInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\LongInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\ProgressInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\StringInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\Items\UnknownProgressInfoItem.cs" />
-    <Compile Include="ConsoleInfoPanel\ProgressSnapshot.cs" />
-    <Compile Include="ConsoleProgressBar\ConsoleProgressBar.cs" />
-    <Compile Include="IRunnable.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+
+  <ItemGroup><!-- Remove explicit Compile includes; SDK will include *.cs automatically -->
+  
+    <Folder Include="Properties\" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj">
-      <Project>{5699e023-1f37-4394-b50c-36236c8eace2}</Project>
-      <Name>Extensions</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
