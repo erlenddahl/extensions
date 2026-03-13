@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Diagnostics;
 using System.Linq;
 using Extensions;
@@ -16,9 +16,9 @@ namespace SqliteExtensions
     {
         private static bool _debug = false;
 
-        public static long GetLastInsertedRowId(this SQLiteConnection conn)
+        public static long GetLastInsertedRowId(this SqliteConnection conn)
         {
-            return (long)new SQLiteCommand("SELECT last_insert_rowid();", conn).ExecuteScalar();
+            return (long)new SqliteCommand("SELECT last_insert_rowid();", conn).ExecuteScalar();
         }
 
         /// <summary>
@@ -29,9 +29,9 @@ namespace SqliteExtensions
         /// <param name="where"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static long Count(this SQLiteConnection conn, string table, string where = "", params object[] parameters)
+        public static long Count(this SqliteConnection conn, string table, string where = "", params object[] parameters)
         {
-            var cmd = new SQLiteCommand("SELECT COUNT(*) FROM " + table + (string.IsNullOrEmpty(where) ? "" : " WHERE " + where), conn);
+            var cmd = new SqliteCommand("SELECT COUNT(*) FROM " + table + (string.IsNullOrEmpty(where) ? "" : " WHERE " + where), conn);
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
             return (long)cmd.ExecuteScalar();
@@ -45,9 +45,9 @@ namespace SqliteExtensions
         /// <param name="where"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static long EmptyTable(this SQLiteConnection conn, string table, string where = "", params object[] parameters)
+        public static long EmptyTable(this SqliteConnection conn, string table, string where = "", params object[] parameters)
         {
-            var cmd = new SQLiteCommand("DELETE FROM " + table + (string.IsNullOrEmpty(where) ? "" : " WHERE " + where), conn);
+            var cmd = new SqliteCommand("DELETE FROM " + table + (string.IsNullOrEmpty(where) ? "" : " WHERE " + where), conn);
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
             return (long)cmd.ExecuteNonQuery();
@@ -58,7 +58,7 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static IEnumerable<Dictionary<string, object>> Fetch(this SQLiteDataReader reader)
+        public static IEnumerable<Dictionary<string, object>> Fetch(this SqliteDataReader reader)
         {
             while (reader.Read())
             {
@@ -83,7 +83,7 @@ namespace SqliteExtensions
         /// <param name="reader"></param>
         /// <param name="func"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Fetch<T>(this SQLiteDataReader reader, Func<SQLiteDataReader, T> func)
+        public static IEnumerable<T> Fetch<T>(this SqliteDataReader reader, Func<SqliteDataReader, T> func)
         {
             while (reader.Read())
             {
@@ -108,7 +108,7 @@ namespace SqliteExtensions
                 reader.Close();
         }
 
-        public static void PrintDebug(this SQLiteDataReader reader)
+        public static void PrintDebug(this SqliteDataReader reader)
         {
             var vals = new List<string>();
             for (var i = 0; i < reader.FieldCount; i++)
@@ -116,15 +116,15 @@ namespace SqliteExtensions
             Debug.WriteLine(string.Join(Environment.NewLine, vals));
         }
 
-        public static string Info(this SQLiteDataReader reader, int index)
+        public static string Info(this SqliteDataReader reader, int index)
         {
             var isNull = reader.IsDBNull(index);
             return $"[{index}] {reader.GetName(index)}: {(isNull ? "[NULL]" : reader.GetValue(index))} ({(isNull ? "[NULL]" : reader.GetValue(index).GetType().ToString())}, {reader.GetDataTypeName(index)})";
         }
 
-        public static void PrintSQLiteDebug(this string command, SQLiteConnection conn, params object[] parameters)
+        public static void PrintSQLiteDebug(this string command, SqliteConnection conn, params object[] parameters)
         {
-            var cmd = new SQLiteCommand(command, conn);
+            var cmd = new SqliteCommand(command, conn);
 
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
@@ -148,9 +148,9 @@ namespace SqliteExtensions
         /// <param name="conn"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static T FetchSingle<T>(this string command, SQLiteConnection conn, params object[] parameters)
+        public static T FetchSingle<T>(this string command, SqliteConnection conn, params object[] parameters)
         {
-            return new SQLiteCommand(command, conn).FetchSingle<T>(parameters);
+            return new SqliteCommand(command, conn).FetchSingle<T>(parameters);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace SqliteExtensions
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static T FetchSingle<T>(this SQLiteCommand cmd, params object[] parameters)
+        public static T FetchSingle<T>(this SqliteCommand cmd, params object[] parameters)
         {
             return (T)cmd.Fetch(parameters).First().Values.First();
         }
@@ -169,7 +169,7 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static T FetchSingle<T>(this SQLiteDataReader reader)
+        public static T FetchSingle<T>(this SqliteDataReader reader)
         {
             return (T)reader.Fetch().First().Values.First();
         }
@@ -180,7 +180,7 @@ namespace SqliteExtensions
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> Fetch(this SQLiteCommand cmd, params object[] parameters)
+        public static List<Dictionary<string, object>> Fetch(this SqliteCommand cmd, params object[] parameters)
         {
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
@@ -197,7 +197,7 @@ namespace SqliteExtensions
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static IEnumerable<Dictionary<string, object>> FetchAsync(this SQLiteCommand cmd, params object[] parameters)
+        public static IEnumerable<Dictionary<string, object>> FetchAsync(this SqliteCommand cmd, params object[] parameters)
         {
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
@@ -213,7 +213,7 @@ namespace SqliteExtensions
         /// <param name="func"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static IEnumerable<T> FetchAsync<T>(this SQLiteCommand cmd, Func<SQLiteDataReader, T> func, params object[] parameters)
+        public static IEnumerable<T> FetchAsync<T>(this SqliteCommand cmd, Func<SqliteDataReader, T> func, params object[] parameters)
         {
             if (parameters != null && parameters.Any())
                 cmd.PopulateParameters(parameters);
@@ -229,9 +229,9 @@ namespace SqliteExtensions
         /// <param name="conn"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static List<Dictionary<string, object>> Fetch(this string command, SQLiteConnection conn, params object[] parameters)
+        public static List<Dictionary<string, object>> Fetch(this string command, SqliteConnection conn, params object[] parameters)
         {
-            return new SQLiteCommand(command, conn).Fetch(parameters);
+            return new SqliteCommand(command, conn).Fetch(parameters);
         }
 
         /// <summary>
@@ -241,9 +241,9 @@ namespace SqliteExtensions
         /// <param name="conn"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static IEnumerable<Dictionary<string, object>> FetchAsync(this string command, SQLiteConnection conn, params object[] parameters)
+        public static IEnumerable<Dictionary<string, object>> FetchAsync(this string command, SqliteConnection conn, params object[] parameters)
         {
-            return new SQLiteCommand(command, conn).FetchAsync(parameters);
+            return new SqliteCommand(command, conn).FetchAsync(parameters);
         }
 
         /// <summary>
@@ -254,9 +254,9 @@ namespace SqliteExtensions
         /// <param name="func"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static IEnumerable<T> FetchAsync<T>(this string command, SQLiteConnection conn, Func<SQLiteDataReader, T> func, params object[] parameters)
+        public static IEnumerable<T> FetchAsync<T>(this string command, SqliteConnection conn, Func<SqliteDataReader, T> func, params object[] parameters)
         {
-            return new SQLiteCommand(command, conn).FetchAsync(func, parameters);
+            return new SqliteCommand(command, conn).FetchAsync(func, parameters);
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace SqliteExtensions
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static int ExecuteNonQuery(this SQLiteCommand cmd, params object[] parameters)
+        public static int ExecuteNonQuery(this SqliteCommand cmd, params object[] parameters)
         {
             cmd.PopulateParameters(parameters);
 
@@ -279,9 +279,9 @@ namespace SqliteExtensions
         /// <param name="conn"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static int ExecuteNonQuery(this string command, SQLiteConnection conn, params object[] parameters)
+        public static int ExecuteNonQuery(this string command, SqliteConnection conn, params object[] parameters)
         {
-            return new SQLiteCommand(command, conn).ExecuteNonQuery(parameters);
+            return new SqliteCommand(command, conn).ExecuteNonQuery(parameters);
         }
 
         /// <summary>
@@ -290,15 +290,15 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
-        public static SQLiteCommand PopulateParameters(this SQLiteCommand cmd, params object[] parameters)
+        public static SqliteCommand PopulateParameters(this SqliteCommand cmd, params object[] parameters)
         {
             var parId = 0;
             cmd.Parameters.Clear();
             foreach (var par in parameters)
             {
-                var para = new SQLiteParameter("@" + parId++, GetDbType(par))
+                var para = new SqliteParameter("@" + parId++, GetDbType(par))
                 {
-                    Value = par
+                    Value = par ?? DBNull.Value
                 };
                 cmd.Parameters.Add(para);
             }
@@ -316,11 +316,11 @@ namespace SqliteExtensions
             if (o is bool) return DbType.Boolean;
             if (o is int) return DbType.Int32;
             if (o is short) return DbType.Int16;
-            if (o is Single || o is long) return DbType.Single;
+            if (o is Single || o is long) return DbType.Int64;
             if (o is Double) return DbType.Double;
-            if (o is DateTime) return DbType.Date;
+            if (o is DateTime) return DbType.DateTime;
             if (o is string) return DbType.String;
-            if (o == null) return DbType.Int32;
+            if (o == null) return DbType.Object;
 
             throw new NotImplementedException("GetDbType: " + (o == null ? "null" : o.GetType().ToString()));
         }
@@ -331,10 +331,10 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="parameters"></param>
-        public static void AddParameters(this SQLiteCommand cmd, IEnumerable<Tuple<string, object>> parameters)
+        public static void AddParameters(this SqliteCommand cmd, IEnumerable<Tuple<string, object>> parameters)
         {
             foreach (var p in parameters)
-                cmd.Parameters.AddWithValue("@" + p.Item1.CleanAlphaNumeric(), p.Item2);
+                cmd.Parameters.AddWithValue("@" + p.Item1.CleanAlphaNumeric(), p.Item2 ?? DBNull.Value);
         }
 
         /// <summary>
@@ -344,9 +344,9 @@ namespace SqliteExtensions
         /// <param name="conn"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public static int Execute(this string command, SQLiteConnection conn, IEnumerable<Tuple<string, object>> parameters = null)
+        public static int Execute(this string command, SqliteConnection conn, IEnumerable<Tuple<string, object>> parameters = null)
         {
-            var cmd = new SQLiteCommand(command, conn);
+            var cmd = new SqliteCommand(command, conn);
             if (parameters != null) cmd.AddParameters(parameters);
 
             return cmd.ExecuteNonQuery();
@@ -357,7 +357,7 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static int Vacuum(this SQLiteConnection conn)
+        public static int Vacuum(this SqliteConnection conn)
         {
             return "vacuum;".Execute(conn);
         }
@@ -369,7 +369,7 @@ namespace SqliteExtensions
         /// <param name="table"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static int CreateIndex(this SQLiteConnection conn, string table, params string[] columns)
+        public static int CreateIndex(this SqliteConnection conn, string table, params string[] columns)
         {
             return conn.CreateNamedIndex(table, table + "_" + string.Join("_", columns), columns);
         }
@@ -382,7 +382,7 @@ namespace SqliteExtensions
         /// <param name="indexName"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public static int CreateNamedIndex(this SQLiteConnection conn, string table, string indexName, params string[] columns)
+        public static int CreateNamedIndex(this SqliteConnection conn, string table, string indexName, params string[] columns)
         {
             try
             {
@@ -400,12 +400,12 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public static long CountTables(this SQLiteConnection conn)
+        public static long CountTables(this SqliteConnection conn)
         {
             return "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence';".FetchSingle<long>(conn);
         }
 
-        public static string GetStringSafe(this SQLiteDataReader reader, int index)
+        public static string GetStringSafe(this SqliteDataReader reader, int index)
         {
             return reader.IsDBNull(index) ? null : reader.GetString(index);
         }

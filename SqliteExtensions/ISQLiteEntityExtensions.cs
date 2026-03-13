@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -15,10 +15,10 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="conn"></param>
-        public static int InsertAll(this IEnumerable<SQLiteEntity> entities, SQLiteConnection conn)
+        public static int InsertAll(this IEnumerable<SQLiteEntity> entities, SqliteConnection conn)
         {
             var count = 0;
-            SQLiteCommand cmd = null;
+            SqliteCommand cmd = null;
             using (var trans = conn.BeginTransaction())
             {
                 foreach (var entity in entities)
@@ -26,7 +26,7 @@ namespace SqliteExtensions
                     cmd = cmd == null ? entity.GetInsertCommand(conn) : entity.PopulateParameters(cmd);
                     var res = cmd.ExecuteNonQuery();
                     if (res != 1) Debug.WriteLine(res);
-                    entity.Id = conn.LastInsertRowId;
+                    entity.Id = GetLastInsertedRowId(conn);
                     count++;
                 }
                 trans.Commit();
@@ -41,11 +41,11 @@ namespace SqliteExtensions
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="conn"></param>
-        public static int SaveAll(this IEnumerable<SQLiteEntity> entities, SQLiteConnection conn)
+        public static int SaveAll(this IEnumerable<SQLiteEntity> entities, SqliteConnection conn)
         {
             var count = 0;
             bool prevWasInsert = true;
-            SQLiteCommand cmd = null;
+            SqliteCommand cmd = null;
             using (var trans = conn.BeginTransaction())
             {
                 foreach (var entity in entities)
@@ -62,7 +62,7 @@ namespace SqliteExtensions
                     var res = cmd.ExecuteNonQuery();
 
                     if (currIsInsert)
-                        entity.Id = conn.LastInsertRowId;
+                        entity.Id = GetLastInsertedRowId(conn);
 
                     if (res != 1) Debug.WriteLine(res);
                     count++;
@@ -71,6 +71,11 @@ namespace SqliteExtensions
             }
             if (cmd != null) cmd.Dispose();
             return count;
+        }
+
+        private static long GetLastInsertedRowId(SqliteConnection conn)
+        {
+            return (long)new SqliteCommand("SELECT last_insert_rowid();", conn).ExecuteScalar();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +12,12 @@ namespace SqliteExtensions
     {
         public long Id { get; set; }
 
-        protected static IEnumerable<Dictionary<string, object>> InternalFromDb(SQLiteConnection conn, string tableName, string where = "", params object[] parameters)
+        protected static IEnumerable<Dictionary<string, object>> InternalFromDb(SqliteConnection conn, string tableName, string where = "", params object[] parameters)
         {
             return InternalFromDbLight(conn, tableName, "*", where, parameters);
         }
 
-        protected static IEnumerable<Dictionary<string, object>> InternalFromDbLight(SQLiteConnection conn, string tableName, string select = "*", string where = "", params object[] parameters)
+        protected static IEnumerable<Dictionary<string, object>> InternalFromDbLight(SqliteConnection conn, string tableName, string select = "*", string where = "", params object[] parameters)
         {
             if (!string.IsNullOrEmpty(where))
             {
@@ -28,12 +28,12 @@ namespace SqliteExtensions
             return ("SELECT " + select + " FROM " + tableName + where).FetchAsync(conn, parameters);
         }
 
-        public static IEnumerable<T> InternalFromDbQuick<T>(SQLiteConnection conn, string tableName, Func<SQLiteDataReader, T> func, string select = "*", string where = "", params object[] parameters)
+        public static IEnumerable<T> InternalFromDbQuick<T>(SqliteConnection conn, string tableName, Func<SqliteDataReader, T> func, string select = "*", string where = "", params object[] parameters)
         {
             return InternalFromDbQuick(conn, tableName, func, select, where, -1, parameters);
         }
 
-        public static IEnumerable<T> InternalFromDbQuick<T>(SQLiteConnection conn, string tableName, Func<SQLiteDataReader, T> func, string select = "*", string where = "", int limit = -1, params object[] parameters)
+        public static IEnumerable<T> InternalFromDbQuick<T>(SqliteConnection conn, string tableName, Func<SqliteDataReader, T> func, string select = "*", string where = "", int limit = -1, params object[] parameters)
         {
             if (!string.IsNullOrEmpty(where))
             {
@@ -46,36 +46,41 @@ namespace SqliteExtensions
         }
 
         /// <summary>
-        /// Generate an SQLiteCommand for inserting this object into the database.
+        /// Generate an SqliteCommand for inserting this object into the database.
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public abstract SQLiteCommand GetInsertCommand(SQLiteConnection conn);
+        public abstract SqliteCommand GetInsertCommand(SqliteConnection conn);
 
         /// <summary>
         /// Populate the given command with the entity's parameters.
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
-        public abstract SQLiteCommand PopulateParameters(SQLiteCommand cmd);
+        public abstract SqliteCommand PopulateParameters(SqliteCommand cmd);
 
         /// <summary>
-        /// Generate an SQLiteCommand for updating this object in the database.
+        /// Generate an SqliteCommand for updating this object in the database.
         /// </summary>
         /// <param name="conn"></param>
         /// <returns></returns>
-        public abstract SQLiteCommand GetUpdateCommand(SQLiteConnection conn);
+        public abstract SqliteCommand GetUpdateCommand(SqliteConnection conn);
 
-        public void Insert(SQLiteConnection db, bool updateId = true)
+        public void Insert(SqliteConnection db, bool updateId = true)
         {
             GetInsertCommand(db).ExecuteNonQuery();
             if (updateId)
-                Id = db.LastInsertRowId;
+                Id = GetLastInsertedRowId(db);
         }
 
-        protected SQLiteCommand GetDeleteCommand(SQLiteConnection conn, string tableName)
+        private static long GetLastInsertedRowId(SqliteConnection conn)
         {
-            return new SQLiteCommand("DELETE FROM " + tableName + " WHERE id = " + Id, conn);
+            return (long)new SqliteCommand("SELECT last_insert_rowid();", conn).ExecuteScalar();
+        }
+
+        protected SqliteCommand GetDeleteCommand(SqliteConnection conn, string tableName)
+        {
+            return new SqliteCommand("DELETE FROM " + tableName + " WHERE id = " + Id, conn);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,7 +59,7 @@ namespace SqliteExtensions
             return this;
         }
 
-        public void Create(SQLiteConnection conn, bool ifNotExists = true)
+        public void Create(SqliteConnection conn, bool ifNotExists = true)
         {
             var pks = _columns.Count(p => p.PrimaryKey);
 
@@ -69,7 +69,7 @@ namespace SqliteExtensions
             else s = s.Substring(0, s.Length - 1);
             s += Environment.NewLine + ");";
 
-            using (SQLiteCommand cmd = new SQLiteCommand(s, conn))
+            using (SqliteCommand cmd = new SqliteCommand(s, conn))
             {
                 cmd.ExecuteNonQuery();
             }
