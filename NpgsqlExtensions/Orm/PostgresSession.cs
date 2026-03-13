@@ -294,7 +294,8 @@ namespace NpgsqlExtensions.Orm
                 if (pex.SqlState != "42P07") throw;
             }
 
-            var csv = new CsvReader(separator);
+            var csvSettings = new CsvSettings { Separator = separator };
+            var csv = new CsvReader(csvSettings);
 
             var count = 0;
             foreach (var subset in csv.ReadFile(csvPath).Sublists(subsetSize))
