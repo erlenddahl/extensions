@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -22,6 +23,10 @@ namespace DataflowUtilities.ProducerConsumer
         /// The number of milliseconds to wait before checking if the number of buffer items is low enough to keep posting.
         /// </summary>
         public int MaxBufferExceededWaitingTime { get; set; } = 200;
+
+        /// <summary>
+        /// The number of seconds lost while waiting because the buffer was full.
+        /// </summary>
         public double TimeLostToFullBuffer { get; private set; } = 0;
 
         /// <summary>
@@ -37,8 +42,8 @@ namespace DataflowUtilities.ProducerConsumer
         /// <summary>
         /// The most recent exceptions of all consumers that had any exceptions.
         /// </summary>
-        public IEnumerable<(DateTime, Exception)> LastExceptions => Consumers?.Select(p => p.consumer.LastException).Where(p => p.ex != null) ?? new (DateTime, Exception)[0];
-
+        public IEnumerable<(DateTime, Exception)> LastExceptions => Consumers?.Select(p => p.consumer.LastException).Where(p => p.ex != null) ?? Array.Empty<(DateTime, Exception)>();
+        
         /// <summary>
         /// Will be called when an item causes an exception.
         /// </summary>
@@ -64,7 +69,7 @@ namespace DataflowUtilities.ProducerConsumer
 
         public abstract void Run();
 
-        public void Post(TItem item, bool ignoreBufferLimit = false, Action performWhileWaiting = null)
+        public void Post(TItem item, bool ignoreBufferLimit = false, Action? performWhileWaiting = null)
         {
             if (ConsumerCount < 1) throw new Exception("ConsumerCount cannot be less than 1.");
             if (Consumers == null || !Consumers.Any()) Run();
@@ -82,16 +87,16 @@ namespace DataflowUtilities.ProducerConsumer
         /// Sleeps the current thread until the number of items in the buffer is below the allowed number
         /// of items per consumer.
         /// </summary>
-        public void WaitForBufferLimit(Action performWhileWaiting = null)
+        public void WaitForBufferLimit(Action? performWhileWaiting = null)
         {
-            var start = DateTime.Now;
+            var timer = Stopwatch.StartNew();
             while (IsBufferLimitExceeded)
             {
                 performWhileWaiting?.Invoke();
                 Thread.Sleep(MaxBufferExceededWaitingTime);
+                if (Consumers.Any(p => p.task.IsFaulted)) return;
             }
-
-            TimeLostToFullBuffer += DateTime.Now.Subtract(start).TotalSeconds;
+            TimeLostToFullBuffer += timer.ElapsedMilliseconds / 1000d;
         }
 
         public void Complete(bool waitForConsumers = true)

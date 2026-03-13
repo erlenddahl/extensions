@@ -129,7 +129,7 @@ namespace Extensions.Utilities
         /// <param name="lineSeparator">Separator between lines (or not lines)</param>
         /// <param name="reorder">If true, entries will be ordered by their value, descending.</param>
         /// <returns></returns>
-        public string ToString(string keyValueFormat = "{0}: {1}", string lineSeparator = null, bool reorder = false)
+        public string ToString(string keyValueFormat, string lineSeparator = null, bool reorder = false)
         {
             lock (_watch)
             {

@@ -13,6 +13,16 @@ namespace DataflowUtilities.ProducerConsumer
 
         public Func<TState> StateGenerator { get; set; }
 
+        /// <summary>
+        /// Contains all exceptions from all consumers, if <see cref="TrackExceptions"/>> is true. Otherwise null.
+        /// </summary>
+        public List<Exception>? AllExceptions { get; set; }
+
+        /// <summary>
+        /// If set to true, all exceptions from all consumers will be stored in <see cref="AllExceptions"/>.
+        /// </summary>
+        public bool TrackExceptions { get; set; }
+
         public StateConsumerCollection(IEnumerable<TState> states) : base()
         {
             States = states.ToArray();
@@ -27,7 +37,22 @@ namespace DataflowUtilities.ProducerConsumer
         {
             if (States == null || !States.Any())
                 States = Enumerable.Range(0, ConsumerCount).Select(p => StateGenerator()).AsParallel().ToArray();
-            Consumers = States.Select(p => new StateConsumer<TItem, TState>(p)).Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction, OnException))).ToList();
+
+            if (TrackExceptions)
+            {
+                AllExceptions = new List<Exception>();
+            }
+
+            Consumers = States
+                .Select(p => new StateConsumer<TItem, TState>(p))
+                .Select(p => ((ConsumerBase)p, p.Run(Buffer, ConsumeAction, (item, ex) =>
+                {
+                    if (TrackExceptions)
+                    {
+                        AllExceptions.Add(ex);
+                    }
+                    OnException(item, ex);
+                }))).ToList();
         }
     }
 }
