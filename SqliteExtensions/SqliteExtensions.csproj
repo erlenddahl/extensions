@@ -6,15 +6,9 @@
     <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="Stub.System.Data.SQLite.Core.NetFramework" Version="1.0.117.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117.0" />
-    <PackageReference Include="System.Data.SQLite.EF6" Version="1.0.117.0" />
-    <PackageReference Include="System.Data.SQLite.Linq" Version="1.0.117.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Extensions\Extensions.csproj" />
