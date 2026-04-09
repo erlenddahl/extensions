@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions.IEnumerableExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.IEnumerableExtensions

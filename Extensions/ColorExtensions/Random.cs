@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 
-namespace Extensions.ColorExtensions
+namespace net.erlenddahl.Extensions.ColorExtensions
 {
     public static class RandomColors
     {

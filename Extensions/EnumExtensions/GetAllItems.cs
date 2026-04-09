@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.EnumExtensions
+namespace net.erlenddahl.Extensions.EnumExtensions
 {
     public static class EnumItems
     {

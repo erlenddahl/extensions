@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Extensions.DoubleExtensions
+namespace net.erlenddahl.Extensions.DoubleExtensions
 {
     public static class PercentageDifferenceExtensions
     {

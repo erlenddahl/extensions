@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.Utilities.Caching
+namespace net.erlenddahl.Extensions.Utilities.Caching
 {
     /// <summary>
     /// Simple dictionary based cache meant for lazily created singleton values.

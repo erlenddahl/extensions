@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Extensions.IEnumerableExtensions
+namespace net.erlenddahl.Extensions.IEnumerableExtensions
 {
     public static class SafeMaxExtensions
     {

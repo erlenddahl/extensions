@@ -1,5 +1,4 @@
-﻿using Extensions.IntExtensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.IntExtensions
 {

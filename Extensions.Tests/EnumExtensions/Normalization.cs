@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Extensions.DoubleExtensions;
-using Extensions.EnumExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.EnumExtensions

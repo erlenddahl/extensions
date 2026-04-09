@@ -1,5 +1,4 @@
 ﻿using System;
-using Extensions.ArrayExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.ArrayExtensions

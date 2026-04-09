@@ -1,4 +1,4 @@
-﻿namespace Extensions.StringExtensions
+﻿namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class Capitalization
     {

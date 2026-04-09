@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using Extensions.IEnumerableExtensions;
-using Extensions.ListExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.IEnumerableExtensions

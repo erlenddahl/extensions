@@ -1,5 +1,4 @@
 ﻿using System;
-using Extensions.DoubleExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.DoubleExtensions

@@ -1,4 +1,4 @@
-﻿namespace Extensions.Nullable
+﻿namespace net.erlenddahl.Extensions.Nullable
 {
     public static class SafeExtensions
     {

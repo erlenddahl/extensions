@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Extensions.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Reflection

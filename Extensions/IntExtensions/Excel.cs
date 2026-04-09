@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Extensions.IntExtensions
+namespace net.erlenddahl.Extensions.IntExtensions
 {
     public static class Excel
     {

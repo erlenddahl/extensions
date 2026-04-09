@@ -1,6 +1,6 @@
-﻿using Extensions.DoubleExtensions;
+﻿using net.erlenddahl.Extensions.DoubleExtensions;
 
-namespace Extensions.IntExtensions
+namespace net.erlenddahl.Extensions.IntExtensions
 {
     public static class Normalization
     {

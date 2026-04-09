@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Extensions.Tests.IEnumerableExtensions;
-using Extensions.Utilities.Csv;
-using Extensions.Utilities.Statistics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Utilities.Statistics

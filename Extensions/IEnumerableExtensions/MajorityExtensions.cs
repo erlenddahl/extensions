@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions.DictionaryExtensions;
-using Extensions.ListExtensions;
 
-namespace Extensions.IEnumerableExtensions
+namespace net.erlenddahl.Extensions.IEnumerableExtensions
 {
     public static class MajorityExtensions
     {

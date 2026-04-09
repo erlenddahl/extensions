@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using static Extensions.ListExtensions.NeighbourExtensions;
+using static net.erlenddahl.Extensions.ListExtensions.NeighbourExtensions;
 
-namespace Extensions.ListExtensions
+namespace net.erlenddahl.Extensions.ListExtensions
 {
     public static class InterpolationExtensions
     {

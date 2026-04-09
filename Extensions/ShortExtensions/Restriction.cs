@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Extensions.ShortExtensions
+﻿namespace net.erlenddahl.Extensions.ShortExtensions
 {
     public static class Restriction
     {

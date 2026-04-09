@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Extensions.StringExtensions
+namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class LineSplitting
     {

@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using Extensions.StringExtensions;
 
-namespace Extensions.Utilities.Csv
+namespace net.erlenddahl.Extensions.Utilities.Csv
 {
     public class CsvSettings
     {

@@ -5,10 +5,6 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using Extensions;
-using Extensions.IEnumerableExtensions;
-using Extensions.Reflection;
-using Extensions.StringExtensions;
-using Extensions.Utilities.Csv;
 using Npgsql;
 using NpgsqlExtensions.UnnestInserter;
 

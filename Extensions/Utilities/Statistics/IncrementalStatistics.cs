@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Extensions.DateTimeExtensions;
-using Extensions.DictionaryExtensions;
-using Extensions.DoubleExtensions;
-using Extensions.Utilities.Csv;
+using net.erlenddahl.Extensions.DateTimeExtensions;
+using net.erlenddahl.Extensions.Utilities.Csv;
 
-namespace Extensions.Utilities.Statistics
+namespace net.erlenddahl.Extensions.Utilities.Statistics
 {
     public class IncrementalStatistics
     {

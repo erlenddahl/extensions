@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using Extensions.Utilities;
-using Extensions.Utilities.Csv;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Utilities.Csv

@@ -1,4 +1,4 @@
-﻿namespace Extensions.IntExtensions
+﻿namespace net.erlenddahl.Extensions.IntExtensions
 {
     public static class Reversing
     {

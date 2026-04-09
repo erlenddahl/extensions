@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Extensions.DateTimeExtensions;
-using Extensions.TimeSpanExtensions;
-using Extensions.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Utilities

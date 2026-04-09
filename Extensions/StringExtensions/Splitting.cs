@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Extensions.StringExtensions
+namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class Splitting
     {

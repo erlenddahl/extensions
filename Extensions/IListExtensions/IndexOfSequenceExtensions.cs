@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Extensions.IListExtensions
+namespace net.erlenddahl.Extensions.IListExtensions
 {
     public static partial class IndexOfSequenceExtensions
     {

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.TimeSpanExtensions
+namespace net.erlenddahl.Extensions.TimeSpanExtensions
 {
     public static class Rounding
     {

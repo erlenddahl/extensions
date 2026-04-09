@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Extensions.ListExtensions
+namespace net.erlenddahl.Extensions.ListExtensions
 {
     public static class ThinExtensions
     {

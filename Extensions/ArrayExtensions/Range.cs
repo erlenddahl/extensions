@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.ArrayExtensions
+namespace net.erlenddahl.Extensions.ArrayExtensions
 {
     public static class Range
     {

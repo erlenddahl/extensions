@@ -1,6 +1,4 @@
-﻿using Extensions.IEnumerableExtensions;
-using Extensions.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Utilities.MoreMathTests
 {

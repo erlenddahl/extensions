@@ -1,5 +1,4 @@
 using System;
-using Extensions.TimeSpanExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.TimeSpanExtensions

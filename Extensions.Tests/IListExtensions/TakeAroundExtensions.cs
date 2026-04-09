@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Extensions.IListExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.IListExtensions

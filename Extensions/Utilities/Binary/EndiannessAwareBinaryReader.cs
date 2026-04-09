@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Extensions.Utilities.Binary
+namespace net.erlenddahl.Extensions.Utilities.Binary
 {
     public class EndiannessAwareBinaryReader : BinaryReader
     {

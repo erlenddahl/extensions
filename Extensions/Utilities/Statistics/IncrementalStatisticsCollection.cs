@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Extensions.Utilities.Csv;
-using Extensions.Utilities.EqualityComparers;
+using net.erlenddahl.Extensions.Utilities.Csv;
+using net.erlenddahl.Extensions.Utilities.EqualityComparers;
 
-namespace Extensions.Utilities.Statistics
+namespace net.erlenddahl.Extensions.Utilities.Statistics
 {
     public class IncrementalStatisticsCollection
     {

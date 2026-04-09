@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Extensions.DateTimeExtensions
+namespace net.erlenddahl.Extensions.DateTimeExtensions
 {
     public static class IEnumerables
     {

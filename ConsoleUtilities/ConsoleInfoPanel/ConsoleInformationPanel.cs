@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
 using ConsoleUtilities.ConsoleInfoPanel.Items;
-using Extensions.StringExtensions;
 
 namespace ConsoleUtilities.ConsoleInfoPanel
 {

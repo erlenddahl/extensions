@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Extensions.Utilities.Csv
+namespace net.erlenddahl.Extensions.Utilities.Csv
 {
     public class CsvWriter : IDisposable
     {

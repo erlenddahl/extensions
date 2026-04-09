@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Extensions.StringExtensions
+namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class Indices
     {

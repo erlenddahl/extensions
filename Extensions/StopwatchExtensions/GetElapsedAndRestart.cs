@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace Extensions.StopwatchExtensions
+namespace net.erlenddahl.Extensions.StopwatchExtensions
 {
     public static class StopwatchExtensions
     {

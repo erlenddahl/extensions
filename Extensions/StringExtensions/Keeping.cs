@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Extensions.StringExtensions
+namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class Keeping
     {

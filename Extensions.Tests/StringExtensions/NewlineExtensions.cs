@@ -1,5 +1,4 @@
 ﻿using System;
-using Extensions.StringExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.StringExtensions

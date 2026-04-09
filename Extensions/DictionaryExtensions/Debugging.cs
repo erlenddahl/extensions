@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Extensions.DictionaryExtensions
+namespace net.erlenddahl.Extensions.DictionaryExtensions
 {
     public static class Debugging
     {

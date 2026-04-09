@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Extensions.Utilities;
+using net.erlenddahl.Extensions.Utilities;
 
-namespace Extensions.TimeSpanExtensions
+namespace net.erlenddahl.Extensions.TimeSpanExtensions
 {
     public static class Ranges
     {

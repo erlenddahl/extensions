@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Extensions.ListExtensions;
 
-namespace Extensions.IListExtensions
+namespace net.erlenddahl.Extensions.IListExtensions
 {
     public static class TakeAroundExtensions
     {

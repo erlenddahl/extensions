@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Extensions.Utilities.EqualityComparers
+namespace net.erlenddahl.Extensions.Utilities.EqualityComparers
 {
     /// <summary>
     /// Non-generic variant of Jon Skeet's ArrayEqualityComparer for using arrays as Dictionary keys.

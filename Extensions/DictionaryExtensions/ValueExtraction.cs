@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Extensions.DictionaryExtensions
+namespace net.erlenddahl.Extensions.DictionaryExtensions
 {
     public static class ValueExtraction {
         /// <summary>

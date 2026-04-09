@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Extensions.Utilities.Caching
+namespace net.erlenddahl.Extensions.Utilities.Caching
 {
     /// <summary>
     /// A least-recently-used cache stored like a dictionary.

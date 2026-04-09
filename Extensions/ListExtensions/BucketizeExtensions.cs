@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Extensions.IEnumerableExtensions;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 
-namespace Extensions.ListExtensions
+namespace net.erlenddahl.Extensions.ListExtensions
 {
     public static class BucketizeExtensions
     {

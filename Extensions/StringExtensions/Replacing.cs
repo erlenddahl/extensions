@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Extensions.StringExtensions
+namespace net.erlenddahl.Extensions.StringExtensions
 {
     public static class Replacing
     {

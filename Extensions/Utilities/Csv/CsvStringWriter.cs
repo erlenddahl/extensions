@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Extensions.Utilities.Csv
+namespace net.erlenddahl.Extensions.Utilities.Csv
 {
     public class CsvStringWriter : IDisposable
     {

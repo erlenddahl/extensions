@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Extensions.ListExtensions
+namespace net.erlenddahl.Extensions.ListExtensions
 {
     public static class WeightedAverageExtensions
     {

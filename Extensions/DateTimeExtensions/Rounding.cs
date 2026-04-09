@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.DateTimeExtensions
+namespace net.erlenddahl.Extensions.DateTimeExtensions
 {
     public enum RoundingDirection
     {

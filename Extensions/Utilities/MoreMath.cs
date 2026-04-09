@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Extensions.Utilities
+namespace net.erlenddahl.Extensions.Utilities
 {
    public static class MoreMath
     {

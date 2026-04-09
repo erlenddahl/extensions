@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Extensions.DateTimeExtensions;
+using net.erlenddahl.Extensions.DateTimeExtensions;
 
-namespace Extensions.DoubleExtensions
+namespace net.erlenddahl.Extensions.DoubleExtensions
 {
     public static class Rounding
     {

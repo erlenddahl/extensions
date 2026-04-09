@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Extensions.IEnumerableExtensions;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 
-namespace Extensions.DictionaryExtensions
+namespace net.erlenddahl.Extensions.DictionaryExtensions
 {
     public static class BucketizeExtensions
     {

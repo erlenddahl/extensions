@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Extensions.Utilities
+namespace net.erlenddahl.Extensions.Utilities
 {
     public class TaskTimer
     {

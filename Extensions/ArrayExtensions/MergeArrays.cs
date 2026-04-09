@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Extensions.ArrayExtensions
+namespace net.erlenddahl.Extensions.ArrayExtensions
 {
     public static class MergeArrays
     {

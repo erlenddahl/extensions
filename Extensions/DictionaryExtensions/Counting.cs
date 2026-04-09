@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using Extensions.Utilities;
+using net.erlenddahl.Extensions.Utilities;
 
-namespace Extensions.DictionaryExtensions
+namespace net.erlenddahl.Extensions.DictionaryExtensions
 {
     public static class Counting
     {

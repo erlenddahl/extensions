@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Extensions.IEnumerableExtensions
+namespace net.erlenddahl.Extensions.IEnumerableExtensions
 {
     public static class Converting
     {

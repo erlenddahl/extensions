@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Extensions.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.Utilities;

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
-namespace Extensions.ObjectExtensions
+namespace net.erlenddahl.Extensions.ObjectExtensions
 {
     public static class TypeExtensions
     {

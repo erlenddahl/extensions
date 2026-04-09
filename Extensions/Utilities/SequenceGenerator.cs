@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Extensions.Utilities
+namespace net.erlenddahl.Extensions.Utilities
 {
     public class SequenceGenerator : IEnumerable<int>, IEnumerator<int>
     {

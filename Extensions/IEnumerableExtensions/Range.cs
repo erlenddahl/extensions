@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Extensions.Utilities;
+using net.erlenddahl.Extensions.Utilities;
 
-namespace Extensions.IEnumerableExtensions
+namespace net.erlenddahl.Extensions.IEnumerableExtensions
 {
     public static class Range
     {

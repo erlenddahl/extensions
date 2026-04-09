@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
-namespace Extensions.DateTimeExtensions
+namespace net.erlenddahl.Extensions.DateTimeExtensions
 {
     public static class WeekNumber
     {

@@ -1,6 +1,4 @@
-﻿using Extensions.DateTimeExtensions;
-using Extensions.DoubleExtensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Extensions.Tests.DoubleExtensions
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Extensions.ListExtensions
+namespace net.erlenddahl.Extensions.ListExtensions
 {
     public static class MedianExtensions
     {
