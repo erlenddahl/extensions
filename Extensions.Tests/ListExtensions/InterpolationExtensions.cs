@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.ListExtensions;
 
 namespace Extensions.Tests.ListExtensions
 {
@@ -12,7 +13,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new int?[] { 0, 1, 2, null, 4, 5, null, null, 8, 9, null, null, null, null, null, null, 16 };
             var correct = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -24,7 +25,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new int?[] { null, null, null, null, 4, 5, null, null, 8, 9, null, null, null, null, null, null, 16 };
             var correct = new int[] { 4, 4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -36,7 +37,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new int?[] { 0, 1, 2, null, 4, 5, null, null, 8, 9, null, null, null, null, null, null, null };
             var correct = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -48,7 +49,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new int?[] { 0, 1, 2, null, 4, 5, null, null, 8, 9, null };
             var correct = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -72,7 +73,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new int[] { 0, 1, 2, -1, 4, 5, -1, -1, 8, 9, -1, -1, -1, -1, -1, -1, 16 };
             var correct = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p < 0).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p < 0).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -96,7 +97,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { 0, 1, 2, null, 4, 5, null, null, 8, 9, null, null, null, null, null, null, 16 };
             var correct = new double[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -108,7 +109,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { -1, null, 0, null, null, 0.5 };
             var correct = new double[] { -1, -0.5, 0, 0.166667, 0.3333333, 0.5 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i].Value, 0.01);
@@ -120,7 +121,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { null, null, null };
             var correct = new double?[] { null, null, null };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -132,7 +133,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { -1, -5, -3 };
             var correct = new double?[] { null, null, null };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p < 0).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p < 0).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -144,7 +145,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { 1, null, null };
             var correct = new double?[] { 1, 1, 1 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);
@@ -156,7 +157,7 @@ namespace Extensions.Tests.ListExtensions
             var list = new double?[] { null, null, 1 };
             var correct = new double?[] { 1, 1, 1 };
 
-            var interpolated = list.Interpolate(Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
+            var interpolated = list.Interpolate(net.erlenddahl.Extensions.ListExtensions.InterpolationExtensions.WeightedAverage, p => p == null).ToList();
 
             for (var i = 0; i < list.Length; i++)
                 Assert.AreEqual(correct[i], interpolated[i]);

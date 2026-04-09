@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.ListExtensions;
 
 namespace Extensions.Tests.ListExtensions
 {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.Utilities.Caching;
 
 namespace Extensions.Tests.Utilities.Caching
 {

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.IListExtensions;
 
 namespace Extensions.Tests.IListExtensions
 {

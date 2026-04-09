@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using net.erlenddahl.Extensions.DictionaryExtensions;
 
 namespace net.erlenddahl.Extensions.IEnumerableExtensions
 {

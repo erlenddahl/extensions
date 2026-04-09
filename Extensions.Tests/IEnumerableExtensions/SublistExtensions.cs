@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 
 namespace Extensions.Tests.IEnumerableExtensions
 {

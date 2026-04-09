@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using net.erlenddahl.Extensions.DateTimeExtensions;
+using net.erlenddahl.Extensions.DictionaryExtensions;
+using net.erlenddahl.Extensions.DoubleExtensions;
 using net.erlenddahl.Extensions.Utilities.Csv;
 
 namespace net.erlenddahl.Extensions.Utilities.Statistics

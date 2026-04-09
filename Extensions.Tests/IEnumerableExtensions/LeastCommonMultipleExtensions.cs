@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 
 namespace Extensions.Tests.IEnumerableExtensions
 {

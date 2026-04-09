@@ -1,5 +1,6 @@
 ﻿using System;
 using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+using net.erlenddahl.Extensions.TimeSpanExtensions;
 
 namespace ConsoleUtilities.ConsoleInfoPanel.Items
 {

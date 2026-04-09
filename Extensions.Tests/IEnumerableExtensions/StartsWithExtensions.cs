@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.ArrayExtensions;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 
 namespace Extensions.Tests.IEnumerableExtensions
 {

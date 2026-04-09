@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.ArrayExtensions;
 
 namespace Extensions.Tests.ArrayExtensions
 {

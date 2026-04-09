@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading;
-using Extensions;
+using net.erlenddahl.Extensions.TimeSpanExtensions;
 
 //Source: https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54
 namespace ConsoleUtilities.ConsoleProgressBar

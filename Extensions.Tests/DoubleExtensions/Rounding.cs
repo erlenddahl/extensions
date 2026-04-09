@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.DateTimeExtensions;
+using net.erlenddahl.Extensions.DoubleExtensions;
 
 namespace Extensions.Tests.DoubleExtensions
 {

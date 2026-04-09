@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>net.erlenddahl.Extensions</PackageId>
     <RootNamespace>net.erlenddahl.Extensions</RootNamespace>
     <Title>Various extensions</Title>
     <Authors>Erlend Dahl</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/erlenddahl/extensions</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

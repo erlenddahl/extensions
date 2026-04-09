@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.Utilities.Csv;
 
 namespace Extensions.Tests.Utilities.Csv
 {

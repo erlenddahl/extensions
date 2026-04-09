@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Extensions.Tests.IntExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.IntExtensions;
 
 namespace Extensions.Tests.IntExtensions
 {

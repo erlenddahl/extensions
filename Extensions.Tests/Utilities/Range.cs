@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using net.erlenddahl.Extensions.DateTimeExtensions;
+using net.erlenddahl.Extensions.TimeSpanExtensions;
+using net.erlenddahl.Extensions.Utilities;
 
 namespace Extensions.Tests.Utilities
 {
