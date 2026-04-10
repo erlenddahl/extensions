@@ -1,8 +1,7 @@
-﻿using System;
-using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
-using net.erlenddahl.Extensions.TimeSpanExtensions;
+﻿using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+using net.erlenddahl.ConsoleUtilities.Extensions;
 
-namespace ConsoleUtilities.ConsoleInfoPanel.Items
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.Items
 {
     public class UnknownProgressInfoItem : ConsoleInfoItem, IDisposable, IHideableItem
     {

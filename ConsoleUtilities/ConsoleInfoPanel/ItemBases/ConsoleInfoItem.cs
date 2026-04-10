@@ -1,4 +1,4 @@
-﻿namespace ConsoleUtilities.ConsoleInfoPanel.ItemBases
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.ItemBases
 {
     public abstract class ConsoleInfoItem
     {

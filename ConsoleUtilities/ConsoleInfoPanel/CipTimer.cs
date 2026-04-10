@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace ConsoleUtilities.ConsoleInfoPanel
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel
 {
     public class CipTimer : IDisposable
     {

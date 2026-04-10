@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace ConsoleUtilities.ConsoleCommand
+namespace net.erlenddahl.ConsoleUtilities.ConsoleCommand
 {
     public abstract class ConsoleCommand
     {

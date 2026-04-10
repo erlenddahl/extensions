@@ -1,10 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Threading;
-using net.erlenddahl.Extensions.TimeSpanExtensions;
+﻿using System.Text;
+using net.erlenddahl.ConsoleUtilities.Extensions;
 
 //Source: https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54
-namespace ConsoleUtilities.ConsoleProgressBar
+namespace net.erlenddahl.ConsoleUtilities.ConsoleProgressBar
 {
     /// <summary>
     /// An ASCII progress bar

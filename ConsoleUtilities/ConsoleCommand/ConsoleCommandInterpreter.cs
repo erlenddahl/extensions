@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace ConsoleUtilities.ConsoleCommand
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleCommand
 {
     public class ConsoleCommandInterpreter
     {

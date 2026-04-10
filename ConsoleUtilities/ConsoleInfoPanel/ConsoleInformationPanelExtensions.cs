@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ConsoleUtilities.ConsoleInfoPanel
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel
 {
     public static class ConsoleInformationPanelExtensions
     {

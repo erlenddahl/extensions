@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
-using ConsoleUtilities.ConsoleInfoPanel.Items;
-using net.erlenddahl.Extensions.StringExtensions;
+﻿using System.Text;
+using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.Items;
+using net.erlenddahl.ConsoleUtilities.Extensions;
 
-namespace ConsoleUtilities.ConsoleInfoPanel
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel
 {
     public class ConsoleInformationPanel : IDisposable
     {

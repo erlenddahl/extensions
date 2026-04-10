@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace ConsoleUtilities.ConsoleInfoPanel
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel
 {
     public class ConsoleInformationPanelTests
     {

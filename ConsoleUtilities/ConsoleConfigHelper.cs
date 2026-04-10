@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace ConsoleUtilities
+﻿namespace net.erlenddahl.ConsoleUtilities
 {
     public class ConsoleConfigHelper
     {

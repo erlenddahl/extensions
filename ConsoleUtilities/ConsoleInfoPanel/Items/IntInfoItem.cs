@@ -1,7 +1,6 @@
-﻿using System.Threading;
-using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+﻿using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.ItemBases;
 
-namespace ConsoleUtilities.ConsoleInfoPanel.Items
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.Items
 {
     public class IntInfoItem : ConsoleInfoItem
     {

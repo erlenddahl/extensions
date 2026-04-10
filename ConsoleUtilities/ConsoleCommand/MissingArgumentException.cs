@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ConsoleUtilities.ConsoleCommand
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleCommand
 {
     public class MissingArgumentException : Exception
     {

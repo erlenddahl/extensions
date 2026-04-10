@@ -1,4 +1,4 @@
-﻿namespace ConsoleUtilities.ConsoleCommand
+﻿namespace net.erlenddahl.ConsoleUtilities.ConsoleCommand
 {
     public enum ConsoleCommandParameterType
     {

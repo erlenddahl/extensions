@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 
-namespace DataflowUtilities.ProducerConsumer
+namespace Sintef.DataflowUtilities.ProducerConsumer
 {
     public abstract class ConsumerCollectionBase<TItem>
     {

@@ -1,7 +1,6 @@
-﻿using System;
-using ConsoleUtilities.ConsoleInfoPanel.Items;
+﻿using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.Items;
 
-namespace ConsoleUtilities.ConsoleInfoPanel
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel
 {
     public class ProgressSnapshot
     {

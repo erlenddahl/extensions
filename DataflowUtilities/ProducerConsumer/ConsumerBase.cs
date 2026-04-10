@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
-namespace DataflowUtilities.ProducerConsumer
+namespace Sintef.DataflowUtilities.ProducerConsumer
 {
     public abstract class ConsumerBase
     {

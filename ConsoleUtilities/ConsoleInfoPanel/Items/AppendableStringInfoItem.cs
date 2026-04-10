@@ -1,7 +1,6 @@
-﻿using System;
-using ConsoleUtilities.ConsoleInfoPanel.ItemBases;
+﻿using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.ItemBases;
 
-namespace ConsoleUtilities.ConsoleInfoPanel.Items
+namespace net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel.Items
 {
     public class AppendableStringInfoItem : ConsoleInfoItem
     {

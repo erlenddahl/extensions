@@ -1,4 +1,4 @@
-﻿namespace ConsoleUtilities
+﻿namespace net.erlenddahl.ConsoleUtilities
 {
     public interface IRunnable
     {

@@ -1,9 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net472</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+
+    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>net.erlenddahl.ConsoleUtilities</PackageId>
+    <RootNamespace>net.erlenddahl.ConsoleUtilities</RootNamespace>
+    <Title>Console Utilities</Title>
+    <Authors>Erlend Dahl</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/erlenddahl/extensions</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageVersion>1.0.1</PackageVersion>
+
   </PropertyGroup>
 
   <!-- Let SDK include source files implicitly to avoid duplicate Compile items -->
@@ -11,12 +22,7 @@
     <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
   </PropertyGroup>
 
-  <ItemGroup><!-- Remove explicit Compile includes; SDK will include *.cs automatically -->
-  
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

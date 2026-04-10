@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Tasks.Dataflow;
 
-namespace DataflowUtilities.ProducerConsumer
+namespace Sintef.DataflowUtilities.ProducerConsumer
 {
     public class BufferBlockDistinctWrapper<T>
     {

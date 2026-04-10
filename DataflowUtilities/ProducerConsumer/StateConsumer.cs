@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Tasks.Dataflow;
 
-namespace DataflowUtilities.ProducerConsumer
+namespace Sintef.DataflowUtilities.ProducerConsumer
 {
     public class StateConsumer<TItem, TState> : ConsumerBase
     {
