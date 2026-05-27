@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions;
+using net.erlenddahl.Extensions.StringExtensions;
 using Npgsql;
 
-namespace NpgsqlExtensions.Orm
+namespace net.erlenddahl.NpgsqlExtensions.Orm
 {
     public class PostgresOrmTable
     {

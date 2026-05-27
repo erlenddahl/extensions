@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Extensions;
+using net.erlenddahl.Extensions.StringExtensions;
+using net.erlenddahl.Extensions.Utilities.Csv;
 
-namespace NpgsqlExtensions.Orm
+namespace net.erlenddahl.NpgsqlExtensions.Orm
 {
     public class PostgresOrmColumn
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NpgsqlExtensions.Orm;
+using net.erlenddahl.NpgsqlExtensions.Orm;
 
 namespace NpgsqlExtensions.Tests
 {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
 using Npgsql;
 
-namespace NpgsqlExtensions
+namespace net.erlenddahl.NpgsqlExtensions
 {
     public static class NpgsqlCommandExtensions
     {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ConsoleUtilities.ConsoleInfoPanel;
-using ConsoleUtilities.ConsoleProgressBar;
+using net.erlenddahl.ConsoleUtilities.ConsoleInfoPanel;
+using net.erlenddahl.ConsoleUtilities.ConsoleProgressBar;
 
 namespace ConsoleTester
 {

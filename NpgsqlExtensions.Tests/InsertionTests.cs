@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NpgsqlExtensions.Orm;
+using net.erlenddahl.NpgsqlExtensions.Orm;
 
 namespace NpgsqlExtensions.Tests
 {

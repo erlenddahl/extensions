@@ -4,11 +4,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
-using Extensions;
+using net.erlenddahl.Extensions.IEnumerableExtensions;
+using net.erlenddahl.Extensions.Reflection;
+using net.erlenddahl.Extensions.StringExtensions;
+using net.erlenddahl.Extensions.Utilities.Csv;
+using net.erlenddahl.NpgsqlExtensions.UnnestInserter;
 using Npgsql;
-using NpgsqlExtensions.UnnestInserter;
 
-namespace NpgsqlExtensions.Orm
+namespace net.erlenddahl.NpgsqlExtensions.Orm
 {
     public class PostgresOrmSession : IDisposable
     {

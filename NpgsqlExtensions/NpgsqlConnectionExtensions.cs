@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Npgsql;
+﻿using Npgsql;
 
-namespace NpgsqlExtensions
+namespace net.erlenddahl.NpgsqlExtensions
 {
     public static class NpgsqlConnectionExtensions
     {

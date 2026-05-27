@@ -4,7 +4,8 @@ using System.Data;
 using Microsoft.Data.Sqlite;
 using System.Diagnostics;
 using System.Linq;
-using Extensions;
+using net.erlenddahl.Extensions;
+using net.erlenddahl.Extensions.StringExtensions;
 
 namespace SqliteExtensions
 {

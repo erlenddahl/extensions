@@ -1,11 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>net.erlenddahl.NpgsqlExtensions</PackageId>
+    <RootNamespace>net.erlenddahl.NpgsqlExtensions</RootNamespace>
+    <Title>NpgsqlExtensions</Title>
+    <Authors>Erlend Dahl</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/erlenddahl/extensions</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="8.0.9" />
+    <PackageReference Include="net.erlenddahl.Extensions" Version="1.0.1" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

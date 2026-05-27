@@ -1,8 +1,6 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-using Npgsql;
+﻿using Npgsql;
 
-namespace NpgsqlExtensions.Orm
+namespace net.erlenddahl.NpgsqlExtensions.Orm
 {
     public class PostgresOrm
     {
